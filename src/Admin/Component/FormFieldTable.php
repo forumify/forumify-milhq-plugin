@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Admin\Component;
 
 use Doctrine\ORM\QueryBuilder;
 use Forumify\Core\Component\Table\AbstractDoctrineTable;
+use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Milhq\Entity\Form;
 use Forumify\Milhq\Entity\FormField;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -59,7 +60,7 @@ class FormFieldTable extends AbstractDoctrineTable
         ;
     }
 
-    protected function reorderItem(object $entity, string $direction): void
+    protected function reorderItem(SortableEntityInterface $entity, string $direction): void
     {
         $this->repository->reorder(
             $entity,

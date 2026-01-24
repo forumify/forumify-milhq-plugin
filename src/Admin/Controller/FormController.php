@@ -10,6 +10,9 @@ use Forumify\Milhq\Entity\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * @extends AbstractCrudController<Form>
+ */
 #[Route('/forms', 'form')]
 class FormController extends AbstractCrudController
 {

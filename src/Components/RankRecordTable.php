@@ -8,7 +8,7 @@ use Forumify\Milhq\Entity\Record\RankRecord;
 use Symfony\Component\Asset\Packages;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
-#[AsLiveComponent('RankRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
+#[AsLiveComponent('Milhq\\RankRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
 class RankRecordTable extends AbstractRecordTable
 {
     protected array $searchFields = ['rank.name', 'type'];

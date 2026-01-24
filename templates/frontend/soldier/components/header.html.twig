@@ -1,11 +1,14 @@
 <div>
     <h1 class="mb-0 flex gap-2 items-center">
-        {{ user.name }}
-        {% if user.status %}
+        {{ soldier.name }}
+        {% if soldier.status %}
             {% include '@ForumifyMilhqPlugin/frontend/roster/components/status.html.twig' with {
-                status: user.status
+                status: soldier.status
             } only %}
         {% endif %}
     </h1>
-    <p class="text-subtitle">{{ user.rank.name ?? '' }}, {{ user.position.name ?? '' }}</p>
+    {% set subtitle = [soldier.rank.name ?? null, soldier.position.name ?? null]|filter(v => v)|join(', ') %}
+    {% if subtitle is not empty %}
+        <p class="text-subtitle">{{ subtitle }}</p>
+    {% endif %}
 </div>

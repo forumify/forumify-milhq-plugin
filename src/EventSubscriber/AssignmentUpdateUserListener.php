@@ -68,17 +68,17 @@ class AssignmentUpdateUserListener
         }
     }
 
-    private function getPrevious(Soldier $user, AssignmentRecord $record): callable
+    private function getPrevious(Soldier $soldier, AssignmentRecord $record): callable
     {
         return fn(string $thing): ?AssignmentRecord => $this->assignmentRecordRepository
             ->createQueryBuilder('ar')
             ->where('ar.type = :type')
             ->andWhere('ar != :record')
-            ->andWhere('ar.user = :user')
+            ->andWhere('ar.soldier = :soldier')
             ->andWhere("ar.$thing IS NOT NULL")
             ->setParameter('record', $record)
             ->setParameter('type', 'primary')
-            ->setParameter('user', $user)
+            ->setParameter('soldier', $soldier)
             ->orderBy('ar.createdAt', 'DESC')
             ->setMaxResults(1)
             ->getQuery()

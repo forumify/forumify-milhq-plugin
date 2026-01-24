@@ -22,7 +22,7 @@ class RecordFormController extends AbstractController
     ) {
     }
 
-    #[Route('/users/create-record/{type}', 'record_form')]
+    #[Route('/soldiers/create-record/{type}', 'record_form')]
     public function __invoke(
         Request $request,
         string $type
@@ -31,16 +31,16 @@ class RecordFormController extends AbstractController
 
         $data = ['created_at' => new DateTime()];
 
-        $userIds = $request->query->get('users', '');
-        $userIds = array_filter(explode(',', $userIds));
-        if (!empty($userIds)) {
-            $data['users'] = $this->soldierRepository->findBy(['id' => $userIds]);
+        $soldierIds = $request->query->get('soldiers', '');
+        $soldierIds = array_filter(explode(',', $soldierIds));
+        if (!empty($soldierIds)) {
+            $data['soldiers'] = $this->soldierRepository->findBy(['id' => $soldierIds]);
         }
 
         $form = $this->createForm(RecordType::class, $data, ['type' => $type]);
         $form->handleRequest($request);
         if (!$form->isSubmitted() || !$form->isValid()) {
-            return $this->render('@ForumifyMilhqPlugin/admin/users/record_form.html.twig', [
+            return $this->render('@ForumifyMilhqPlugin/admin/soldiers/record_form.html.twig', [
                 'form' => $form->createView(),
                 'type' => $type,
             ]);
@@ -52,10 +52,10 @@ class RecordFormController extends AbstractController
             $this->recordService->createRecord($type, $data);
         } catch (SoldierNotFoundException) {
             $this->addFlash('error', 'milhq.admin.requires_milhq_account');
-            return $this->redirectToRoute('milhq_admin_user_list');
+            return $this->redirectToRoute('milhq_admin_soldier_list');
         }
 
-        $this->addFlash('success', 'milhq.admin.users.record_form.created');
-        return $this->redirectToRoute('milhq_admin_user_list');
+        $this->addFlash('success', 'milhq.admin.soldiers.record_form.created');
+        return $this->redirectToRoute('milhq_admin_soldier_list');
     }
 }

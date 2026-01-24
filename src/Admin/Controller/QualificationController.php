@@ -11,12 +11,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * @extends AbstractCrudController<Qualification>
+ */
 #[Route('/qualifications', 'qualification')]
 #[IsGranted('forumify-milhq.admin.organization.view')]
 class QualificationController extends AbstractCrudController
 {
-    protected string $listTemplate = '@ForumifyMilhqPlugin/admin/crud/list.html.twig';
-
     protected ?string $permissionView = 'forumify-milhq.admin.organization.qualifications.view';
     protected ?string $permissionCreate = 'forumify-milhq.admin.organization.qualifications.create';
     protected ?string $permissionEdit = 'forumify-milhq.admin.organization.qualifications.manage';

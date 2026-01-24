@@ -11,6 +11,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * @extends AbstractCrudController<Award>
+ */
 #[Route('/awards', 'award')]
 #[IsGranted('forumify-milhq.admin.organization.awards.view')]
 class AwardController extends AbstractCrudController

@@ -24,13 +24,13 @@ class AdminMenuBuilder implements AdminMenuBuilderInterface
     {
         $u = $this->urlGenerator->generate(...);
 
-        $menu = new Menu('MILHQ', ['icon' => 'ph ph-shield-chevron', 'permission' => 'forumify-milhq.admin.view'], [
+        $milhq = new Menu('MILHQ', ['icon' => 'ph ph-shield-chevron', 'permission' => 'forumify-milhq.admin.view'], [
             new MenuItem('Configuration', $u('milhq_admin_configuration'), ['icon' => 'ph ph-wrench', 'permission' => 'forumify-milhq.admin.configuration.manage']),
-            new MenuItem('Users', $u('milhq_admin_user_list'), ['icon' => 'ph ph-users', 'permission' => 'forumify-milhq.admin.users.view']),
+            new MenuItem('Soldiers', $u('milhq_admin_soldier_list'), ['icon' => 'ph ph-users', 'permission' => 'forumify-milhq.admin.soldiers.view']),
         ]);
 
         if ($this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', 'premium')) {
-            $menu
+            $milhq
                 ->addItem(new MenuItem('Operations', $u('milhq_admin_operations_list'), [
                     'icon' => 'ph ph-airplane-takeoff',
                     'permission' => 'forumify-milhq.admin.operations.view',
@@ -46,9 +46,9 @@ class AdminMenuBuilder implements AdminMenuBuilderInterface
         foreach ($this->formRepository->findAll() as $form) {
             $submissionMenu->addItem(new MenuItem($form->getName(), $u('milhq_admin_submission_list', ['form' => $form->getId()])));
         }
-        $menu->addItem($submissionMenu);
+        $milhq->addItem($submissionMenu);
 
-        $menu->addItem(new Menu('Records', ['icon' => 'ph ph-files', 'permission' => 'forumify-milhq.admin.records.view'], [
+        $milhq->addItem(new Menu('Records', ['icon' => 'ph ph-files', 'permission' => 'forumify-milhq.admin.records.view'], [
             new MenuItem('Service Records', $u('milhq_admin_service_records_list'), ['permission' => 'forumify-milhq.admin.records.service_records.view']),
             new MenuItem('Award Records', $u('milhq_admin_award_records_list'), ['permission' => 'forumify-milhq.admin.records.award_records.view']),
             new MenuItem('Combat Records', $u('milhq_admin_combat_records_list'), ['permission' => 'forumify-milhq.admin.records.combat_records.view']),
@@ -57,7 +57,7 @@ class AdminMenuBuilder implements AdminMenuBuilderInterface
             new MenuItem('Qualification Records', $u('milhq_admin_qualification_records_list'), ['permission' => 'forumify-milhq.admin.records.qualification_records.view']),
         ]));
 
-        $menu->addItem(new Menu('Organization', ['icon' => 'ph ph-buildings', 'permission' => 'forumify-milhq.admin.organization.view'], [
+        $milhq->addItem(new Menu('Organization', ['icon' => 'ph ph-buildings', 'permission' => 'forumify-milhq.admin.organization.view'], [
             new MenuItem('Awards', $u('milhq_admin_award_list'), ['permission' => 'forumify-milhq.admin.organization.awards.view']),
             new MenuItem('Documents', $u('milhq_admin_document_list'), ['permission' => 'forumify-milhq.admin.organization.documents.view']),
             new MenuItem('Forms', $u('milhq_admin_form_list'), ['permission' => 'forumify-milhq.admin.organization.forms.view']),
@@ -70,11 +70,6 @@ class AdminMenuBuilder implements AdminMenuBuilderInterface
             new MenuItem('Units', $u('milhq_admin_unit_list'), ['permission' => 'forumify-milhq.admin.organization.units.view']),
         ]));
 
-        $menu->addItem(new MenuItem('Sync', $u('milhq_admin_sync'), [
-            'icon' => 'ph ph-link',
-            'permission' => 'forumify-milhq.admin.run_sync',
-        ]));
-
-        $menu->addItem($menu);
+        $menu->addItem($milhq);
     }
 }

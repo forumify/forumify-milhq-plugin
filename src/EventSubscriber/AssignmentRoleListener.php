@@ -132,7 +132,7 @@ class AssignmentRoleListener
             ->where('ar.type = :type')
             ->andWhere('ar.soldier = :soldier')
             ->setParameter('type', AssignmentRecord::TYPE_SECONDARY)
-            ->setParameter('user', $soldier)
+            ->setParameter('soldier', $soldier)
         ;
 
         if ($ignore !== null) {

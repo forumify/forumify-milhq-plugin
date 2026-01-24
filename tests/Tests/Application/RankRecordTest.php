@@ -20,12 +20,12 @@ class RankRecordTest extends MilhqWebTestCase
     {
         $targetUser = SoldierFactory::createOne();
 
-        $c = $this->client->request('GET', '/admin/soldier/records/rank');
+        $c = $this->client->request('GET', '/admin/milhq/records/rank');
         $newRecordLink = $c->filter('a[aria-label="New rank record"]')->link();
         $this->client->click($newRecordLink);
 
         $this->client->submitForm('Save', [
-            'record[users]' => [$targetUser->getId()],
+            'record[soldiers]' => [$targetUser->getId()],
             'record[type]' => 'promotion',
             'record[rank]' => MilsimStory::rankPVT()->getId(),
         ]);

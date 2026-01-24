@@ -21,8 +21,8 @@ class DischargeController extends AbstractController
     ) {
     }
 
-    #[Route('/users/{id}/discharge', 'user_discharge')]
-    #[IsGranted('forumify-milhq.admin.user.discharge')]
+    #[Route('/users/{id}/discharge', 'soldier_discharge')]
+    #[IsGranted('forumify-milhq.admin.soldiers.discharge')]
     public function __invoke(Request $request, Soldier $soldier): Response
     {
         $discharge = new Discharge($soldier);
@@ -35,10 +35,10 @@ class DischargeController extends AbstractController
             $this->dischargeService->discharge($discharge);
 
             $this->addFlash('success', 'Discharged user.');
-            return $this->redirectToRoute('milhq_admin_user_list');
+            return $this->redirectToRoute('milhq_admin_soldier_list');
         }
 
-        return $this->render('@ForumifyMilhqPlugin/admin/users/edit/discharge.html.twig', [
+        return $this->render('@ForumifyMilhqPlugin/admin/soldiers/edit/discharge.html.twig', [
             'form' => $form,
             'soldier' => $soldier,
         ]);

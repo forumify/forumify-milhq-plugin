@@ -1,6 +1,6 @@
 <div id="submissions" class="grid-12 gap-4">
     <div class="col-xs-12 col-sm-6 col-md-7">
-        {{ component('SubmissionList', { soldierId: soldier.id }) }}
+        {{ component('Milhq\\SubmissionList', { soldierId: soldier.id }) }}
     </div>
     <div class="col-xs-12 col-sm-6 col-md-5 flex flex-col gap-2">
         {% if plugin_version('forumify/forumify-milhq-plugin', 'premium') and setting('milhq.report_in.enabled') %}

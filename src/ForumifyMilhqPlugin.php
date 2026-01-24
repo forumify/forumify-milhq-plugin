@@ -19,7 +19,7 @@ class ForumifyMilhqPlugin extends AbstractForumifyPlugin
             'forumify',
             'forumify MILHQ - Personnel & Unit Management.',
             'https://forumify.net',
-            'milhq_admin_settings',
+            'milhq_admin_configuration',
         );
     }
 

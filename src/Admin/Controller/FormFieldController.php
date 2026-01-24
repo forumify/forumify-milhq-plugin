@@ -16,6 +16,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * @extends AbstractCrudController<FormField>
+ */
 #[Route('/forms/{formId}/fields', 'form_field')]
 #[IsGranted('forumify-milhq.admin.organization.forms.manage')]
 class FormFieldController extends AbstractCrudController
@@ -42,7 +45,7 @@ class FormFieldController extends AbstractCrudController
 
     protected function getTableName(): string
     {
-        return 'MilhqFormFieldTable';
+        return 'Milhq\\FormFieldTable';
     }
 
     protected function getForm(?object $data): FormInterface

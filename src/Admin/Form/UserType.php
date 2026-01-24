@@ -63,15 +63,15 @@ class UserType extends AbstractType
             ->add('rank', EntityType::class, [
                 'choice_label' => 'name',
                 'class' => Rank::class,
-                'help' => 'milhq.admin.users.edit.rank_help',
+                'help' => 'milhq.admin.soldiers.edit.rank_help',
                 'required' => false,
             ])
             ->add('createdAt', DateType::class, [
-                'help' => 'milhq.admin.users.edit.created_at_help',
+                'help' => 'milhq.admin.soldiers.edit.created_at_help',
                 'widget' => 'single_text',
             ])
             ->add('steamId', NumberType::class, [
-                'help' => 'milhq.admin.users.edit.steam_id_help',
+                'help' => 'milhq.admin.soldiers.edit.steam_id_help',
                 'help_html' => true,
                 'required' => false,
             ])

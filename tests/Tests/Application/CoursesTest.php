@@ -83,7 +83,7 @@ class CoursesTest extends MilhqWebTestCase
 
         QualificationRecordFactory::createOne([
             'qualification' => MilsimStory::qualificationLandNav(),
-            'user' => $soldier,
+            'soldier' => $soldier,
         ]);
 
         $render = $this
@@ -115,7 +115,7 @@ class CoursesTest extends MilhqWebTestCase
 
         self::assertResponseIsSuccessful();
 
-        $qualificationRecords = self::getContainer()->get(QualificationRecordRepository::class)->findBy(['user' => $soldier->getId()]);
+        $qualificationRecords = self::getContainer()->get(QualificationRecordRepository::class)->findBy(['soldier' => $soldier->getId()]);
         $realQualifications = array_map(fn ($record) => $record->getQualification()->getName(), $qualificationRecords);
         foreach (['Land Navigation', 'Combat Life Saver'] as $expected) {
             self::assertContains($expected, $realQualifications);

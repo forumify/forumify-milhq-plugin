@@ -22,6 +22,7 @@ use Forumify\Milhq\Repository\SoldierRepository;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: SoldierRepository::class)]
+#[ORM\Table(name: 'milhq_soldier')]
 #[UniqueEntity('user', errorPath: 'user')]
 class Soldier
 {
@@ -39,7 +40,7 @@ class Soldier
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Rank $rank = null;
 
-    #[ORM\ManyToOne(targetEntity: Unit::class, inversedBy: 'users', fetch: 'EAGER')]
+    #[ORM\ManyToOne(targetEntity: Unit::class, inversedBy: 'soldiers', fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Unit $unit = null;
 
@@ -61,22 +62,22 @@ class Soldier
     #[ORM\Column(nullable: true)]
     private ?string $uniform = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ServiceRecord::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: ServiceRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $serviceRecords;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: AwardRecord::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: AwardRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $awardRecords;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: CombatRecord::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: CombatRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $combatRecords;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: RankRecord::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: RankRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $rankRecords;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: AssignmentRecord::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: AssignmentRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $assignmentRecords;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: QualificationRecord::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: QualificationRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $qualificationRecords;
 
     #[ORM\OneToOne(targetEntity: Topic::class)]

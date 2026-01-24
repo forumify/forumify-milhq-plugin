@@ -6,7 +6,7 @@
         <a href="{{ path('milhq_admin_submission_list', { form: submission.form.id }) }}">
             {{ submission.form.name }}
         </a> &gt;
-        {{ submission.user.name }}
+        {{ submission.soldier.name }}
     </div>
     <h1 class="flex items-center gap-2 mb-4">
         {{ submission.form.name }}
@@ -22,8 +22,8 @@
             <div class="box">
                 <div class="mb-2">
                     <p class="text-bold">{{ 'milhq.admin.submissions.view.user'|trans }}</p>
-                    <a href="{{ path('milhq_admin_user_edit', { identifier: submission.user.id }) }}">
-                        {{ submission.user.name }}
+                    <a href="{{ path('milhq_admin_soldier_edit', { identifier: submission.soldier.id }) }}">
+                        {{ submission.soldier.name }}
                     </a>
                 </div>
                 {% include '@ForumifyMilhqPlugin/components/submission.html.twig' %}

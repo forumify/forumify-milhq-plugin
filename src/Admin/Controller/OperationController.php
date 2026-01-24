@@ -11,6 +11,9 @@ use Forumify\Plugin\Attribute\PluginVersion;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * @extends AbstractCrudController<Operation>
+ */
 #[PluginVersion('forumify/forumify-milhq-plugin', 'premium')]
 #[Route('/operations', 'operations')]
 class OperationController extends AbstractCrudController

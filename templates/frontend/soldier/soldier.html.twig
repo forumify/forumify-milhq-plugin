@@ -1,62 +1,62 @@
 {% extends '@Forumify/frontend/base.html.twig' %}
 {% block title_page %}
-    {% if user.rank %}{{ user.rank.abbreviation }} {% endif %}{{ user.name }}
+    {% if soldier.rank %}{{ soldier.rank.abbreviation }} {% endif %}{{ soldier.name }}
 {% endblock %}
 {% block body %}
     <div class="flex justify-between mb-6">
         {% include '@ForumifyMilhqPlugin/frontend/soldier/components/header.html.twig' %}
-        {% if user.user is not null %}
-            <a class="btn-primary" href="{{ path('forumify_forum_profile', { username: user.user.username }) }}">
-                {{ 'milhq.user.forum_profile'|trans }}
+        {% if soldier.user is not null %}
+            <a class="btn-primary" href="{{ path('forumify_forum_profile', { username: soldier.user.username }) }}">
+                {{ 'milhq.soldier.forum_profile'|trans }}
             </a>
         {% endif %}
     </div>
-    {% if user.uniform %}
+    {% if soldier.uniform %}
         <div class="text-center mb-4">
-            <img style="max-height: 530px; max-width: 100%" src="{{ asset(user.uniform, 'milhq.asset') }}">
+            <img style="max-height: 530px; max-width: 100%" src="{{ asset(soldier.uniform, 'milhq.asset') }}">
         </div>
     {% endif %}
     <div class="grid gap-4">
         <div class="col-xs-12 col-md-4 col-xl-3 flex flex-col gap-4">
-            {% if user.rank %}
+            {% if soldier.rank %}
                 <div class="card hide-phone">
-                    <div class="card-title">{{ 'milhq.user.rank'|trans }}</div>
+                    <div class="card-title">{{ 'milhq.soldier.rank'|trans }}</div>
                     <div class="card-body flex flex-col items-center">
-                        {% if user.rank.image %}
-                            <img width="125px" height="auto" src="{{ asset(user.rank.image, 'milhq.asset') }}" alt="">
+                        {% if soldier.rank.image %}
+                            <img width="125px" height="auto" src="{{ asset(soldier.rank.image, 'milhq.asset') }}" alt="">
                         {% endif %}
                         <div class="text-small text-center">
-                            <p>{{ user.rank.name }}</p>
-                            <span class="text-bold">{{ user.rank.paygrade }}</span> | {{ user.rank.abbreviation }}
+                            <p>{{ soldier.rank.name }}</p>
+                            <span class="text-bold">{{ soldier.rank.paygrade }}</span> | {{ soldier.rank.abbreviation }}
                         </div>
                     </div>
                 </div>
             {% endif %}
             <div class="card">
-                <div class="card-title">{{ 'milhq.user.assignment'|trans }}</div>
+                <div class="card-title">{{ 'milhq.soldier.assignment'|trans }}</div>
                 <div class="card-body">
                     <div class="flex flex-col gap-2">
-                        {% if user.specialty %}
+                        {% if soldier.specialty %}
                             <div>
-                                <p class="text-bold">{{ 'milhq.user.specialty'|trans }}</p>
-                                <p>{{ user.specialty.name }}</p>
+                                <p class="text-bold">{{ 'milhq.soldier.specialty'|trans }}</p>
+                                <p>{{ soldier.specialty.name }}</p>
                             </div>
                         {% endif %}
-                        {% if user.unit %}
+                        {% if soldier.unit %}
                             <div>
-                                <p class="text-bold">{{ 'milhq.user.unit'|trans }}</p>
-                                <p>{{ user.unit.name }}</p>
+                                <p class="text-bold">{{ 'milhq.soldier.unit'|trans }}</p>
+                                <p>{{ soldier.unit.name }}</p>
                             </div>
                         {% endif %}
-                        {% if user.position %}
+                        {% if soldier.position %}
                             <div>
-                                <p class="text-bold">{{ 'milhq.user.position'|trans }}</p>
-                                <p>{{ user.position.name }}</p>
+                                <p class="text-bold">{{ 'milhq.soldier.position'|trans }}</p>
+                                <p>{{ soldier.position.name }}</p>
                             </div>
                         {% endif %}
                         {% if supervisors is not empty %}
                             <div>
-                                <p class="text-bold">{{ 'milhq.user.supervisors'|trans }}</p>
+                                <p class="text-bold">{{ 'milhq.soldier.supervisors'|trans }}</p>
                                 <ul>
                                     {% for supervisor in supervisors %}
                                         <li>{{ supervisor.rank.abbreviation|default('') }} {{ supervisor.name }}</li>
@@ -69,10 +69,10 @@
             </div>
             {% if tis or tig %}
                 <div class="card">
-                    <div class="card-title">{{ 'milhq.user.length_in_service'|trans }}</div>
+                    <div class="card-title">{{ 'milhq.soldier.length_in_service'|trans }}</div>
                     <div class="card-body flex flex-col">
                         {% if tis %}
-                            <p class="text-bold">{{ 'milhq.user.time_in_service'|trans }}</p>
+                            <p class="text-bold">{{ 'milhq.soldier.time_in_service'|trans }}</p>
                             <p class="mb-2">
                                 {{ [
                                     'date_relative.years'|trans({ count: tis.format('%y') }),
@@ -82,7 +82,7 @@
                             </p>
                         {% endif %}
                         {% if tig %}
-                            <p class="text-bold">{{ 'milhq.user.time_in_grade'|trans }}</p>
+                            <p class="text-bold">{{ 'milhq.soldier.time_in_grade'|trans }}</p>
                             <p class="mb-2">
                                 {{ [
                                     'date_relative.years'|trans({ count: tig.format('%y') }),
@@ -97,13 +97,13 @@
             {% if setting('milhq.report_in.enabled') %}
                 <div class="card">
                     <div class="card-title">
-                        {{ 'milhq.user.last_report_in'|trans }}
+                        {{ 'milhq.soldier.last_report_in'|trans }}
                     </div>
                     <div class="card-body">
                         {% if reportInDate is not null %}
                             {{ reportInDate|format_date }}
                         {% else %}
-                            {{ 'milhq.user.no_report_in'|trans }}
+                            {{ 'milhq.soldier.no_report_in'|trans }}
                         {% endif %}
                     </div>
                 </div>
@@ -113,35 +113,35 @@
         <div class="col-xs-12 col-md-8 col-xl-9">
             {% embed '@Forumify/components/tabs.html.twig' %}
                 {% block tabs %}
-                    <button class="btn-link" data-tab-id="assignment">{{ 'milhq.user.profile'|trans }}</button>
-                    <button class="btn-link" data-tab-id="service-record">{{ 'milhq.user.service_record'|trans }}</button>
-                    <button class="btn-link" data-tab-id="award-record">{{ 'milhq.user.award_record'|trans }}</button>
-                    <button class="btn-link" data-tab-id="combat-record">{{ 'milhq.user.combat_record'|trans }}</button>
-                    <button class="btn-link" data-tab-id="rank-record">{{ 'milhq.user.rank_record'|trans }}</button>
-                    <button class="btn-link" data-tab-id="assignment-record">{{ 'milhq.user.assignment_record'|trans }}</button>
-                    <button class="btn-link" data-tab-id="qualification-record">{{ 'milhq.user.qualifications'|trans }}</button>
+                    <button class="btn-link" data-tab-id="assignment">{{ 'milhq.soldier.profile'|trans }}</button>
+                    <button class="btn-link" data-tab-id="service-record">{{ 'milhq.soldier.service_record'|trans }}</button>
+                    <button class="btn-link" data-tab-id="award-record">{{ 'milhq.soldier.award_record'|trans }}</button>
+                    <button class="btn-link" data-tab-id="combat-record">{{ 'milhq.soldier.combat_record'|trans }}</button>
+                    <button class="btn-link" data-tab-id="rank-record">{{ 'milhq.soldier.rank_record'|trans }}</button>
+                    <button class="btn-link" data-tab-id="assignment-record">{{ 'milhq.soldier.assignment_record'|trans }}</button>
+                    <button class="btn-link" data-tab-id="qualification-record">{{ 'milhq.soldier.qualifications'|trans }}</button>
                 {% endblock %}
                 {% block tabpanels %}
                     <div id="assignment">
                         {% include '@ForumifyMilhqPlugin/frontend/soldier/components/assignment.html.twig' %}
                     </div>
                     <div id="service-record">
-                        {{ component('ServiceRecordTable', { user: user }) }}
+                        {{ component('Milhq\\ServiceRecordTable', { soldier: soldier }) }}
                     </div>
                     <div id="award-record">
-                        {{ component('AwardRecordTable', { user: user }) }}
+                        {{ component('Milhq\\AwardRecordTable', { soldier: soldier }) }}
                     </div>
                     <div id="combat-record">
-                        {{ component('CombatRecordTable', { user: user }) }}
+                        {{ component('Milhq\\CombatRecordTable', { soldier: soldier }) }}
                     </div>
                     <div id="rank-record">
-                        {{ component('RankRecordTable', { user: user }) }}
+                        {{ component('Milhq\\RankRecordTable', { soldier: soldier }) }}
                     </div>
                     <div id="assignment-record">
-                        {{ component('AssignmentRecordTable', { user: user }) }}
+                        {{ component('Milhq\\AssignmentRecordTable', { soldier: soldier }) }}
                     </div>
                     <div id="qualification-record">
-                        {{ component('QualificationRecordTable', { user: user }) }}
+                        {{ component('Milhq\\QualificationRecordTable', { soldier: soldier }) }}
                     </div>
                 {% endblock %}
             {% endembed %}

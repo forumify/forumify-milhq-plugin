@@ -31,11 +31,11 @@ class EnlistmentTest extends MilhqWebTestCase
 
         $submission = self::getContainer()->get(FormSubmissionRepository::class)->findOneBy([
             'form' => MilsimStory::formEnlistment()->getId(),
-            'user' => $soldier,
+            'soldier' => $soldier,
         ]);
         self::assertNotNull($submission);
 
-        $this->client->request('GET', '/soldier/enlist');
+        $this->client->request('GET', '/milhq/enlist');
         self::assertAnySelectorTextContains('p', 'Your enlistment is being processed');
         self::assertAnySelectorTextSame('a', 'View enlistment topic');
         self::assertAnySelectorTextSame('a', 'Start another enlistment');

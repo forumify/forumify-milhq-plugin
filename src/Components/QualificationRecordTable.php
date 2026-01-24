@@ -8,7 +8,7 @@ use Forumify\Milhq\Entity\Record\QualificationRecord;
 use Symfony\Component\Asset\Packages;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
-#[AsLiveComponent('QualificationRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
+#[AsLiveComponent('Milhq\\QualificationRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
 class QualificationRecordTable extends AbstractRecordTable
 {
     protected array $searchFields = ['qualification.name'];

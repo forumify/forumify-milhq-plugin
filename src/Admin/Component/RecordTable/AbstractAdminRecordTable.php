@@ -24,8 +24,8 @@ abstract class AbstractAdminRecordTable extends AbstractDoctrineTable
     {
         $this
             ->addDateColumn()
-            ->addColumn('user', [
-                'field' => 'user.name',
+            ->addColumn('soldier', [
+                'field' => 'soldier.name',
             ])
             ->addRecordColumns()
             ->addColumn('actions', [

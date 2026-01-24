@@ -12,7 +12,7 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Twig\Environment;
 
 #[AsLiveComponent('Milhq\\SoldierTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.users.view')]
+#[IsGranted('forumify-milhq.admin.soldiers.view')]
 class SoldierTable extends AbstractDoctrineTable
 {
     public function __construct(private readonly Environment $twig)
@@ -52,7 +52,7 @@ class SoldierTable extends AbstractDoctrineTable
             ])
             ->addColumn('actions', [
                 'label' => '',
-                'renderer' => fn ($_, $row) => $this->twig->render('@ForumifyMilhqPlugin/admin/users/list/actions.html.twig', ['row' => $row]),
+                'renderer' => fn ($_, $row) => $this->twig->render('@ForumifyMilhqPlugin/admin/soldiers/list/actions.html.twig', ['row' => $row]),
                 'searchable' => false,
                 'sortable' => false,
             ]);

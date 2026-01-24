@@ -13,11 +13,11 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 /**
  * @extends AbstractDoctrineList<FormSubmission>
  */
-#[AsLiveComponent('SubmissionList', '@ForumifyMilhqPlugin/frontend/components/submission_list.html.twig')]
+#[AsLiveComponent('Milhq\\SubmissionList', '@ForumifyMilhqPlugin/frontend/components/submission_list.html.twig')]
 class SubmissionList extends AbstractDoctrineList
 {
     #[LiveProp]
-    public int $userId;
+    public int $soldierId;
 
     protected function getEntityClass(): string
     {
@@ -27,8 +27,8 @@ class SubmissionList extends AbstractDoctrineList
     protected function getQuery(): QueryBuilder
     {
         return parent::getQuery()
-            ->where('e.user = :user')
-            ->setParameter('user', $this->userId)
+            ->where('e.soldier = :soldier')
+            ->setParameter('soldier', $this->soldierId)
             ->orderBy('e.createdAt', 'DESC')
         ;
     }

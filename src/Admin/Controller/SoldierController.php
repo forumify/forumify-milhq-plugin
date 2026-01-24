@@ -11,8 +11,11 @@ use Forumify\Milhq\Repository\AssignmentRecordRepository;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * @extends AbstractCrudController<Soldier>
+ */
 #[Route('/soldiers', 'soldier')]
-class UserController extends AbstractCrudController
+class SoldierController extends AbstractCrudController
 {
     protected string $listTemplate = '@ForumifyMilhqPlugin/admin/soldiers/list/list.html.twig';
     protected string $formTemplate = '@ForumifyMilhqPlugin/admin/soldiers/edit/form.html.twig';

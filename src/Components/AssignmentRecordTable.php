@@ -8,7 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
-#[AsLiveComponent('AssignmentRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
+#[AsLiveComponent('Milhq\\AssignmentRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
 class AssignmentRecordTable extends AbstractRecordTable
 {
     protected array $searchFields = ['position.name', 'unit.name'];

@@ -15,7 +15,7 @@ use Twig\Environment;
 
 #[AsLiveComponent('Milhq\\SubmissionTable', '@Forumify/components/table/table.html.twig')]
 #[IsGranted('forumify-milhq.admin.submissions.view')]
-class SubmissionTable extends AbstractDoctrineTable
+class FormSubmissionTable extends AbstractDoctrineTable
 {
     #[LiveProp]
     public ?int $form = null;
@@ -36,11 +36,11 @@ class SubmissionTable extends AbstractDoctrineTable
             ->addColumn('createdAt', [
                 'field' => 'createdAt',
                 'label' => 'Created At',
-                'renderer' => fn(?DateTimeInterface $date) => $date->format('Y-m-d H:i:s'),
+                'renderer' => fn(?DateTimeInterface $date) => $date?->format('Y-m-d H:i:s') ?? '',
                 'searchable' => false,
             ])
-            ->addColumn('user', [
-                'field' => 'user?.name',
+            ->addColumn('soldier', [
+                'field' => 'soldier?.name',
                 'label' => 'Name',
             ])
             ->addColumn('form', [

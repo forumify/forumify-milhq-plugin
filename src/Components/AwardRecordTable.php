@@ -8,7 +8,7 @@ use Forumify\Milhq\Entity\Record\AwardRecord;
 use Symfony\Component\Asset\Packages;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
-#[AsLiveComponent('AwardRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
+#[AsLiveComponent('Milhq\\AwardRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
 class AwardRecordTable extends AbstractRecordTable
 {
     protected array $searchFields = ['award.name'];

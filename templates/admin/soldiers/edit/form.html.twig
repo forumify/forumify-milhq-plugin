@@ -2,13 +2,13 @@
 {% block body %}
     <div class="flex justify-between items-start mb-4">
         {% if data is not null %}
-            <h1>{{ 'milhq.admin.users.edit.title'|trans({ name: data.name }) }}</h1>
+            <h1>{{ 'milhq.admin.soldiers.edit.title'|trans({ name: data.name }) }}</h1>
             {% embed '@Forumify/components/menu.html.twig' with { placement: 'bottom-end', buttonClass: 'btn-primary' } %}
                 {% block button_text %}
-                    <i class="ph ph-plus"></i>{{ 'milhq.admin.users.quick_actions'|trans }}
+                    <i class="ph ph-plus"></i>{{ 'milhq.admin.soldiers.quick_actions'|trans }}
                 {% endblock %}
                 {% block menu_items %}
-                    {% include '@ForumifyMilhqPlugin/admin/users/list/quick_actions.html.twig' with { user: data } %}
+                    {% include '@ForumifyMilhqPlugin/admin/soldiers/list/quick_actions.html.twig' with { soldier: data } %}
                 {% endblock %}
         {% endembed %}
         {% else %}
@@ -20,10 +20,10 @@
         {% embed '@Forumify/components/tabs.html.twig' %}
             {% block tabs %}
                 <button type="button" class="btn-link" data-tab-id="general">
-                    {{ 'milhq.admin.users.edit.general'|trans }}
+                    {{ 'milhq.admin.soldiers.edit.general'|trans }}
                 </button>
                 <button type="button" class="btn-link" data-tab-id="assignment">
-                    {{ 'milhq.admin.users.edit.assignment'|trans }}
+                    {{ 'milhq.admin.soldiers.edit.assignment'|trans }}
                 </button>
             {% endblock %}
             {% block tabpanels %}
@@ -43,7 +43,7 @@
                 <div id="assignment">
                     <h2>Primary Assignment</h2>
                     <div class="alert-warning mb-4">
-                        <p>{{ 'milhq.admin.users.edit.assignment_warning'|trans }}</p>
+                        <p>{{ 'milhq.admin.soldiers.edit.assignment_warning'|trans }}</p>
                     </div>
                     {{ form_row(form.specialty) }}
                     {{ form_row(form.status) }}
@@ -55,7 +55,7 @@
         {% endembed %}
         <div class="flex justify-center items-center gap-2">
             <button type="submit" class="btn-primary">{{ 'save'|trans }}</button>
-            <a href="{{ path('milhq_admin_user_list') }}" class="btn-outlined">{{ 'cancel'|trans }}</a>
+            <a href="{{ path('milhq_admin_soldier_list') }}" class="btn-outlined">{{ 'cancel'|trans }}</a>
         </div>
         {{ form_end(form) }}
     </div>

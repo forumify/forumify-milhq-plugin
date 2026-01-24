@@ -41,7 +41,7 @@ class FormSubmissionTest extends MilhqWebTestCase
         $this->client->click($formLinks->first()->link());
         self::assertAnySelectorTextContains('.rich-text', 'Form instructions');
 
-        $this->client->submitForm('Save', ['milhq_form[reason]' => 'Need to go to a wedding.']);
+        $this->client->submitForm('Save', ['submission_form[reason]' => 'Need to go to a wedding.']);
         self::assertResponseIsSuccessful();
 
         $c = $this->client->request('GET', '/admin/milhq/submissions?form=' . $form->getId());

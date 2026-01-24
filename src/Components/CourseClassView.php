@@ -22,7 +22,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
-#[PluginVersion('forumify/', 'premium')]
+#[PluginVersion('forumify/forumify-milhq-plugin', 'premium')]
 #[AsLiveComponent('Milhq\\CourseClassView', '@ForumifyMilhqPlugin/frontend/components/course_class/class.html.twig')]
 class CourseClassView extends AbstractController
 {
@@ -81,14 +81,14 @@ class CourseClassView extends AbstractController
 
     public function isSignedUpAsStudent(): bool
     {
-        $user = $this->soldierService->getLoggedInSoldier();
-        if ($user === null) {
+        $soldier = $this->soldierService->getLoggedInSoldier();
+        if ($soldier === null) {
             return false;
         }
 
         return $this->classStudentRepository->count([
             'class' => $this->class,
-            'user' => $user,
+            'soldier' => $soldier,
         ]) > 0;
     }
 
@@ -99,16 +99,16 @@ class CourseClassView extends AbstractController
             return;
         }
 
-        $user = $this->soldierService->getLoggedInSoldier();
-        if ($user === null) {
+        $soldier = $this->soldierService->getLoggedInSoldier();
+        if ($soldier === null) {
             return;
         }
 
-        $student = $this->classStudentRepository->findOneBy(['user' => $user, 'class' => $this->class]);
+        $student = $this->classStudentRepository->findOneBy(['soldier' => $soldier, 'class' => $this->class]);
         if ($student === null) {
             $student = new CourseClassStudent();
             $student->setClass($this->class);
-            $student->setSoldier($user);
+            $student->setSoldier($soldier);
             $this->classStudentRepository->save($student);
         } else {
             $this->classStudentRepository->remove($student);
@@ -123,14 +123,14 @@ class CourseClassView extends AbstractController
             'permission' => 'signup_as_instructor',
         ]);
 
-        $user = $this->soldierService->getLoggedInSoldier();
-        if ($user === null) {
+        $soldier = $this->soldierService->getLoggedInSoldier();
+        if ($soldier === null) {
             return;
         }
 
         $instructor = $this->classInstructorRepository->findOneBy([
             'class' => $this->class,
-            'user' => $user,
+            'soldier' => $soldier,
         ]);
 
         if ($instructor !== null) {
@@ -141,14 +141,14 @@ class CourseClassView extends AbstractController
         $instructorType = $instructorId === null ? null : $this->instructorRepository->find($instructorId);
 
         $cInstructor = new CourseClassInstructor();
-        $cInstructor->setSoldier($user);
+        $cInstructor->setSoldier($soldier);
         $cInstructor->setClass($this->class);
         $cInstructor->setInstructor($instructorType);
         $this->classInstructorRepository->save($cInstructor);
     }
 
     #[LiveAction]
-    public function removeStudent(#[LiveArg] int $userId): void
+    public function removeStudent(#[LiveArg] int $soldierId): void
     {
         $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
             'entity' => $this->class->getCourse(),
@@ -157,7 +157,7 @@ class CourseClassView extends AbstractController
 
         $student = $this->classStudentRepository->findOneBy([
             'class' => $this->class,
-            'user' => $userId,
+            'soldier' => $soldierId,
         ]);
 
         if ($student !== null) {
@@ -166,7 +166,7 @@ class CourseClassView extends AbstractController
     }
 
     #[LiveAction]
-    public function removeInstructor(#[LiveArg] int $userId): void
+    public function removeInstructor(#[LiveArg] int $soldierId): void
     {
         $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
             'entity' => $this->class->getCourse(),
@@ -175,7 +175,7 @@ class CourseClassView extends AbstractController
 
         $instructor = $this->classInstructorRepository->findOneBy([
             'class' => $this->class,
-            'user' => $userId,
+            'soldier' => $soldierId,
         ]);
 
         if ($instructor !== null) {
@@ -185,14 +185,14 @@ class CourseClassView extends AbstractController
 
     public function isSignedUpAsInstructor(): bool
     {
-        $user = $this->soldierService->getLoggedInSoldier();
-        if ($user === null) {
+        $soldier = $this->soldierService->getLoggedInSoldier();
+        if ($soldier === null) {
             return false;
         }
 
         return $this->classInstructorRepository->count([
             'class' => $this->class,
-            'user' => $user,
+            'soldier' => $soldier,
         ]) > 0;
     }
 

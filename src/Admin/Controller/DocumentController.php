@@ -10,11 +10,12 @@ use Forumify\Milhq\Entity\Document;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * @extends AbstractCrudController<Document>
+ */
 #[Route('/documents', 'document')]
 class DocumentController extends AbstractCrudController
 {
-    protected string $listTemplate = '@ForumifyMilhqPlugin/admin/crud/list.html.twig';
-
     protected ?string $permissionView = 'forumify-milhq.admin.organization.documents.view';
     protected ?string $permissionCreate = 'forumify-milhq.admin.organization.documents.create';
     protected ?string $permissionEdit = 'forumify-milhq.admin.organization.documents.manage';

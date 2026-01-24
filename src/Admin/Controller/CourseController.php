@@ -16,6 +16,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * @extends AbstractCrudController<Course>
+ */
 #[PluginVersion('forumify/forumify-milhq-plugin', 'premium')]
 #[Route('/courses', 'courses')]
 class CourseController extends AbstractCrudController

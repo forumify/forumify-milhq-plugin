@@ -1,7 +1,7 @@
 {
     "require": {
-        "forumify/": "@dev",
-        "forumify/forumify-platform": "^1.0",
+        "forumify/forumify-milhq-plugin": "@dev",
+        "forumify/forumify-platform": "dev-master",
         "symfony/flex": "^2",
         "symfony/runtime": "7.4.*"
     },
@@ -28,7 +28,8 @@
             "symfony/flex": true,
             "symfony/runtime": true
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "lock": false
     },
     "autoload-dev": {
         "psr-4": {

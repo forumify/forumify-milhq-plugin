@@ -4,7 +4,7 @@
     <div class="flex justify-between mb-4">
         {% include '@ForumifyMilhqPlugin/frontend/soldier/components/header.html.twig' %}
         {% block opcenter_actions %}
-            <a class="btn-primary" href="{{ path('soldier', { id: soldier.id }) }}">
+            <a class="btn-primary" href="{{ path('milhq_soldier', { id: soldier.id }) }}">
                 {{ 'milhq.opcenter.pfile'|trans }}
             </a>
         {% endblock %}

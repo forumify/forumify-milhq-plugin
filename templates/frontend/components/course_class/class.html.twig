@@ -75,10 +75,10 @@
                         <tr>
                             <td>
                                 <span class="flex items-center gap-1 p-1">
-                                    {% if student.user.rank is not null and student.user.rank.image is not null %}
-                                        <img width="24px" height="24px" src="{{ asset(student.user.rank.image, 'milhq.asset') }}">
+                                    {% if student.soldier.rank is not null and student.soldier.rank.image is not null %}
+                                        <img width="24px" height="24px" src="{{ asset(student.soldier.rank.image, 'milhq.asset') }}">
                                     {% endif %}
-                                    {{ student.user.name }}
+                                    {{ student.soldier.name }}
                                     {% set studentResult = student.courseUser.result %}
                                     {% if studentResult %}
                                         {% set color = {
@@ -95,7 +95,7 @@
                                 {% if canManage %}
                                     <button
                                         class="btn-link btn-icon btn-small"
-                                        {{ live_action('removeStudent', { userId: student.user.id }) }}
+                                        {{ live_action('removeStudent', { userId: student.soldier.id }) }}
                                     >
                                         <i class="ph ph-x"></i>
                                     </button>

@@ -1,6 +1,6 @@
 <div class="flex">
-    {% if is_granted('forumify-milhq.admin.users.manage') %}
-        <a class="btn-link btn-icon btn-small" href="{{ path('milhq_admin_user_edit', { identifier: row.id }) }}">
+    {% if is_granted('forumify-milhq.admin.soldiers.manage') %}
+        <a class="btn-link btn-icon btn-small" href="{{ path('milhq_admin_soldier_edit', { identifier: row.id }) }}">
             <i class="ph ph-pencil-simple-line"></i>
         </a>
     {% endif %}
@@ -20,7 +20,7 @@
         } %}
             {% block button_text %}<i class="ph ph-caret-down"></i>{% endblock %}
             {% block menu_items %}
-                {% include '@ForumifyMilhqPlugin/admin/users/list/quick_actions.html.twig' with { user: row } %}
+                {% include '@ForumifyMilhqPlugin/admin/soldiers/list/quick_actions.html.twig' with { soldier: row } %}
             {% endblock %}
         {% endembed %}
     {% endif %}

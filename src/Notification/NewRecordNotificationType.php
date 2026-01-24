@@ -78,7 +78,7 @@ class NewRecordNotificationType extends AbstractEmailNotificationType
             return '';
         }
 
-        return $this->urlGenerator->generate('soldier', ['id' => $soldierId]);
+        return $this->urlGenerator->generate('milhq_soldier', ['id' => $soldierId]);
     }
 
     public function getEmailTemplate(Notification $notification): string

@@ -165,7 +165,7 @@ milhq:
         pending_with_topic:  'Your enlistment is being processed. View the enlistment topic for further instructions and updates.'
         topic: 'View enlistment topic'
         start_new: 'Start another enlistment'
-    user:
+    soldier:
         not_found: 'This user does not exist on milhq.'
         forum_profile: 'Forum profile'
         rank: 'Rank'
@@ -316,9 +316,9 @@ milhq:
             title: 'You received a new rank'
             description: >-
                 {type, select,
-                    0       {You were promoted to {rank}.}
-                    1       {You were demoted to {rank}.}
-                    other   {}
+                    promotion {You were promoted to {rank}.}
+                    demotion  {You were demoted to {rank}.}
+                    other     {}
                 }
         assignment_record:
             title: 'You received a new position'

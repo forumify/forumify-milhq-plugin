@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Controller;
 
 use DateInterval;
 use DateTime;
+use DateTimeInterface;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
 use Forumify\Milhq\Repository\AssignmentRecordRepository;
@@ -31,15 +32,9 @@ class SoldierController extends AbstractController
     #[Route('soldier/{id}', 'soldier')]
     public function __invoke(Soldier $soldier): Response
     {
-        $lastReportInDate = $this
-            ->reportInRepository
-            ->findOneBy(['soldier' => $soldier])
-            ?->getLastReportInDate()
-        ;
-
         return $this->render('@ForumifyMilhqPlugin/frontend/soldier/soldier.html.twig', [
             'awards' => $this->getAwardCounts($soldier),
-            'reportInDate' => $lastReportInDate,
+            'reportInDate' => $this->getLastReportInDate($soldier),
             'secondaryAssignments' => $this->getSecondaryUnits($soldier),
             'tig' => $this->getTimeInGrade($soldier),
             'tis' => $this->getTimeInService($soldier),
@@ -48,13 +43,18 @@ class SoldierController extends AbstractController
         ]);
     }
 
+    private function getLastReportInDate(Soldier $soldier): ?DateTimeInterface
+    {
+        return $this->reportInRepository->findOneBy(['soldier' => $soldier])?->getLastReportInDate();
+    }
+
     private function getTimeInGrade(Soldier $soldier): ?DateInterval
     {
         $rankRecords = $this->rankRecordRepository
             ->createQueryBuilder('rr')
             ->select('MAX(rr.createdAt)')
-            ->where('rr.user = :user')
-            ->setParameter('user', $soldier)
+            ->where('rr.soldier = :soldier')
+            ->setParameter('soldier', $soldier)
             ->getQuery()
             ->getResult()
         ;
@@ -102,13 +102,14 @@ class SoldierController extends AbstractController
 
         $grouped = [];
         foreach ($records as $record) {
-            $unitId = $record->getUnit()?->getId();
-            if ($unitId === null) {
+            $unit = $record->getUnit();
+            if ($unit === null) {
                 continue;
             }
 
+            $unitId = $unit->getId();
             if (!isset($grouped[$unitId])) {
-                $grouped[$unitId] = ['name' => $record->getUnit()->getName()];
+                $grouped[$unitId] = ['name' => $unit->getName()];
             }
 
             $data = [

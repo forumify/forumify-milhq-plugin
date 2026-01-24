@@ -1,9 +1,9 @@
 <div class="flex flex-col gap-4">
-    {% if user.signature %}
-        <img class="card" width="100%" height="auto" src="{{ asset(user.signature, 'milhq.asset') }}">
+    {% if soldier.signature %}
+        <img class="card" width="100%" height="auto" src="{{ asset(soldier.signature, 'milhq.asset') }}">
     {% endif %}
     <div class="card">
-        <div class="card-title">{{ 'milhq.user.awards'|trans }}</div>
+        <div class="card-title">{{ 'milhq.soldier.awards'|trans }}</div>
         {% set awards = awards|filter(a => a.image is not null) %}
         {% if awards is not empty %}
             <div class="card-body grid-xs-4 grid-sm-6 grid-md-12 gap-1">
@@ -26,11 +26,11 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p class="text-small card-body">{{ 'milhq.user.no_awards'|trans }}</p>
+            <p class="text-small card-body">{{ 'milhq.soldier.no_awards'|trans }}</p>
         {% endif %}
     </div>
     <div class="card">
-        <div class="card-title">{{ 'milhq.user.secondary_positions'|trans }}</div>
+        <div class="card-title">{{ 'milhq.soldier.secondary_positions'|trans }}</div>
         <div class="card-body">
             <ul class="text-small flex flex-col gap-2">
                 {% for unit in secondaryAssignments %}
@@ -43,7 +43,7 @@
                         </ul>
                     </li>
                 {% else %}
-                    <li>{{ 'milhq.user.no_secondary_positions'|trans }}</li>
+                    <li>{{ 'milhq.soldier.no_secondary_positions'|trans }}</li>
                 {% endfor %}
             </ul>
         </div>

@@ -15,14 +15,12 @@ use Forumify\Milhq\Entity\Record\RecordInterface;
 use Forumify\Milhq\Event\RecordsCreatedEvent;
 use Forumify\Milhq\Notification\NewRecordNotificationType;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 #[AsEventListener]
 class SendRecordNotificationListener
 {
     public function __construct(
         private readonly NotificationService $notificationService,
-        private readonly NormalizerInterface $normalizer,
     ) {
     }
 
@@ -44,10 +42,9 @@ class SendRecordNotificationListener
             return;
         }
 
-        // NOTE: backwards compatibility conversion to preserve NewRecordNotificationType
         $type = RecordService::classToType($record);
-        $data = $this->normalizer->normalize($record, 'milhq_array');
 
+        $data = ['text' => $record->getText()];
         if ($record instanceof AwardRecord) {
             $data['award']['name'] = $record->getAward()->getName();
         } elseif ($record instanceof RankRecord) {
@@ -64,8 +61,6 @@ class SendRecordNotificationListener
             $data['position']['name'] = ($record->getPosition() ?? $soldier->getPosition())?->getName() ?? '';
             $data['unit']['name'] = ($record->getUnit() ?? $soldier->getUnit())?->getName() ?? '';
         }
-
-        $data['text'] = $record->getText();
 
         $this->notificationService->sendNotification(new Notification(
             NewRecordNotificationType::TYPE,

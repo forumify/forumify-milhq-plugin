@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * @extends AbstractCrudController<Roster>
+ */
 #[Route('/rosters', 'roster')]
 #[IsGranted('forumify-milhq.admin.organization.rosters.view')]
 class RosterController extends AbstractCrudController

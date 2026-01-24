@@ -4,11 +4,6 @@
         <a href="{{ path('milhq_admin_form_list') }}">Forms</a> &gt;
         {{ parentForm.name }}
     </div>
-    {% if syncEnabled %}
-        <div class="alert-warning mb-4">
-            Form fields are readonly in forumify admin and must be managed from milhq.io.
-        </div>
-    {% endif %}
     <h2>
         {{ title }}
         {% if capabilities.create %}

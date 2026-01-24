@@ -21,7 +21,7 @@ class AssignmentRecordTest extends MilhqWebTestCase
 
         // phpcs:ignore
         $this->client->submitForm('Save', [
-            'record[users]' => [$targetUser->getId()],
+            'record[soldiers]' => [$targetUser->getId()],
             'record[type]' => 'primary',
             'record[status]' => MilsimStory::statusActiveDuty()->getId(),
             'record[specialty]' => MilsimStory::specialtyInfantry()->getId(),
@@ -49,7 +49,7 @@ class AssignmentRecordTest extends MilhqWebTestCase
         $this->client->click($newRecordLink);
 
         $this->client->submitForm('Save', [
-            'record[users]' => [$targetUser->getId()],
+            'record[soldiers]' => [$targetUser->getId()],
             'record[type]' => 'secondary',
             'record[status]' => MilsimStory::statusActiveDuty()->getId(),
             'record[specialty]' => MilsimStory::specialtyInfantry()->getId(),

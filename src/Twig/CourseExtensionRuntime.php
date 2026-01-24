@@ -59,9 +59,11 @@ class CourseExtensionRuntime implements RuntimeExtensionInterface
             return [];
         }
 
-        $soldiers = $soldiersInClass->map(fn (CourseClassInstructor|CourseClassStudent $ccx) => $ccx->getSoldier());
+        $soldiers = $soldiersInClass
+            ->map(fn (CourseClassInstructor|CourseClassStudent $ccx) => $ccx->getSoldier())
+            ->toArray();
 
-        $soldierIds = $soldiers->map(fn (Soldier $soldier) => $soldier->getId())->toArray();
+        $soldierIds = array_map(fn (Soldier $soldier) => $soldier->getId(), $soldiers);
         $courseUsers = array_combine($soldierIds, $soldiersInClass->toArray());
 
         $this->soldierService->sortSoldiers($soldiers);

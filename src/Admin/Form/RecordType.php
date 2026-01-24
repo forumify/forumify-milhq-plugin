@@ -34,7 +34,7 @@ class RecordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('users', EntityType::class, [
+            ->add('soldiers', EntityType::class, [
                 'autocomplete' => true,
                 'choice_label' => 'name',
                 'class' => Soldier::class,

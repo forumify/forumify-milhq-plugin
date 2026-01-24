@@ -10,7 +10,7 @@ use Forumify\Milhq\Event\RecordsCreatedEvent;
 use Forumify\Milhq\Service\SyncSoldierService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SyncUserSubscriber implements EventSubscriberInterface
+class SyncSoldierSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly SyncSoldierService $syncUserService,

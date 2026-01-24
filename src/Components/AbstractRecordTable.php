@@ -19,7 +19,7 @@ use Twig\Environment;
 abstract class AbstractRecordTable extends AbstractDoctrineTable
 {
     #[LiveProp]
-    public Soldier $user;
+    public Soldier $soldier;
 
     #[LiveProp(writable: true)]
     public string $query = '';
@@ -82,8 +82,8 @@ abstract class AbstractRecordTable extends AbstractDoctrineTable
     {
 
         $qb = parent::getQuery($search)
-            ->andWhere('e.user = :user')
-            ->setParameter('user', $this->user)
+            ->andWhere('e.soldier = :soldier')
+            ->setParameter('soldier', $this->soldier)
         ;
 
         foreach ($this->searchFields as $searchField) {
