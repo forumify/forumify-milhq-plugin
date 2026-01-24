@@ -1,0 +1,11 @@
+parameters:
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    PluginTests\:
+        resource: '../Tests/'
+        exclude:
+            - '../Tests/PluginTestKernel.php'

@@ -1,0 +1,42 @@
+{
+    "name": "@forumify/forumify-milhq-plugin",
+    "description": "Frontend assets for MILHQ plugin",
+    "version": "0.1.0",
+    "symfony": {
+        "controllers": {
+            "aar_form": {
+                "main": "dist/aar_form_controller.js",
+                "fetch": "lazy",
+                "enabled": true,
+                "autoimport": {}
+            },
+            "course_class_report": {
+                "main": "dist/course_class_report_controller.js",
+                "fetch": "lazy",
+                "enabled": true,
+                "autoimport": {}
+            },
+            "user_edit": {
+                "main": "dist/user_edit_controller.js",
+                "fetch": "lazy",
+                "enabled": true,
+                "autoimport": {}
+            }
+        },
+        "importmap": {
+            "@hotwired/stimulus": "^3.0.0"
+        }
+    },
+    "dependencies": {
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.22.0",
+        "@hotwired/stimulus": "^3.0.0",
+        "@stylistic/eslint-plugin": "^4.2.0",
+        "core-js": "^3.34.0",
+        "eslint": "^9.22.0"
+    },
+    "scripts": {
+        "lint": "eslint dist"
+    }
+}

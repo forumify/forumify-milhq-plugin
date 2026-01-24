@@ -1,0 +1,5 @@
+{% include '@Forumify/frontend/forum/forum_tag.html.twig' with { tag: {
+    class: class|default('text-extra-small'),
+    color: status.color,
+    title: status.name,
+} } only %}

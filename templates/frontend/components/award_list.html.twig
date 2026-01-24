@@ -1,0 +1,35 @@
+{% embed '@Forumify/components/list.html.twig' with { class: '' } %}
+    {% block pagination_top %}
+        <div class="mb-6">
+            {% include '@Forumify/components/components/pagination.html.twig' %}
+        </div>
+    {% endblock %}
+    {% block list %}
+        <ul>
+            {% for item in this.result.rows %}
+                <li class="card flex flex-col mb-4">
+                    <div class="card-title">
+                        {{ item.name }}
+                    </div>
+                    <div class="card-body grid gap-4">
+                        <div class="col-xs-12 col-sm-3 col-lg-2 flex items-center justify-center">
+                            {% if item.image %}
+                                <img src="{{ asset(item.image, 'milhq.asset') }}" width="100%" height="auto">
+                            {% endif %}
+                        </div>
+                        <div class="col-xs-12 col-sm-9 col-lg-10">
+                            {{ item.description|milhq_text }}
+                        </div>
+                    </div>
+                </li>
+            {% else %}
+                <li>{{ 'milhq.award.no_awards'|trans }}</li>
+            {% endfor %}
+        </ul>
+    {% endblock %}
+    {% block pagination_bottom %}
+        <div class="mt-6">
+            {% include '@Forumify/components/components/pagination.html.twig' %}
+        </div>
+    {% endblock %}
+{% endembed %}

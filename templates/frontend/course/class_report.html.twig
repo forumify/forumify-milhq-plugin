@@ -1,0 +1,52 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% set title = 'milhq.course.class.report'|trans({ class: class.title }) %}
+{% block title_page %}{{ title }}{% endblock %}
+{% block body %}
+    <h1>{{ title }}</h1>
+    <div {{ stimulus_controller('forumify/forumify-milhq-plugin/course_class_report') }}>
+        {{ form_start(form) }}
+        <div class="box mb-4">
+            <h3>Instructors</h3>
+            <div
+                {{ stimulus_target('forumify/forumify-milhq-plugin/course_class_report', 'instructors') }}
+                data-prototype="{{ form_widget(form.instructors.vars.prototype)|e('html_attr') }}"
+                data-index="{{ form.instructors|length }}"
+            >
+                {{ form_widget(form.instructors) }}
+            </div>
+            <button
+                class="btn-link btn-small"
+                type="button"
+                {{ stimulus_action('forumify/forumify-milhq-plugin/course_class_report', 'addInstructor') }}
+            >
+                <i class="ph ph-plus"></i>
+                Add Instructor
+            </button>
+        </div>
+        <div class="box mb-4">
+            <h3>Students</h3>
+            <div
+                {{ stimulus_target('forumify/forumify-milhq-plugin/course_class_report', 'students') }}
+                data-prototype="{{ form_widget(form.students.vars.prototype)|e('html_attr') }}"
+                data-index="{{ form.students|length }}"
+            >
+                {{ form_widget(form.students) }}
+            </div>
+            <button
+                class="btn-link btn-small"
+                type="button"
+                {{ stimulus_action('forumify/forumify-milhq-plugin/course_class_report', 'addStudent') }}
+            >
+                <i class="ph ph-plus"></i>
+                Add Student
+            </button>
+        </div>
+        <div class="flex justify-center items-center gap-2">
+            <button type="submit" class="btn-primary">{{ 'save'|trans }}</button>
+            <a href="{{ path('milhq_course_class_view', { id: class.id }) }}" class="btn-outlined">
+                {{ 'cancel'|trans }}
+            </a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

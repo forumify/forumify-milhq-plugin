@@ -1,0 +1,42 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}
+    {{ title|trans }}
+{% endblock %}
+{% block body %}
+    <div {{ stimulus_controller('forumify/forumify-milhq-plugin/aar_form', {
+        fetchUnitUri: path('milhq_aar_unit', { id: 'id', mission: aar.mission.id })
+    }) }}>
+        <div class="flex justify-center d-none" {{ stimulus_target('forumify/forumify-milhq-plugin/aar_form', 'loader') }}>
+            {% include '@Forumify/components/loader.html.twig' %}
+        </div>
+        <div id="aar-form-wrapper" {{ stimulus_target('forumify/forumify-milhq-plugin/aar_form', 'form') }}>
+            {% include '@Forumify/admin/components/simple_form.html.twig' with {
+                title: title|trans
+            } %}
+        </div>
+        <div id="attendance-table-prototype" class="d-none">
+            <div class="form-row">
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="text-left">{{ 'milhq.aar.attendance.user'|trans }}</th>
+                        {% for status in attendanceStatus %}
+                            <th class="text-left">{{ status|capitalize }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="flex items-center"></td>
+                        {% for status in attendanceStatus %}
+                            <td>
+                                <input type="radio" name="attendance[__ID__]" value="{{ status }}">
+                            </td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

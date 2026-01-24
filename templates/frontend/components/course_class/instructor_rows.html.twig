@@ -1,0 +1,32 @@
+<tr>
+    <td colspan="2" class="p-2 border-b text-left">{{ instructorType }}</td>
+</tr>
+{% for instructor in instructors|milhq_course_users %}
+    <tr>
+        <td>
+            <span class="flex items-center gap-1 p-1">
+                {% if instructor.user.rank is not null and instructor.user.rank.image is not null %}
+                    <img width="24px" height="24px" src="{{ asset(instructor.user.rank.image, 'milhq.asset') }}">
+                {% endif %}
+                {{ instructor.user.name }}
+                {% set instructorAttended = instructor.courseUser.present %}
+                {% if instructorAttended is null %}
+                {% elseif instructorAttended %}
+                    <i class="ph ph-check-circle" style="color: green"></i>
+                {% else %}
+                    <i class="ph ph-prohibit-inset" style="color: gray"></i>
+                {% endif %}
+            </span>
+        </td>
+        <td class="text-right">
+            {% if canManage %}
+                <button
+                    class="btn-link btn-icon btn-small"
+                    {{ live_action('removeInstructor', { userId: instructor.user.id }) }}
+                >
+                    <i class="ph ph-x"></i>
+                </button>
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}

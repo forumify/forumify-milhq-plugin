@@ -1,0 +1,23 @@
+{% extends '@Forumify/emails/base.html.twig' %}
+{% block title %}
+    {{ this.title(notification) }}
+{% endblock %}
+{% block body %}
+    <h2>
+        {{ this.title(notification) }}
+    </h2>
+    <hr>
+    <div class="content-block">
+        <p>
+            {{ this.description(notification) }}
+        </p>
+    </div>
+    <hr>
+    {% set url = this.url(notification) %}
+    {% if url is not empty %}
+        {% include '@Forumify/emails/components/button.html.twig' with {
+            href: url,
+            label: 'milhq.opcenter.pfile'|trans,
+        } only %}
+    {% endif %}
+{% endblock %}

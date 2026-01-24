@@ -1,0 +1,18 @@
+{% extends '@Forumify/components/list.html.twig' %}
+{% block list %}
+    <ul>
+        {% for aar in this.result.rows %}
+            <li class="flex flex-col topic-row justify-between">
+                <a class="topic-link" href="{{ path('milhq_aar_view', { id: aar.id }) }}"></a>
+                <div class="flex justify-between">
+                    <h4 class="mb-0 text-subtitle">{{ aar.unit.name }}</h4>
+                    <div class="flex items-center gap-2 text-small">
+                        {{ aar.createdAt|format_date }}
+                    </div>
+                </div>
+            </li>
+        {% else %}
+            <li class="text-center p-4">{{ 'milhq.mission.no_aars'|trans }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

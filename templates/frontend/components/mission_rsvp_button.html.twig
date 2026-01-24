@@ -1,0 +1,47 @@
+{% set rsvp = this.rsvp %}
+{% set going = rsvp is not null and rsvp.going %}
+<div {{ attributes }}>
+    <div class="flex gap-2 items-center">
+        <div {{ stimulus_controller('forumify/menu', { placement: 'bottom-end' }) }}>
+            {% if going %}
+                <button class="btn-link" {{ stimulus_target('forumify/menu', 'openButton') }}>
+                    <i class="ph ph-check" style="color: green"></i>{{ 'milhq.mission.rsvp.going'|trans }}
+                </button>
+            {% elseif rsvp is not null %}
+                <button class="btn-link" {{ stimulus_target('forumify/menu', 'openButton') }}>
+                    <i class="ph ph-x-circle" style="color: red"></i>{{ 'milhq.mission.rsvp.not_going'|trans }}
+                </button>
+            {% else %}
+                <button class="btn-primary" {{ stimulus_target('forumify/menu', 'openButton') }}>
+                    <i class="ph ph-calendar"></i>{{ 'milhq.mission.rsvp.rsvp'|trans }}
+                </button>
+            {% endif %}
+            <div class="menu" {{ stimulus_target('forumify/menu', 'menu') }}>
+                {% if rsvp is null or not going %}
+                    <button class="btn-link" {{
+                    stimulus_action('live', 'action', parameters: { action: 'toggle', going: true })
+                    |stimulus_action('forumify/menu', 'close')
+                    }}>
+                        <i class="ph ph-check-circle" style="color: green"></i>{{ 'milhq.mission.rsvp.going'|trans }}
+                    </button>
+                {% endif %}
+                {% if rsvp is null or going %}
+                    <button class="btn-link" {{
+                    stimulus_action('live', 'action', parameters: { action: 'toggle', going: false })
+                    |stimulus_action('forumify/menu', 'close')
+                    }}>
+                        <i class="ph ph-x-circle" style="color: red"></i>{{ 'milhq.mission.rsvp.not_going'|trans }}
+                    </button>
+                {% endif %}
+                {% if rsvp is not null %}
+                    <button class="btn-link" {{
+                    stimulus_action('live', 'action', parameters: { action: 'cancel' })
+                    |stimulus_action('forumify/menu', 'close')
+                    }}>
+                        <i class="ph ph-prohibit-inset" style="color: gray"></i>{{ 'milhq.mission.rsvp.remove_rsvp'|trans }}
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+{% extends '@Forumify/admin/base.html.twig' %}
+{% block title_page %}
+    {{ 'milhq.admin.users.list.title'|trans }}
+{% endblock %}
+{% block body %}
+    <div class="flex justify-between items-center mb-4">
+        <span class="flex items-center gap-2">
+            <h2 class="mb-0">{{ 'milhq.admin.users.list.title'|trans }}</h2>
+            {% if capabilities.create %}
+                <a class="btn-primary btn-icon btn-small" href="{{ path('milhq_admin_user_create') }}">
+                    <i class="ph ph-plus"></i>
+                </a>
+            {% endif %}
+        </span>
+        {% if [
+            'records.service_records.create',
+            'records.award_records.create',
+            'records.assignment_records.create',
+            'records.combat_records.create',
+            'records.rank_records.create',
+            'records.qualification_records.create',
+        ] has some perm => is_granted('forumify-milhq.admin.' ~ perm) %}
+            <div {{ stimulus_controller('forumify/menu', { placement: 'bottom-end' }) }}>
+                <a class="btn-primary" {{ stimulus_target('forumify/menu', 'openButton') }}>
+                    <i class="ph ph-plus"></i>{{ 'milhq.admin.users.quick_actions'|trans }}
+                </a>
+                <div class="menu" {{ stimulus_target('forumify/menu', 'menu') }}>
+                    {% include '@ForumifyMilhqPlugin/admin/users/list/quick_actions.html.twig' %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    {{ component('Milhq\\SoldierTable') }}
+{% endblock %}

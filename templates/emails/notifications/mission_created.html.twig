@@ -1,0 +1,23 @@
+{% extends '@Forumify/emails/base.html.twig' %}
+{% block title %}
+    {{ this.title(notification) }}
+{% endblock %}
+{% block body %}
+    <h2>
+        {{ this.title(notification) }}
+    </h2>
+    <hr>
+    <div class="content-block">
+        <p>
+            {{ this.description(notification) }}
+        </p>
+    </div>
+    <hr>
+    {% set link = this.url(notification) %}
+    {% if link %}
+        {% include '@Forumify/emails/components/button.html.twig' with {
+            href: link,
+            label: 'milhq.notification.mission_created.view_mission'|trans,
+        } only %}
+    {% endif %}
+{% endblock %}

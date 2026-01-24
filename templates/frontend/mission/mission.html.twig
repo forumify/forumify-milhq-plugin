@@ -1,0 +1,113 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}
+    {{ mission.title }}
+{% endblock %}
+{% block body %}
+    <div class="breadcrumbs text-small">
+        <a href="{{ path('milhq_operations_center') }}">{{ 'milhq.opcenter.operations_center'|trans }}</a> &gt;
+        <a href="{{ path('milhq_operations_view', { slug: mission.operation.slug }) }}">{{ mission.operation.title }}</a> &gt;
+        {{ mission.title }}
+    </div>
+    <div class="mb-8 flex justify-between">
+        <div>
+            <h1 class="mb-0">{{ mission.title }}</h1>
+            <div class="flex items-center gap-2 text-small">
+                {{ 'milhq.mission.mission_by'|trans }}
+                {% include '@Forumify/components/avatar.html.twig' with { user: mission.createdBy, className: 'avatar-xs' } only %}
+                <span class="flex items-baseline gap-2">
+                    {% include '@Forumify/components/username.html.twig' with { user: mission.createdBy } only %}
+                    {{ mission.createdAt|format_date }}
+                </span>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            {% if mission.operation.requestRsvp and mission.canRsvp %}
+                {{ component('Milhq\\MissionRSVPButton', { mission: mission }) }}
+            {% endif %}
+            {% if can('manage_after_action_reports', mission.operation) %}
+                <a class="btn-primary" href="{{ path('milhq_aar_create', { mission: mission.id }) }}">
+                    {{ 'milhq.aar.create'|trans }}
+                </a>
+            {% endif %}
+            {% if can('manage_missions', mission.operation) %}
+                <a class="btn-link btn-icon" href="{{ path('milhq_missions_edit', { id: mission.id }) }}">
+                    <i class="ph ph-pencil-simple-line"></i>
+                </a>
+                <a class="btn-link btn-icon" href="{{ path('milhq_missions_delete', { id: mission.id }) }}">
+                    <i class="ph ph-x"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="grid-12 items-start gap-4" {{ stimulus_controller('forumify/tabs') }}>
+        <div class="col-xs-12 col-md-5 col-lg-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if mission.operation.image %}
+                        <div class="border-b">
+                            <img class="rounded" src="{{ asset(mission.operation.image, 'forumify.asset') }}" style="width: 100%; height: auto">
+                        </div>
+                    {% endif %}
+                    {% if mission.operation.requestRsvp %}
+                        {{ component('Milhq\\MissionStats', {mission: mission}) }}
+                    {% endif %}
+                    <div role="tablist" {{ stimulus_target('forumify/tabs', 'tabs') }}>
+                        {% block tabs %}
+                            <button type="button" class="btn-outlined w-100 mt-2" data-tab-id="brief">{{ 'milhq.mission.tab.briefing'|trans }}</button>
+                            {% if mission.operation.requestRsvp %}
+                                <button type="button" class="btn-outlined w-100 mt-2" data-tab-id="attendance">{{ 'milhq.mission.tab.expected_attendance'|trans }}</button>
+                            {% endif %}
+                            {% if can('view_after_action_reports', mission.operation) %}
+                                <button type="button" class="btn-outlined w-100 mt-2" data-tab-id="aar">{{ 'milhq.mission.tab.aar'|trans }}</button>
+                            {% endif %}
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-md-7 col-lg-9 mission_content d-none" {{ stimulus_target('forumify/tabs', 'tabPanels') }}>
+            {% block tabpanels %}
+                <div id="brief">
+                    <h3>{{ 'milhq.mission.tab.briefing'|trans }}</h3>
+                    <div class="box">
+                        <div class="mb-6">
+                            <p class="mb-2">
+                                {{ 'milhq.mission.start'|trans }}
+                                <span class="text-bold">{{ mission.start|format_date(true) }}</span>
+                            </p>
+                            {% if mission.end %}
+                                <p class="mb-2">
+                                    {{ 'milhq.mission.end'|trans }}
+                                    <span class="text-bold">{{ mission.end|format_date(true) }}</span>
+                                </p>
+                            {% endif %}
+                        </div>
+                        {{ mission.briefing|rich }}
+                    </div>
+                </div>
+                {% if mission.operation.requestRsvp %}
+                    <div id="attendance">
+                        <h3>{{ 'milhq.mission.tab.expected_attendance'|trans }}</h3>
+                        {{ component('Milhq\\MissionRoster', {mission: mission}) }}
+                    </div>
+                {% endif %}
+                {% if can('view_after_action_reports', mission.operation) %}
+                    <div id="aar">
+                        <h3>{{ 'milhq.mission.aars'|trans }}</h3>
+                        <div class="mb-8">
+                            {% if not mission.afterActionReports.empty %}
+                                {{ component('Milhq\\AfterActionReportList', { mission: mission }) }}
+                            {% else %}
+                                <div class="card">
+                                    <div class="card-body text-center text-muted">
+                                        {{ 'milhq.mission.no_aars'|trans }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends '@Forumify/components/list.html.twig' %}
+{% block list %}
+    <ul>
+        {% for course in this.result.rows %}
+            <li class="topic-row">
+                <a class="topic-link" href="{{ path('milhq_courses_view', { slug: course.slug }) }}"></a>
+                <div class="flex justify-between">
+                    {{ course.title }}
+                    <span class="text-small text-light hide-phone">
+                            {{ 'milhq.opcenter.class_last'|trans }}
+                        {% set lastClass = this.lastClass(course) %}
+                        {% if lastClass is null %}
+                            {{ 'milhq.opcenter.class_never'|trans }}
+                        {% else %}
+                            {{ lastClass|format_date }}
+                        {% endif %}
+                        </span>
+                </div>
+            </li>
+        {% else %}
+            <li class="p-4">{{ 'milhq.opcenter.no_courses'|trans }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

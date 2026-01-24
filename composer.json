@@ -1,0 +1,36 @@
+{
+    "name": "forumify/forumify-milhq-plugin",
+    "type": "forumify-plugin",
+    "keywords": ["symfony-ux"],
+    "license": "OSL-3.0",
+    "require": {
+        "php": ">=8.4",
+        "forumify/forumify-platform": "^1.0.7",
+        "league/commonmark": "^2.5"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "squizlabs/php_codesniffer": "^3.13",
+        "phpstan/phpstan-symfony": "^2.0",
+        "slevomat/coding-standard": "^8.15"
+    },
+    "autoload": {
+        "psr-4": {
+            "Forumify\\Milhq\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": false,
+            "symfony/runtime": false,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "lock": false
+    },
+    "extra": {
+        "forumify-plugin-class": "Forumify\\Milhq\\ForumifyMilhqPlugin",
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}

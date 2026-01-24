@@ -1,0 +1,46 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}
+    {{ operation.title }}
+{% endblock %}
+{% block body %}
+    <div class="breadcrumbs text-small">
+        <a href="{{ path('milhq_operations_center') }}">{{ 'milhq.opcenter.operations_center'|trans }}</a> &gt;
+        {{ operation.title }}
+    </div>
+    <div class="mb-8 flex justify-between">
+        <div>
+            <h1 class="mb-0">{{ operation.title }}</h1>
+            <p class="text-small">
+                {% if operation.start %}
+                    {{ operation.start|date('j M Y') }}
+                {% endif %}
+                {% if operation.start and operation.end %}
+                    <i class="ph ph-arrow-right"></i>
+                {% endif %}
+                {% if operation.end %}
+                    {{ operation.end|date('j M Y') }}
+                {% endif %}
+            </p>
+        </div>
+        <div class="flex gap-2">
+            {% if can('manage_missions', operation) %}
+                <a class="btn-primary" href="{{ path('milhq_missions_create', { operation: operation.id }) }}">
+                    <i class="ph ph-plus"></i>
+                    {{ 'milhq.mission.create'|trans }}
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% if can('view_missions', operation) %}
+        <div class="mb-4">
+            <h3>{{ 'milhq.operation.missions'|trans }}</h3>
+            {{ component('Milhq\\MissionList', { operation: operation }) }}
+        </div>
+    {% endif %}
+    <div>
+        <h3>{{ 'milhq.operation.operation'|trans }}</h3>
+        <div class="box">
+            {{ operation.content|rich }}
+        </div>
+    </div>
+{% endblock %}

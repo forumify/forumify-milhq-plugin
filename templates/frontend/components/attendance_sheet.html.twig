@@ -1,0 +1,31 @@
+<div {{ attributes }}>
+    {% if this.sheet is null %}
+        <div class="box" data-loading="hide">
+            {% if this.error %}
+                <div class="alert-error mb-4">{{ this.error }}</div>
+            {% endif %}
+            {{ form_start(form, {
+                attr: {
+                    'data-action': 'live#action:prevent',
+                    'data-live-action-param': 'calculate'
+                }
+            }) }}
+            {{ form_widget(form) }}
+            <div class="flex justify-center">
+                <button class="btn-primary">
+                    <i class="ph ph-calculator"></i>
+                    {{ 'milhq.attendance_sheet.generate'|trans }}
+                </button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    {% else %}
+        {% include '@ForumifyMilhqPlugin/frontend/components/attendance_sheet/sheet.html.twig' %}
+    {% endif %}
+    <div data-loading>
+        <div class="flex flex-col justify-center items-center w-100" style="height: 300px;">
+            {% include '@Forumify/components/loader.html.twig' %}
+            <span class="text-light">{{ 'milhq.attendance_sheet.loading'|trans }}</span>
+        </div>
+    </div>
+</div>

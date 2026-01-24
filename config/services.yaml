@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Forumify\Milhq\:
+        resource: '../src/'
+        exclude:
+            - '../src/**/DataFixture/'
+            - '../src/**/DependencyInjection/'
+            - '../src/**/Entity/'

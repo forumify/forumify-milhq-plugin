@@ -1,0 +1,45 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}{{ class.title }}{% endblock %}
+{% block body %}
+    {% set course = class.course %}
+    {% set canManage = can('manage_classes', course) %}
+    <div class="breadcrumbs text-small">
+        <a href="{{ path('milhq_operations_center') }}">{{ 'milhq.opcenter.operations_center'|trans }}</a> &gt;
+        <a href="{{ path('milhq_courses_view', { slug: course.slug }) }}">{{ course.title }}</a> &gt;
+        {{ class.title }}
+    </div>
+    <div class="mb-8 flex justify-between flex-wrap">
+        <div>
+            <h1 class="mb-0">{{ class.title }}</h1>
+            <div class="flex items-center gap-2 text-small">
+                {{ 'milhq.course.class.created_by'|trans }}
+                {% include '@Forumify/components/avatar.html.twig' with { user: class.createdBy, className: 'avatar-xs' } only %}
+                <span class="flex items-baseline gap-2">
+                    {% include '@Forumify/components/username.html.twig' with { user: class.createdBy } only %}
+                    {{ class.createdAt|format_date }}
+                </span>
+            </div>
+        </div>
+        {% if canManage %}
+            <div class="flex gap-2">
+                {% if class.result %}
+                    <a class="btn-link btn-icon" href="{{ path('milhq_course_class_report', { id: class.id }) }}" title="Edit class report">
+                        <i class="ph ph-note-pencil"></i>
+                    </a>
+                {% else %}
+                    <a class="btn-primary" href="{{ path('milhq_course_class_report', { id: class.id }) }}">
+                        <i class="ph ph-note-pencil"></i>
+                        {{ 'milhq.course.class.new_report'|trans }}
+                    </a>
+                {% endif %}
+                <a class="btn-link btn-icon" href="{{ path('milhq_course_class_edit', { id: class.id }) }}" title="Edit class">
+                    <i class="ph ph-pencil-simple-line"></i>
+                </a>
+                <a class="btn-link btn-icon" href="{{ path('milhq_course_class_delete', { id: class.id }) }}" title="Delete class">
+                    <i class="ph ph-trash"></i>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    {{ component('Milhq\\CourseClassView', { class: class }) }}
+{% endblock %}

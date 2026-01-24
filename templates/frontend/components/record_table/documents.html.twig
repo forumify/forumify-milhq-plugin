@@ -1,0 +1,49 @@
+{# TODO: document parsing??? #}
+{% if document is not null %}
+    {% embed '@Forumify/components/modal.html.twig' %}
+        {% block modalOpenButton %}
+            <button class="btn-link btn-icon btn-small"><i class="ph ph-certificate"></i></button>
+        {% endblock %}
+        {% block modalContent %}
+            <div class="card">
+                <div class="card-title">
+                    {% if document.name %}
+                        {{ record.document.name }}
+                    {% else %}
+                        {{ 'milhq.user.document'|trans }}
+                    {% endif %}
+                </div>
+                <div class="card-body text-left">
+                    {% if item is not null and item.image is defined and item.image is not null %}
+                        <div class="text-center mb-6">
+                            <img width="25%" height="auto" src="{{ asset(item.image, 'milhq.asset') }}" alt="">
+                        </div>
+                    {% endif %}
+                    {{ document|milhq_document(record)|rich }}
+                </div>
+            </div>
+        {% endblock %}
+    {% endembed %}
+{% endif %}
+{% if showRecordText and record.text %}
+    {% embed '@Forumify/components/modal.html.twig' %}
+        {% block modalOpenButton %}
+            <button class="btn-link btn-icon btn-small"><i class="ph ph-file-text"></i></button>
+        {% endblock %}
+        {% block modalContent %}
+            <div class="card">
+                <div class="card-title">
+                    {{ 'milhq.user.text'|trans }}
+                </div>
+                <div class="card-body text-left">
+                    {% if item is not null and item.image is defined and item.image is not null %}
+                        <div class="text-center mb-6">
+                            <img width="25%" height="auto" src="{{ asset(item.image, 'milhq.asset') }}" alt="">
+                        </div>
+                    {% endif %}
+                    {{ record.text|rich }}
+                </div>
+            </div>
+        {% endblock %}
+    {% endembed %}
+{% endif %}

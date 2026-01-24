@@ -1,0 +1,45 @@
+{% extends '@Forumify/components/list.html.twig' %}
+{% block row %}
+    <li class="mb-2 flex items-center justify-between">
+        <div>
+            {% embed '@Forumify/components/modal.html.twig' %}
+                {% block modalOpenButton %}
+                    <a>{{ item.form.name }}</a>
+                {% endblock %}
+                {% block modalContent %}
+                    <div class="box">
+                        <div class="mb-4">
+                            <h2>{{ item.form.name }}</h2>
+                            {% include '@ForumifyMilhqPlugin/components/submission.html.twig' with {
+                                submission: item
+                            } %}
+                        </div>
+                        {% if item.status %}
+                            <h3>Status</h3>
+                            <div class="mb-4">
+                                {% include '@ForumifyMilhqPlugin/frontend/roster/components/status.html.twig' with {
+                                    status: item.status,
+                                    class: 'text-small'
+                                } only %}
+                            </div>
+                        {% endif %}
+                        {% if item.statusReason %}
+                            <h3>Reason</h3>
+                            <p>{{ item.statusReason }}</p>
+                        {% endif %}
+                    </div>
+                {% endblock %}
+            {% endembed %}
+            <p class="text-small">{{ item.createdAt|format_date }}</p>
+        </div>
+        {% if item.status %}
+            {% include '@ForumifyMilhqPlugin/frontend/roster/components/status.html.twig' with {
+                status: item.status,
+                class: 'text-small'
+            } only %}
+        {% endif %}
+    </li>
+{% endblock %}
+{% block empty %}
+    {{ 'table.no_entries'|trans }}
+{% endblock %}

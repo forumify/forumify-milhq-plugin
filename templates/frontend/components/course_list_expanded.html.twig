@@ -1,0 +1,35 @@
+{% set class = '' %}
+{% extends '@Forumify/components/list.html.twig' %}
+{% block list %}
+    <ul>
+        {% for course in this.result.rows %}
+            <li class="card flex flex-col mb-4" style="position: relative; padding: 0">
+                <div class="card-title">
+                    {{ course.title }}
+                </div>
+                <div class="card-body flex gap-4">
+                    {% if course.image is not null %}
+                        <div class="flex justify-center items-start hide-phone">
+                            <img src="{{ asset(course.image, 'forumify.asset') }}" width="250px" height="auto">
+                        </div>
+                    {% endif %}
+                    <div>
+                        {{ course.description|rich }}
+                    </div>
+                </div>
+            </li>
+        {% else %}
+            <li>{{ 'milhq.opcenter.no_courses'|trans }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+{% block pagination_top %}
+    <div class="mb-6">
+        {% include '@Forumify/components/components/pagination.html.twig' %}
+    </div>
+{% endblock %}
+{% block pagination_bottom %}
+    <div class="mt-6">
+        {% include '@Forumify/components/components/pagination.html.twig' %}
+    </div>
+{% endblock %}

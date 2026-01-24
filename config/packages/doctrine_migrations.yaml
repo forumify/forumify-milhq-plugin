@@ -1,0 +1,3 @@
+doctrine_migrations:
+    migrations_paths:
+        'ForumifyMilhqPluginMigrations': '%kernel.project_dir%/vendor/forumify/forumify-milhq-plugin/migrations'

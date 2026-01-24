@@ -1,0 +1,17 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}{{ 'milhq.enlistment.enlist'|trans }}{% endblock %}
+{% block body %}
+    <div class="box">
+        {% if instructions is not empty %}
+            <div class="mb-6 rich-text">
+                {{ instructions|milhq_text }}
+            </div>
+        {% endif %}
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div class="flex justify-center items-center gap-2">
+            <button type="submit" class="btn-primary">{{ 'milhq.enlistment.enlist'|trans }}</button>
+        </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

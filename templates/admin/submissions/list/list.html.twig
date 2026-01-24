@@ -1,0 +1,15 @@
+{% extends '@Forumify/admin/base.html.twig' %}
+{% block title_page %}
+    {{ 'milhq.admin.submissions.list.title'|trans }}
+{% endblock %}
+{% block body %}
+    {% if form %}
+        <div class="breadcrumbs text-small">
+            <a href="{{ path('milhq_admin_submission_list') }}">Submissions</a> &gt; {{ form.name }}
+        </div>
+    {% endif %}
+    <h1>
+        {{ 'milhq.admin.submissions.list.title'|trans }}
+    </h1>
+    {{ component('Milhq\\SubmissionTable', { form: form is not null ? form.id : null }) }}
+{% endblock %}

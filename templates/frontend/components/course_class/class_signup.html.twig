@@ -1,0 +1,66 @@
+<div>
+    <div data-loading>
+        <div class="flex justify-center items-center" style="min-height: 100px;">
+            {% include '@Forumify/components/loader.html.twig' %}
+        </div>
+    </div>
+    <div data-loading="hide" class="flex flex-col gap-2">
+        {% if this.signupOpen %}
+            {% set isStudent = this.signedUpAsStudent %}
+            {% if isStudent or this.canSignUpAsStudent %}
+                <button
+                    class="btn-outlined w-100 justify-start"
+                    {{ live_action('toggleStudent') }}
+                >
+                    {% if not isStudent %}
+                        <i class="ph ph-student"></i>
+                        {{ 'milhq.course.class.register_as_student'|trans }}
+                    {% else %}
+                        <i class="ph ph-x"></i>
+                        {{ 'milhq.course.class.deregister_as_student'|trans }}
+                    {% endif %}
+                </button>
+            {% else %}
+                <button class="btn-outlined" disabled>
+                    <i class="ph ph-student"></i>
+                    {{ 'milhq.course.class.prerequisites_not_met'|trans }}
+                </button>
+            {% endif %}
+            {% if can('signup_as_instructor', class.course) %}
+                {% set isInstructor = this.signedUpAsInstructor %}
+                {% if isInstructor %}
+                    <button
+                        class="btn-outlined w-100 justify-start"
+                        {{ live_action('registerInstructor', { instructorId: null }) }}
+                    >
+                        <i class="ph ph-x"></i>
+                        {{ 'milhq.course.class.deregister_as_instructor'|trans }}
+                    </button>
+                {% else %}
+                    {% for instructor in this.class.course.instructors %}
+                        <button
+                            class="btn-outlined w-100 justify-start"
+                            {{ live_action('registerInstructor', { instructorId: instructor.id }) }}
+                        >
+                            <i class="ph ph-chalkboard-teacher"></i>
+                            {{ 'milhq.course.class.register_as_instructor'|trans({ instructor: instructor.title }) }}
+                        </button>
+                    {% else %}
+                        <button
+                            class="btn-outlined w-100 justify-start"
+                            {{ live_action('registerInstructor') }}
+                        >
+                            <i class="ph ph-chalkboard-teacher"></i>
+                            {{ 'milhq.course.class.register_as_instructor'|trans({ instructor: 'Instructor' }) }}
+                        </button>
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <div class="flex justify-center items-center gap-2 text-light" style="height: 100px">
+                <i class="ph ph-prohibit-inset"></i>
+                {{ 'milhq.course.class.signups_closed'|trans }}
+            </div>
+        {% endif %}
+    </div>
+</div>

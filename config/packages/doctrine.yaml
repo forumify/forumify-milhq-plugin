@@ -1,0 +1,9 @@
+doctrine:
+    orm:
+        mappings:
+            milhq:
+                is_bundle: false
+                type: attribute
+                dir: '%kernel.project_dir%/vendor/forumify/forumify-milhq-plugin/src/Entity'
+                prefix: Forumify\Milhq\Entity
+                alias: MilhqEntity

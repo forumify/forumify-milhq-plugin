@@ -1,0 +1,8 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block body %}
+    {% include '@Forumify/admin/components/confirm.html.twig' with {
+        warningText: 'milhq.course.class.delete'|trans({ class: class.title }),
+        confirmPath: path('milhq_course_class_delete', { id: class.id, confirmed: 1 }),
+        cancelPath: path('milhq_course_class_view', { id: class.id })
+    } only %}
+{% endblock %}

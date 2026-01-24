@@ -1,0 +1,26 @@
+<div {{ attributes }} >
+    {% if this.reportedIn %}
+        <p class="alert-success border pl-4 pr-4 flex justify-start items-center" style="height: 40px; border-radius: var(--button-border-radius)">
+            <i class="ph ph-check mr-2"></i>
+            {{ 'milhq.report_in.reported_in'|trans }}
+        </p>
+    {% elseif this.canReportIn %}
+        <div data-loading>
+            <button type="button" class="btn-primary w-100 justify-start" disabled>
+                <i class="ph ph-door-open"></i>
+                {{ 'milhq.report_in.report_in'|trans }}
+            </button>
+        </div>
+        <div data-loading="hide">
+            <button
+                type="button"
+                class="btn-primary w-100 justify-start"
+                data-action="live#action"
+                data-live-action-param='reportIn'
+            >
+                <i class="ph ph-door-open"></i>
+                {{ 'milhq.report_in.report_in'|trans }}
+            </button>
+        </div>
+    {% endif %}
+</div>

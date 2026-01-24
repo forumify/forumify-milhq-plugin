@@ -1,0 +1,74 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}
+    {{ 'milhq.aar.title'|trans }}
+{% endblock %}
+{% block body %}
+    {% set mission = aar.mission %}
+    <div class="breadcrumbs text-small">
+        <a href="{{ path('milhq_operations_center') }}">{{ 'milhq.opcenter.operations_center'|trans }}</a> &gt;
+        <a href="{{ path('milhq_operations_view', { slug: mission.operation.slug }) }}">{{ mission.operation.title }}</a> &gt;
+        <a href="{{ path('milhq_missions_view', { id: mission.id }) }}">{{ mission.title }}</a> &gt;
+        {{ aar.unit.name }}
+    </div>
+    <div class="mb-8 flex justify-between">
+        <div>
+            <h1 class="mb-0">{{ aar.unit.name }}</h1>
+            <div class="flex items-center gap-2 text-small">
+                {{ 'milhq.aar.aar_by'|trans }}
+                {% include '@Forumify/components/avatar.html.twig' with { user: aar.createdBy, className: 'avatar-xs' } only %}
+                <span class="flex items-baseline gap-2">
+                    {% include '@Forumify/components/username.html.twig' with { user: aar.createdBy } only %}
+                    {{ aar.createdAt|format_date }}
+                </span>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            {% if can('manage_after_action_reports', mission.operation) %}
+                <a class="btn-link btn-icon" href="{{ path('milhq_aar_edit', { id: aar.id }) }}">
+                    <i class="ph ph-pencil-simple-line"></i>
+                </a>
+                <a class="btn-link btn-icon" href="{{ path('milhq_aar_delete', { id: aar.id }) }}">
+                    <i class="ph ph-x"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="mb-4">
+        <h3>{{ 'milhq.aar.attendance.title'|trans }}</h3>
+        <table class="box">
+            <thead>
+            <tr>
+                {% for state in attendanceStates %}
+                    <th class="text-left">{{ state|capitalize }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% set rowCount = max(attendance|map(state => state|length)) - 1 %}
+            {% for i in 0..rowCount %}
+                <tr>
+                    {% for state in attendanceStates %}
+                        <td>
+                            {% if attendance[state][i] is defined %}
+                                <span class="flex items-center">
+                                    {% set user = attendance[state][i] %}
+                                    {% if user.rank is not null and user.rank.image is not null %}
+                                        <img class="mr-2" width="24" height="24" src="{{ asset(user.rank.image, 'milhq.asset') }}" alt="">
+                                    {% endif %}
+                                    {{ user.name }}
+                                </span>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h3>{{ 'milhq.aar.report'|trans }}</h3>
+        <div class="box">
+            {{ aar.report|rich }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends '@Forumify/admin/base.html.twig' %}
+{% block title_page %}{% endblock %}
+{% block body %}
+    <div class="breadcrumbs text-small">
+        <a href="{{ path('milhq_admin_submission_list') }}">Submissions</a> &gt;
+        <a href="{{ path('milhq_admin_submission_list', { form: submission.form.id }) }}">
+            {{ submission.form.name }}
+        </a> &gt;
+        {{ submission.user.name }}
+    </div>
+    <h1 class="flex items-center gap-2 mb-4">
+        {{ submission.form.name }}
+        {% if submission.status is not null %}
+            {% include '@ForumifyMilhqPlugin/frontend/roster/components/status.html.twig' with {
+                status: submission.status,
+                class: 'text-small'
+            } only %}
+        {% endif %}
+    </h1>
+    <div class="flex gap-4">
+        <div class="w-50">
+            <div class="box">
+                <div class="mb-2">
+                    <p class="text-bold">{{ 'milhq.admin.submissions.view.user'|trans }}</p>
+                    <a href="{{ path('milhq_admin_user_edit', { identifier: submission.user.id }) }}">
+                        {{ submission.user.name }}
+                    </a>
+                </div>
+                {% include '@ForumifyMilhqPlugin/components/submission.html.twig' %}
+            </div>
+        </div>
+        <ul class="w-50">
+            {% if is_granted('forumify-milhq.admin.submissions.assign_statuses') %}
+                <li class="mb-4">
+                    {% include '@Forumify/admin/components/simple_form.html.twig' %}
+                </li>
+            {% endif %}
+            {% if submission.status is not null %}
+                <li class="box mb-2">
+                    <h4>{{ submission.status.name }}</h4>
+                    <p class="text-small mb-2">{{ submission.updatedAt|format_date }}</p>
+                    <p>
+                        {{ submission.statusReason }}
+                    </p>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endblock %}

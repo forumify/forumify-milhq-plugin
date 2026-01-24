@@ -1,0 +1,32 @@
+{% embed '@Forumify/components/menu.html.twig' with { placement: 'bottom-start' } %}
+    {% block button_text %}{{ item.name }}{% endblock %}
+    {% block menu_items %}
+        {% if item.payload is not empty %}
+            {% if (canEnlist and item.payload.roster_guests) or (not canEnlist and item.payload.roster_active_duty) %}
+                <a class="btn-link" href="{{ path('milhq_roster') }}">{{ 'milhq.roster.title'|trans }}</a>
+            {% endif %}
+            {% if (canEnlist and item.payload.awards_guests) or (not canEnlist and item.payload.awards_active_duty) %}
+                <a class="btn-link" href="{{ path('milhq_awards') }}">{{ 'milhq.award.title'|trans }}</a>
+            {% endif %}
+            {% if (canEnlist and item.payload.ranks_guests) or (not canEnlist and item.payload.ranks_active_duty) %}
+                <a class="btn-link" href="{{ path('milhq_ranks') }}">{{ 'milhq.rank.title'|trans }}</a>
+            {% endif %}
+            {% if (canEnlist and item.payload.qualifications_guests) or (not canEnlist and item.payload.qualifications_active_duty) %}
+                <a class="btn-link" href="{{ path('milhq_qualifications') }}">{{ 'milhq.qualification.title'|trans }}</a>
+            {% endif %}
+            {% if plugin_version('forumify/forumify-milhq-plugin', 'premium') %}
+                {% if (canEnlist and item.payload.operations_guests) or (not canEnlist and item.payload.operations_active_duty) %}
+                    <a class="btn-link" href="{{ path('milhq_operations_list') }}">{{ 'milhq.opcenter.operations'|trans }}</a>
+                {% endif %}
+                {% if (canEnlist and item.payload.courses_guests) or (not canEnlist and item.payload.courses_active_duty) %}
+                    <a class="btn-link" href="{{ path('milhq_courses_list') }}">{{ 'milhq.opcenter.courses'|trans }}</a>
+                {% endif %}
+            {% endif %}
+            {% if canEnlist %}
+                <a class="btn-link" href="{{ path('milhq_enlist') }}">{{ 'milhq.enlistment.enlist'|trans }}</a>
+            {% else %}
+                <a class="btn-link" href="{{ path('milhq_operations_center') }}">{{ 'milhq.opcenter.operations_center'|trans }}</a>
+            {% endif %}
+        {% endif %}
+    {% endblock %}
+{% endembed %}

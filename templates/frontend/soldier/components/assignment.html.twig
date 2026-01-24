@@ -1,0 +1,51 @@
+<div class="flex flex-col gap-4">
+    {% if user.signature %}
+        <img class="card" width="100%" height="auto" src="{{ asset(user.signature, 'milhq.asset') }}">
+    {% endif %}
+    <div class="card">
+        <div class="card-title">{{ 'milhq.user.awards'|trans }}</div>
+        {% set awards = awards|filter(a => a.image is not null) %}
+        {% if awards is not empty %}
+            <div class="card-body grid-xs-4 grid-sm-6 grid-md-12 gap-1">
+                {% for award in awards %}
+                    <div style="position: relative;" title="{{ award.name }}">
+                        <div class="text-center">
+                            <img src="{{ asset(award.image, 'milhq.asset') }}" style="width: 100%; height: 42px; object-fit: contain;">
+                        </div>
+                        {% if award.count > 1 %}
+                            <span style="
+                                position: absolute;
+                                bottom: 8px;
+                                right: 8px;
+                                text-shadow: -1px -1px 0 var(--c-elevation-0), 1px -1px 0 var(--c-elevation-0), -1px 1px 0 var(--c-elevation-0), 1px 1px 0 var(--c-elevation-0);"
+                            >
+                                x{{ award.count }}
+                            </span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-small card-body">{{ 'milhq.user.no_awards'|trans }}</p>
+        {% endif %}
+    </div>
+    <div class="card">
+        <div class="card-title">{{ 'milhq.user.secondary_positions'|trans }}</div>
+        <div class="card-body">
+            <ul class="text-small flex flex-col gap-2">
+                {% for unit in secondaryAssignments %}
+                    <li>
+                        <p class="text-bold">{{ unit.name }}</p>
+                        <ul class="ml-2">
+                            {% for record in unit.records %}
+                                <li>{{ record }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% else %}
+                    <li>{{ 'milhq.user.no_secondary_positions'|trans }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>

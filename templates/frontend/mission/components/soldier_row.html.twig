@@ -1,0 +1,38 @@
+{% if rsvp.going == '1' %}
+    {% set statusColor = 'green' %}
+    {% set statusText = 'Going' %}
+{% elseif rsvp.going == '0' %}
+    {% set statusColor = 'red' %}
+    {% set statusText = 'Not Going' %}
+{% endif %}
+
+<div class="flex justify-between items-center w-100">
+    <div class="w-5 text-left">
+        {% if soldier.rank is not null and soldier.rank.image is not null %}
+            <img width="24px" height="24px" src="{{ asset(soldier.rank.image, 'milhq.asset') }}" alt="">
+        {% endif %}
+    </div>
+    <div class="w-35 text-center">
+        <span class="hide-phone">
+            {% if soldier.rank is not null %}
+                {{ soldier.rank.name }}
+            {% endif %}
+        </span>
+        {{ soldier.name }}
+    </div>
+    <div class="w-20 text-center hide-phone">
+        {% if soldier.position is not null %}
+            {{ soldier.position.name }}
+        {% endif %}
+    </div>
+    <div class="w-20 text-center hide-phone">
+        {% if soldier.position is not null %}
+            {{ soldier.position.name }}
+        {% endif %}
+    </div>
+    <div class="w-15 text-center">
+        {% if rsvp is not null %}
+            <span style="color:{{ statusColor }};">{{ statusText }}</span>
+        {% endif %}
+    </div>
+</div>

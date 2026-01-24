@@ -1,0 +1,12 @@
+{% extends '!@Forumify/frontend/components/profile_header.html.twig' %}
+{% block profile_user_actions %}
+    {% if this.showUserActions %}
+        {% set soldier = repository('Soldier').findOneBy({ user: user }) %}
+        {% if soldier is not null %}
+            <a class="btn-outlined btn-icon" href="{{ path('soldier', { id: soldier.id }) }}">
+                <i class="ph ph-shield-chevron"></i>
+            </a>
+        {% endif %}
+    {% endif %}
+    {{ parent() }}
+{% endblock %}

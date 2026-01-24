@@ -1,0 +1,6 @@
+<div id="operations">
+    <h2>{{ 'milhq.opcenter.missions'|trans }}</h2>
+    {{ component('Milhq\\UpcomingMissionList', { loading: 'lazy' }) }}
+    <h2 class="mt-4">{{ 'milhq.opcenter.operations'|trans }}</h2>
+    {{ component('Milhq\\OperationList', { size: 5, inOpCenter: true, loading: 'lazy' }) }}
+</div>

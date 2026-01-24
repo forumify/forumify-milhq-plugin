@@ -1,0 +1,27 @@
+<div class="flex">
+    {% if is_granted('forumify-milhq.admin.users.manage') %}
+        <a class="btn-link btn-icon btn-small" href="{{ path('milhq_admin_user_edit', { identifier: row.id }) }}">
+            <i class="ph ph-pencil-simple-line"></i>
+        </a>
+    {% endif %}
+    {% if [
+        'users.delete',
+        'records.service_records.create',
+        'records.award_records.create',
+        'records.assignment_records.create',
+        'records.combat_records.create',
+        'records.rank_records.create',
+        'records.qualification_records.create',
+    ] has some perm => is_granted('forumify-milhq.admin.' ~ perm) %}
+        {% embed '@Forumify/components/menu.html.twig' with {
+            placement: 'bottom-end',
+            hideAdornment: true,
+            buttonClass: 'btn-link btn-icon btn-small'
+        } %}
+            {% block button_text %}<i class="ph ph-caret-down"></i>{% endblock %}
+            {% block menu_items %}
+                {% include '@ForumifyMilhqPlugin/admin/users/list/quick_actions.html.twig' with { user: row } %}
+            {% endblock %}
+        {% endembed %}
+    {% endif %}
+</div>

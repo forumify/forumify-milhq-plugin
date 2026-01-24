@@ -1,0 +1,26 @@
+{% extends '@Forumify/emails/base.html.twig' %}
+{% block title %}
+    {{ 'milhq.notification.submission_status_updated.title'|trans }}
+{% endblock %}
+{% block body %}
+    <h2>
+        {{ 'milhq.notification.submission_status_updated.title'|trans }}
+    </h2>
+    <hr>
+    <div class="content-block">
+        <p>
+            {{ 'milhq.notification.submission_status_updated.description'|trans({
+                form: form,
+                status: status,
+            }) }}
+        </p>
+        {% if text is not empty %}
+            <p>{{ text }}</p>
+        {% endif %}
+    </div>
+    <hr>
+    {% include '@Forumify/emails/components/button.html.twig' with {
+        href: path('milhq_operations_center', { viewSubmission: submissionId }),
+        label: 'milhq.opcenter.operations_center'|trans,
+    } only %}
+{% endblock %}

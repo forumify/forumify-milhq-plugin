@@ -1,0 +1,22 @@
+{% extends '@Forumify/components/list.html.twig' %}
+{% block list %}
+    <ul>
+        {% for class in this.result.rows %}
+            <li class="topic-row">
+                <a class="topic-link" href="{{ path('milhq_course_class_view', { id: class.id }) }}"></a>
+                <div class="flex justify-between items-center">
+                    <h4 class="mb-0 text-subtitle">{{ class.title }}</h4>
+                    <span class="text-small">{{ class.start|format_date(true) }}</span>
+                </div>
+            </li>
+        {% else %}
+            <li class="p-4">
+                {% if this.course is null %}
+                    {{ 'milhq.course.no_signups'|trans }}
+                {% else %}
+                    {{ 'milhq.course.no_classes'|trans }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

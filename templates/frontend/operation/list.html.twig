@@ -1,0 +1,8 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}
+    {{ 'milhq.opcenter.operations'|trans }}
+{% endblock %}
+{% block body %}
+    <h1>{{ 'milhq.opcenter.operations'|trans }}</h1>
+    {{ component('Milhq\\OperationList', { size: 5 }) }}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends '@Forumify/admin/base.html.twig' %}
+{% block title_page %}
+    Discharge {{ soldier.name }}
+{% endblock %}
+{% block body %}
+    {% include '@Forumify/admin/components/simple_form.html.twig' with {
+        name: soldier.name,
+        form: form,
+        cancelPath: path('milhq_admin_soldier_list')
+    } %}
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}
+    {{ 'milhq.opcenter.courses'|trans }}
+{% endblock %}
+{% block body %}
+    <h1>{{ 'milhq.opcenter.courses'|trans }}</h1>
+    {{ component('Milhq\\CourseList\\Expanded') }}
+{% endblock %}

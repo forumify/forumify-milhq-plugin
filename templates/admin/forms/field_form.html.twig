@@ -1,0 +1,6 @@
+{% extends '@Forumify/admin/crud/form.html.twig' %}
+{% block body %}
+    {% include '@Forumify/admin/components/simple_form.html.twig' with {
+        cancelPath: path(route ~ '_list', { formId: parentForm.id })
+    } %}
+{% endblock %}

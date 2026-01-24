@@ -1,0 +1,25 @@
+{% extends '@Forumify/admin/crud/list.html.twig' %}
+{% block body %}
+    <div class="breadcrumbs text-small">
+        <a href="{{ path('milhq_admin_form_list') }}">Forms</a> &gt;
+        {{ parentForm.name }}
+    </div>
+    {% if syncEnabled %}
+        <div class="alert-warning mb-4">
+            Form fields are readonly in forumify admin and must be managed from milhq.io.
+        </div>
+    {% endif %}
+    <h2>
+        {{ title }}
+        {% if capabilities.create %}
+            <a
+                class="btn-primary btn-small btn-icon"
+                aria-label="{{ 'admin.crud.create'|trans({ single: (translationPrefix ~ 'single')|trans }) }}"
+                href="{{ path(route ~ '_create', { formId: parentForm.id }) }}"
+            >
+                <i class="ph ph-plus"></i>
+            </a>
+        {% endif %}
+    </h2>
+    {{ component(table, { form: parentForm }) }}
+{% endblock %}

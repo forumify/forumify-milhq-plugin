@@ -1,0 +1,53 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}{{ course.title }}{% endblock %}
+{% block body %}
+    <div class="breadcrumbs text-small">
+        <a href="{{ path('milhq_operations_center') }}">{{ 'milhq.opcenter.operations_center'|trans }}</a> &gt;
+        {{ course.title }}
+    </div>
+    <h1>{{ course.title }}</h1>
+    <div class="box flex justify-between gap-2">
+        <div>
+            {{ course.description|rich }}
+            <div class="rich-text">
+                {% set qualifications = course.qualifications|milhq_course_qualifications %}
+                {% if qualifications is not empty %}
+                    <p class="text-bold mt-4">{{ 'milhq.course.qualifications'|trans }}</p>
+                    <ul>
+                        {% for qualification in qualifications %}
+                            <li>{{ qualification }}</li>
+                        {% else %}
+                            <li>{{ 'milhq.course.no_qualifications'|trans }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% set prerequisites = course|milhq_course_prerequisites %}
+                {% if prerequisites is not empty %}
+                    <p class="text-bold mt-4">{{ 'milhq.course.prerequisites'|trans }}</p>
+                    <ul>
+                        {% for prerequisite in prerequisites %}
+                            <li>{{ prerequisite }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+        {% if course.image is not null %}
+            <div class="flex justify-center items-start hide-phone">
+                <img class="rounded" src="{{ asset(course.image, 'forumify.asset') }}" width="250px" height="auto">
+            </div>
+        {% endif %}
+    </div>
+    {% if can('view_classes', course) %}
+        <div class="flex justify-between items-start mb-4 mt-4">
+            <h2>{{ 'milhq.course.classes'|trans }}</h2>
+            {% if can('manage_classes', course) %}
+                <a class="btn-primary" href="{{ path('milhq_course_class_create', { slug: course.slug }) }}">
+                    <i class="ph ph-plus"></i>
+                    {{ 'milhq.course.class.create'|trans }}
+                </a>
+            {% endif %}
+        </div>
+        {{ component('Milhq\\CourseClassList', { course: course }) }}
+    {% endif %}
+{% endblock %}

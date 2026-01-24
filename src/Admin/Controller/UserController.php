@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Forumify\Milhq\Admin\Controller;
+
+use Forumify\Admin\Crud\AbstractCrudController;
+use Forumify\Milhq\Admin\Form\UserType;
+use Forumify\Milhq\Entity\Soldier;
+use Forumify\Milhq\Repository\AssignmentRecordRepository;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Routing\Attribute\Route;
+
+#[Route('/soldiers', 'soldier')]
+class UserController extends AbstractCrudController
+{
+    protected string $listTemplate = '@ForumifyMilhqPlugin/admin/soldiers/list/list.html.twig';
+    protected string $formTemplate = '@ForumifyMilhqPlugin/admin/soldiers/edit/form.html.twig';
+
+    protected ?string $permissionView = 'forumify-milhq.admin.soldiers.view';
+    protected ?string $permissionCreate = 'forumify-milhq.admin.soldiers.create';
+    protected ?string $permissionEdit = 'forumify-milhq.admin.soldiers.manage';
+    protected ?string $permissionDelete = 'forumify-milhq.admin.soldiers.delete';
+
+    public function __construct(
+        private readonly AssignmentRecordRepository $assignmentRecordRepository,
+    ) {
+    }
+
+    protected function getTranslationPrefix(): string
+    {
+        return 'milhq.' . parent::getTranslationPrefix();
+    }
+
+    protected function getEntityClass(): string
+    {
+        return Soldier::class;
+    }
+
+    protected function getTableName(): string
+    {
+        return 'Milhq\\UserTable';
+    }
+
+    protected function getForm(?object $data): FormInterface
+    {
+        return $this->createForm(UserType::class, $data);
+    }
+
+    protected function templateParams(array $params = []): array
+    {
+        $params = parent::templateParams($params);
+        if (empty($params['data'])) {
+            return $params;
+        }
+
+        /** @var Soldier $soldier */
+        $soldier = $params['data'];
+        $params['secondaryAssignmentRecords'] = $this->assignmentRecordRepository->findBy([
+            'type' => 'secondary',
+            'soldier' => $soldier,
+        ]);
+
+        return $params;
+    }
+}

@@ -1,0 +1,18 @@
+{% extends '@Forumify/components/list.html.twig' %}
+{% block list %}
+    <ul>
+        {% for mission in this.result.rows %}
+            <li class="flex flex-col topic-row justify-between">
+                <a class="topic-link" href="{{ path('milhq_missions_view', { id: mission.id }) }}"></a>
+                <div class="flex justify-between">
+                    <h4 class="mb-0 text-subtitle">{{ mission.operation.title }}: {{ mission.title }}</h4>
+                    <div class="flex items-center gap-2 text-small">
+                        {{ mission.start|format_date(true) }}
+                    </div>
+                </div>
+            </li>
+        {% else %}
+            <li class="text-center p-4">{{ 'milhq.opcenter.no_upcoming_missions'|trans }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

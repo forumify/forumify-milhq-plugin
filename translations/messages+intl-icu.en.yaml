@@ -1,0 +1,349 @@
+milhq:
+    settings:
+        tab_settings: 'Settings'
+        tab_general: 'General'
+        tab_profile: 'Profile'
+        tab_report_in: 'Report In'
+        tab_operations: 'Operations'
+        tab_courses: 'Courses'
+        tab_squadxml: 'SquadXML'
+        title: 'MILHQ - Personnel & Unit Management'
+        op_center: 'Operations Center'
+        roster: 'Roster'
+        enlistment: 'Enlistment'
+        enlistment_automations: 'Automations'
+        profile:
+            display_name_format_help: >
+                Format to use. This code is in twig, and is given the Soldier object in context.<br/>
+                You have access to the user, their rank, position, specialty and status.<br/>
+                The following examples assume your soldiers all have roleplay friendly names ("Firstname Lastname"):<br/>
+                <ul class="pl-4 pt-1">
+                    <li><strong>Colonel John Doe:</strong> <code>&lbrace;&lbrace;user.rank.name&rbrace;&rbrace; &lbrace;&lbrace;user.name&rbrace;&rbrace;</code></li>
+                    <li><strong>COL J.Doe:</strong> <code>&lbrace;&lbrace;user.rank.abbreviation&rbrace;&rbrace; &lbrace;&lbrace;user.name|slice(0,1)&rbrace;&rbrace;.&lbrace;&lbrace;user.name|split(&#039; &#039;)|last&rbrace;&rbrace;</code></li>
+                    <li><strong>Commander Doe:</strong> <code>&lbrace;&lbrace;user.position.name&rbrace;&rbrace; &lbrace;&lbrace;user.name|split(&#039; &#039;)|last&rbrace;&rbrace;</code>
+                </ul>
+    admin:
+        requires_milhq_account: 'This action requires you to have a soldier linked to your forum user.'
+        soldier:
+            crud:
+                plural: 'soldiers'
+                single: 'soldier'
+        soldiers:
+            not_found: 'Soldier can not be found.'
+            list:
+                title: 'Soldiers'
+                actions:
+                    service: 'New Service Record'
+                    award: 'New Award'
+                    combat: 'New Combat Record'
+                    rank: 'Promote/Demote'
+                    assignment: 'New Assignment'
+                    qualification: 'New Qualification'
+                    discharge: 'Discharge'
+                    delete: 'Delete User'
+            edit:
+                title: 'Editing {name}'
+                saved: 'User saved.'
+                general: 'General'
+                rank_help: 'Modifying the rank here does not create a new rank record, additionally, time in grade will not be reset. Use "Promote/Demote" in "Quick Actions" to create a new rank record.'
+                created_at_help: 'This date is used to calculate Time In Service on the user''s p-file.'
+                steam_id_help: 'SteamID64 of the user. You can use tools like <a href="https://steamid.io/lookup">steamid.io</a> to find it.'
+                assignment: 'Assignment'
+                assignment_warning: 'To modify the assignment, create a new primary assignment record. Use "New Assignment" in "Quick Actions" to create a new assignment record.'
+                uniform: 'Uniform'
+                no_secondary_assignments: 'This user has no secondary assignments.'
+            delete:
+                confirm: 'You are about to delete {name}. This will completely remove their soldier profile. If you want to keep their records, please assign them to a non-active status like "Civilian" or "Discharged" instead.'
+                deleted: 'User deleted.'
+            record_form:
+                created: 'Record created.'
+            quick_actions: 'Quick Actions'
+        submissions:
+            list:
+                title: 'Form Submissions'
+            view:
+                title: 'Submission'
+                user: 'User'
+                status_reason: 'Status Reason'
+                status_created: 'Submission status updated.'
+        award:
+            crud:
+                single: 'award'
+                plural: 'awards'
+        document:
+            crud:
+                single: 'document'
+                plural: 'documents'
+        form:
+            crud:
+                single: 'form'
+                plural: 'forms'
+        form_field:
+            crud:
+                single: 'field'
+                plural: 'fields'
+        position:
+            crud:
+                single: 'position'
+                plural: 'positions'
+        qualification:
+            crud:
+                single: 'qualification'
+                plural: 'qualifications'
+        rank:
+            crud:
+                single: 'rank'
+                plural: 'ranks'
+        roster:
+            crud:
+                single: 'roster'
+                plural: 'rosters'
+        unit:
+            crud:
+                single: 'unit'
+                plural: 'units'
+        status:
+            crud:
+                single: 'status'
+                plural: 'statuses'
+        specialty:
+            crud:
+                single: 'specialty'
+                plural: 'specialties'
+        configuration:
+            title: 'Configuration'
+        service_record:
+            crud:
+                single: 'service record'
+                plural: 'service records'
+        combat_record:
+            crud:
+                single: 'combat record'
+                plural: 'combat records'
+        award_record:
+            crud:
+                single: 'award record'
+                plural: 'award records'
+        assignment_record:
+            crud:
+                single: 'assignment record'
+                plural: 'assignment records'
+        rank_record:
+            crud:
+                single: 'rank record'
+                plural: 'rank records'
+        qualification_record:
+            crud:
+                single: 'qualification record'
+                plural: 'qualification records'
+        course:
+            crud:
+                single: 'Course'
+                plural: 'Courses'
+            instructor:
+                title: 'Instructors'
+                create: 'New Instructor'
+                created: 'Instructor created.'
+                edit: 'Editing {instructor}'
+                edited: 'Instructor updated.'
+                removed: 'Instructor removed.'
+        operation:
+            crud:
+                single: 'Operation'
+                plural: 'Operations'
+            description_help: 'Brief description that is shown on the operation list page.'
+            rsvp_help: 'When enabled, users will get the option to mark their own attendance before the mission, which will prefil attendance on the after action report.'
+    roster:
+        title: 'Roster'
+        no_users: 'No users in unit.'
+    enlistment:
+        enlist: 'Enlist'
+        not_verified: 'You must verify your email before being able to enlist.'
+        not_eligible: 'You are currently not eligible for enlistment.'
+        not_enabled: 'Enlistments are currently disabled.'
+        pending: 'Your enlistment is being processed.'
+        pending_with_topic:  'Your enlistment is being processed. View the enlistment topic for further instructions and updates.'
+        topic: 'View enlistment topic'
+        start_new: 'Start another enlistment'
+    user:
+        not_found: 'This user does not exist on milhq.'
+        forum_profile: 'Forum profile'
+        rank: 'Rank'
+        length_in_service: 'Length in service'
+        time_in_service: 'Time in service'
+        time_in_grade: 'Time in grade'
+        assignment: 'Assignment'
+        profile: 'Profile'
+        awards: 'Awards'
+        no_awards: 'This user has no awards.'
+        service_record: 'Service Record'
+        award_record: 'Award Record'
+        combat_record: 'Combat Record'
+        rank_record: 'Rank Record'
+        assignment_record: 'Assignment Record'
+        qualifications: 'Qualification Record'
+        specialty: 'Specialty'
+        position: 'Position'
+        unit: 'Unit'
+        supervisors: 'Supervisors'
+        secondary_positions: 'Secondary Positions'
+        no_secondary_positions: 'This user does not have any secondary positions.'
+        document: 'Record Document'
+        text: 'Record Text'
+        last_report_in: 'Last report in'
+        no_report_in: 'This user has not reported in yet.'
+        search_records: 'Search Records'
+    rank:
+        title: 'Ranks'
+        no_ranks: 'No ranks.'
+        type:
+            promotion: 'Promotion'
+            demotion: 'Demotion'
+    award:
+        title: 'Awards'
+        no_awards: 'No awards.'
+    qualification:
+        title: 'Qualifications'
+        no_qualifications: 'No qualifications.'
+    opcenter:
+        operations_center: 'Operations Center'
+        pfile: 'Personnel File'
+        submissions: 'Dashboard'
+        newsfeed: 'Newsfeed'
+        submission_created: 'Form submission created.'
+        status_history: 'Status history'
+        operations: 'Operations'
+        no_operations: 'No operations.'
+        missions: 'Upcoming missions'
+        no_missions: 'This operation has no missions yet. Come back later to see mission briefings.'
+        no_upcoming_missions: 'No upcoming missions. Check back later.'
+        courses: 'Training & Schools'
+        no_courses: 'No courses.'
+        class_signup_open: 'Sign up'
+        class_last: 'Last ran:'
+        class_never: 'Never'
+        attendance: 'Attendance Sheet'
+    operation:
+        missions: 'Missions'
+        operation: 'Operation'
+    mission:
+        create: 'New Mission'
+        edit: 'Edit Mission'
+        created: 'Mission created.'
+        edited: 'Mission modified.'
+        delete: 'You are about to delete mission {mission}. If there are any after action reports, these will be deleted too.'
+        deleted: 'Mission deleted.'
+        no_aars: 'This mission has no after action reports yet.'
+        aars: 'After Action Reports'
+        mission: 'Mission'
+        mission_by: 'Mission by'
+        start: 'Starts on'
+        end: 'Ends on'
+        rsvps: 'Expected Attendance'
+        no_rsvps: 'This mission has no RSVPs yet.'
+        rsvp:
+            rsvp: 'RSVP'
+            going: 'Going'
+            not_going: 'Not Going'
+            remove_rsvp: 'Remove RSVP'
+        tab:
+            briefing: 'Briefing'
+            expected_attendance: 'Expected Attendance'
+            aar: 'After Action Reports'
+    aar:
+        title: 'After Action Report'
+        create: 'New After Action Report'
+        edit: 'Edit After Action Report'
+        created: 'After Action Report submitted.'
+        edited: 'After Action Report modified.'
+        attendance:
+            title: 'Attendance'
+            user: 'User'
+        already_exists: 'An after action report for this unit has already been recorded.'
+        report: 'Report'
+        aar_by: 'After Action Report by'
+        delete: 'You are about to delete the after action report for {unit} in {mission}. If combat records were assigned, these will not be removed.'
+        deleted: 'After Action Report deleted.'
+    report_in:
+        report_in: 'Report In'
+        reported_in: 'You have successfully reported in.'
+    course:
+        qualifications: 'Qualifications upon completion'
+        no_qualifications: 'N/A'
+        prerequisites: 'Prerequisites'
+        classes: 'Classes'
+        no_classes: 'This course hasn''t run yet.'
+        no_signups: 'Currently there are no classes open for registrations.'
+        class:
+            create: 'New Class'
+            created: 'Class created.'
+            edit: 'Edit Class'
+            edited: 'Class edited.'
+            delete: 'You are about to delete the class "{class}".'
+            deleted: 'Class deleted.'
+            description_help: 'Additional class specific information, equipment to bring, where to assemble,...'
+            instructor_slots_help: 'How many instructors are allowed to sign up? Leave blank to allow unlimited, set to 0 to disable signups.'
+            student_slots_help: 'How many students are allowed to sign up? Leave blank to allow unlimited, set to 0 to disable signups.'
+            created_by: 'Class by'
+            register_as_student: 'Register as Student'
+            deregister_as_student: 'Deregister as Student'
+            register_as_instructor: 'Register as {instructor}'
+            deregister_as_instructor: 'Deregister as Instructor'
+            start: 'Starts on'
+            end: 'Ends on'
+            instructors: 'Instructors'
+            students: 'Students'
+            open: 'Open'
+            prerequisites_not_met: 'Prerequisites not met'
+            new_report: 'Submit Class Report'
+            create_report: 'New Class Report'
+            report: '{class} - Report'
+            signups_closed: 'Signups are closed.'
+    notification:
+        submission_status_updated:
+            title: 'Submission status updated'
+            description: 'Your {form} is now {status}.'
+        service_record:
+            title: 'A service record was added to your profile'
+            description: '{text}'
+        award_record:
+            title: 'You received a new award'
+            description: 'You received the {award}.'
+        combat_record:
+            title: 'A combat record was added to your profile'
+            description: '{text}'
+        rank_record:
+            title: 'You received a new rank'
+            description: >-
+                {type, select,
+                    0       {You were promoted to {rank}.}
+                    1       {You were demoted to {rank}.}
+                    other   {}
+                }
+        assignment_record:
+            title: 'You received a new position'
+            description: 'You were assigned to {position} in {unit}.'
+        qualification_record:
+            title: 'You received a new qualification'
+            description: 'You are now qualified in {qualification}'
+        mission_created:
+            title: 'A new mission was posted in operation {operation}'
+            description: 'Details regarding mission {mission} were posted.'
+            view_mission: 'View Mission'
+        report_in_warning:
+            title: 'You are about to be marked {status}'
+            description: 'In {days} days you will be marked {status}. Please report in on the operations center!'
+            action: 'Operations Center'
+        report_in_failure:
+            title: 'You were marked {status}'
+            description: 'You failed to report in in the last {days} days. Please report in as soon as possible!'
+            action: 'Operations Center'
+    attendance_sheet:
+        generate: 'Generate Sheet'
+        loading: 'Generating attendance sheet...'
+        reset: 'Reset'
+        total_present: '# Present'
+        total_excused: '# Excused'
+        total_absent: '# Absent'
+        perc_attended: '% Attended'
+        perc_accountable: '% Accountable'

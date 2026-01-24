@@ -1,0 +1,8 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block body %}
+    {% include '@Forumify/admin/components/confirm.html.twig' with {
+        warningText: 'milhq.mission.delete'|trans({ mission: mission.title }),
+        confirmPath: path('milhq_missions_delete', { id: mission.id, confirmed: 1 }),
+        cancelPath: path('milhq_missions_view', { id: mission.id })
+    } only %}
+{% endblock %}

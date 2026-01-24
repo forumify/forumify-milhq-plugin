@@ -1,0 +1,118 @@
+<div>
+    <button
+        class="btn-outlined mb-4"
+        data-action="live#action"
+        data-live-action-param="reset"
+    >
+        <i class="ph ph-arrow-left"></i>
+        {{ 'milhq.attendance_sheet.reset'|trans }}
+    </button>
+    <div style="overflow-x: scroll">
+        <table class="card" style="width: auto">
+            <thead>
+            <tr>
+                <th></th>
+                <th style="writing-mode: vertical-rl; vertical-align: bottom; rotate: -15deg;">
+                    {{ 'milhq.attendance_sheet.perc_attended'|trans }}
+                </th>
+                <th style="writing-mode: vertical-rl; vertical-align: bottom; rotate: -15deg;">
+                    {{ 'milhq.attendance_sheet.perc_accountable'|trans }}
+                </th>
+                {% for mission in this.missions %}
+                    <th
+                        style="
+                            writing-mode: vertical-rl;
+                            vertical-align: bottom;
+                            rotate: -15deg;
+                            width: 60px;
+                        "
+                        title="{{ mission.title }}"
+                    >
+                        <a href="{{ path('milhq_missions_view', { id: mission.id }) }}">
+                            {{ mission.start|date('Y-m-d') }}
+                        </a>
+                    </th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for unitId, unit in this.units %}
+                <tr>
+                    <th colspan="3" class="text-left p-4">{{ unit.name }}</th>
+                    <th colspan="{{ this.missions|length }}"></th>
+                </tr>
+                {% for user in this.users[unitId] %}
+                    <tr>
+                        <td>
+                        <span class="flex items-center gap-1">
+                            {% if user.rank is not null %}
+                                {% if user.rank.image is not null %}
+                                    <img width="24" height="24" src="{{ asset(user.rank.image, 'milhq.asset') }}">
+                                {% endif %}
+                                {{ user.rank.abbreviation }}
+                            {% endif %}
+                            {{ user.name }}
+                        </span>
+                        </td>
+                        <td>{{ this.userAttendance(user.id) }}%</td>
+                        <td>{{ this.userAccountability(user.id) }}%</td>
+                        {% for missionId, mission in this.missions %}
+                            {% set state = this.sheet[missionId][unitId][user.id] ?? 'unknown' %}
+                            {% set icon = {
+                                present: 'ph ph-check-circle',
+                                excused: 'ph ph-prohibit-inset',
+                                absent: 'ph ph-x-circle',
+                            }[state] ?? '' %}
+                            {% set color = {
+                                present: '0, 200, 0',
+                                excused: '0, 50, 230',
+                                absent: '255, 0, 0'
+                            }[state] ?? '' %}
+                            <td style="color: rgb({{ color }}); background-color: rgba({{ color }}, 0.1);">
+                                <div class="flex justify-center items-center">
+                                    <i class="{{ icon }} text-large"></i>
+                                </div>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            <tr>
+                <th class="text-left p-4" colspan="{{ 3 + this.missions|length }}">
+                    Totals
+                </th>
+            </tr>
+            <tr>
+                <td colspan="3" class="text-right text-bold" data-testid="total-present">{{ 'milhq.attendance_sheet.total_present'|trans }}</td>
+                {% for mission in this.missions %}
+                    <td>{{ this.missionTotalPresent(mission.id) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td colspan="3" class="text-right text-bold" data-testid="total-excused">{{ 'milhq.attendance_sheet.total_excused'|trans }}</td>
+                {% for mission in this.missions %}
+                    <td>{{ this.missionTotalExcused(mission.id) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td colspan="3" class="text-right text-bold" data-testid="total-absent">{{ 'milhq.attendance_sheet.total_absent'|trans }}</td>
+                {% for mission in this.missions %}
+                    <td>{{ this.missionTotalAbsent(mission.id) }}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td colspan="3" class="text-right text-bold" data-testid="perc-attended">{{ 'milhq.attendance_sheet.perc_attended'|trans }}</td>
+                {% for mission in this.missions %}
+                    <td>{{ this.missionPercentageAttended(mission.id) }}%</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td colspan="3" class="text-right text-bold" data-testid="perc-accountable">{{ 'milhq.attendance_sheet.perc_accountable'|trans }}</td>
+                {% for mission in this.missions %}
+                    <td>{{ this.missionPercentageAccountable(mission.id) }}%</td>
+                {% endfor %}
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

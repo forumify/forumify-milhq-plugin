@@ -1,0 +1,43 @@
+{% extends '@Forumify/admin/crud/form.html.twig' %}
+{% block body %}
+    <h1>{{ title }}</h1>
+    {% set formHtml %}
+        <div class="box">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="flex justify-center items-center gap-2">
+                <button type="submit" class="btn-primary">{{ 'save'|trans }}</button>
+                <a href="{{ path(route ~ '_list') }}" class="btn-outlined">{{ 'cancel'|trans }}</a>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    {% endset %}
+    {% if data is null %}
+        {{ formHtml|raw }}
+    {% else %}
+        {% embed '@Forumify/components/tabs.html.twig' %}
+            {% block tabs %}
+                <button type="button" class="btn-link" data-tab-id="course-form">Course</button>
+                <button type="button" class="btn-link" data-tab-id="instructors">Instructors</button>
+            {% endblock %}
+            {% block tabpanels %}
+                <div id="course-form">{{ formHtml }}</div>
+                <div id="instructors">
+                    <h2 class="mb-0">
+                        Instructors
+                        <a
+                            class="btn-primary btn-small btn-icon"
+                            href="{{ path('milhq_admin_courses_create_instructor', { id: data.id }) }}"
+                        >
+                            <i class="ph ph-plus"></i>
+                        </a>
+                    </h2>
+                    <p class="mb-2 text-small">Different types of roles the instructors can sign up as. For example; Safety Officer, Drill Instructor, Drill Sergeant, ...</p>
+                    <div class="mb-4">
+                        {{ component('Milhq\\CourseInstructorTable', { courseId: data.id }) }}
+                    </div>
+                </div>
+            {% endblock %}
+        {% endembed %}
+    {% endif %}
+{% endblock %}

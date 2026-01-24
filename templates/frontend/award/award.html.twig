@@ -1,0 +1,5 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}{{ 'milhq.award.title'|trans }}{% endblock %}
+{% block body %}
+    {{ component('AwardList', { size: 20 }) }}
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends '@Forumify/admin/base.html.twig' %}
+{% block body %}
+    {% include '@Forumify/admin/components/simple_form.html.twig' with {
+        cancelPath: path('milhq_admin_user_list'),
+        title: ('milhq.admin.users.list.actions.' ~ type)|trans
+    } %}
+{% endblock %}

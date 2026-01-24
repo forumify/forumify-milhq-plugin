@@ -1,0 +1,49 @@
+{% set class = '' %}
+{% extends '@Forumify/components/list.html.twig' %}
+{% block pagination_top %}
+    <div class="mb-6">
+        {% include '@Forumify/components/components/pagination.html.twig' %}
+    </div>
+{% endblock %}
+{% block list %}
+    <ul>
+        {% for operation in this.result.rows %}
+            <li class="card flex flex-col mb-4{% if this.inOpCenter %} topic-row{% endif %}" style="position: relative; padding: 0">
+                {% if this.inOpCenter %}
+                    <a class="topic-link" href="{{ path('milhq_operations_view', { slug: operation.slug }) }}"></a>
+                {% endif %}
+                <div class="card-title">
+                    {{ operation.title }}
+                </div>
+                <div class="card-body flex gap-4">
+                    {% if operation.image is not null %}
+                        <div class="flex justify-center items-center hide-phone">
+                            <img src="{{ asset(operation.image, 'forumify.asset') }}" width="250px" height="auto">
+                        </div>
+                    {% endif %}
+                    <div class="rich-text">
+                        <p class="text-small">
+                            {% if operation.start %}
+                                {{ operation.start|date('j M Y') }}
+                            {% endif %}
+                            {% if operation.start and operation.end %}
+                                <i class="ph ph-arrow-right"></i>
+                            {% endif %}
+                            {% if operation.end %}
+                                {{ operation.end|date('j M Y') }}
+                            {% endif %}
+                        </p>
+                        {{ operation.description|striptags|u.truncate(600, '...', false).trim|raw }}
+                    </div>
+                </div>
+            </li>
+        {% else %}
+            <li>{{ 'milhq.opcenter.no_operations'|trans }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+{% block pagination_bottom %}
+    <div class="mt-6">
+        {% include '@Forumify/components/components/pagination.html.twig' %}
+    </div>
+{% endblock %}

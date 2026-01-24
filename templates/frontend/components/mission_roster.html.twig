@@ -1,0 +1,34 @@
+<div {{ attributes }}>
+    {% set units = this.unitsWithRSVPs %}
+
+    {% if units is not empty %}
+        <ul>
+            {% for unit in units %}
+                {% set users = this.getUsersInUnitWithRSVPs(unit) %}
+                {% if users is not empty %}
+                    <li class="card mb-4">
+                        <div class="card-title">{{ unit.name }}</div>
+                        <ul class="card-body">
+                            {% for user in users %}
+                                <li class="text-small">
+                                    <a href="{{ path('soldier', { id: user.id }) }}" class="btn-link w-100">
+                                        {% include '@ForumifyMilhqPlugin/frontend/mission/components/soldier_row.html.twig' with {
+                                            soldier: user,
+                                            rsvp: this.getRSVPForUser(user)
+                                        } only %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="card">
+            <div class="card-body text-center text-muted">
+                {{ 'milhq.mission.no_rsvps'|trans }}
+            </div>
+        </div>
+    {% endif %}
+</div>

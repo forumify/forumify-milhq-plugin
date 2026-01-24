@@ -1,0 +1,42 @@
+{% set recordParams = user is defined ? { users: user.id } : {} %}
+{% if is_granted('forumify-milhq.admin.records.service_records.create') %}
+    <a class="btn-link" href="{{ path('milhq_admin_record_form', recordParams|merge({ type: 'service' })) }}">
+        <i class="ph ph-list-dashes"></i>{{ 'milhq.admin.users.list.actions.service'|trans }}
+    </a>
+{% endif %}
+{% if is_granted('forumify-milhq.admin.records.award_records.create') %}
+    <a class="btn-link" href="{{ path('milhq_admin_record_form', recordParams|merge({ type: 'award' })) }}">
+        <i class="ph ph-medal-military"></i>{{ 'milhq.admin.users.list.actions.award'|trans }}
+    </a>
+{% endif %}
+{% if is_granted('forumify-milhq.admin.records.combat_records.create') %}
+    <a class="btn-link" href="{{ path('milhq_admin_record_form', recordParams|merge({ type: 'combat' })) }}">
+        <i class="ph ph-crosshair"></i>{{ 'milhq.admin.users.list.actions.combat'|trans }}
+    </a>
+{% endif %}
+{% if is_granted('forumify-milhq.admin.records.rank_records.create') %}
+    <a class="btn-link" href="{{ path('milhq_admin_record_form', recordParams|merge({ type: 'rank' })) }}">
+        <i class="ph ph-caret-double-up"></i>{{ 'milhq.admin.users.list.actions.rank'|trans }}
+    </a>
+{% endif %}
+{% if is_granted('forumify-milhq.admin.records.assignment_records.create') %}
+    <a class="btn-link" href="{{ path('milhq_admin_record_form', recordParams|merge({ type: 'assignment' })) }}">
+        <i class="ph ph-identification-card"></i>{{ 'milhq.admin.users.list.actions.assignment'|trans }}
+    </a>
+{% endif %}
+{% if is_granted('forumify-milhq.admin.records.qualification_records.create') %}
+    <a class="btn-link" href="{{ path('milhq_admin_record_form', recordParams|merge({ type: 'qualification' })) }}">
+        <i class="ph ph-certificate"></i>{{ 'milhq.admin.users.list.actions.qualification'|trans }}
+    </a>
+{% endif %}
+{% if user is defined and is_granted('forumify-milhq.admin.users.discharge') %}
+    <a class="btn-link" href="{{ path('milhq_admin_user_discharge', { id: user.id }) }}">
+        <i class="ph ph-door-open"></i> {{ 'milhq.admin.users.list.actions.discharge'|trans }}
+    </a>
+{% endif %}
+{% if user is defined and is_granted('forumify-milhq.admin.users.delete') %}
+    <hr>
+    <a class="btn-link" href="{{ path('milhq_admin_user_delete', { identifier: user.id }) }}">
+        <i class="ph ph-x"></i>{{ 'milhq.admin.users.list.actions.delete'|trans }}
+    </a>
+{% endif %}

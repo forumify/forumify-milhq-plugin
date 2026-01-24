@@ -1,0 +1,6 @@
+flysystem:
+    storages:
+        milhq_asset.storage:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/public/storage/milhq'

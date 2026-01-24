@@ -1,0 +1,71 @@
+You can use {placeholders} in document content. When displaying the content to the user, the placeholder will be replaced with the actual value.
+{% embed '@Forumify/components/modal.html.twig' %}
+    {% block modalOpenButton %}
+        <a>View possible placeholders</a>
+    {% endblock %}
+    {% block modalContent %}
+        <table class="text-regular">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Assignment Record -->
+            <tr><th colspan="2" class="border-b border-t p-2">Assignment Record</th></tr>
+            <tr><td>{assignment_record_status}</td><td>The status of the assignment record.</td></tr>
+            <tr><td>{assignment_record_unit}</td><td>The unit of the assignment record.</td></tr>
+            <tr><td>{assignment_record_position}</td><td>The position of the assignment record.</td></tr>
+            <tr><td>{assignment_record_speciality}</td><td>The specialty of the assignment record.</td></tr>
+            <tr><td>{assignment_record_type}</td><td>The type of assignment record, either Primary or Secondary.</td></tr>
+            <tr><td>{assignment_record_text}</td><td>The text of the assignment record.</td></tr>
+            <tr><td>{assignment_record_date}</td><td>The date of the assignment record.</td></tr>
+
+            <!-- Award Record -->
+            <tr><th colspan="2" class="border-b border-t p-2">Award Record</th></tr>
+            <tr><td>{award_record_award}</td><td>The award of the award record.</td></tr>
+            <tr><td>{award_record_award_image}</td><td>The award image of the award record.</td></tr>
+            <tr><td>{award_record_text}</td><td>The text of the award record.</td></tr>
+            <tr><td>{award_record_date}</td><td>The date of the award record.</td></tr>
+
+            <!-- Combat Record -->
+            <tr><th colspan="2" class="border-b border-t p-2">Combat Record</th></tr>
+            <tr><td>{combat_record_text}</td><td>The text of the combat record.</td></tr>
+            <tr><td>{combat_record_date}</td><td>The date of the combat record.</td></tr>
+
+            <!-- Qualification Record -->
+            <tr><th colspan="2" class="border-b border-t p-2">Qualification Record</th></tr>
+            <tr><td>{qualification_record_qualification}</td><td>The qualification of the qualification record.</td></tr>
+            <tr><td>{qualification_record_qualification_image}</td><td>The qualification image of the qualification record.</td></tr>
+            <tr><td>{qualification_record_text}</td><td>The text of the qualification record.</td></tr>
+            <tr><td>{qualification_record_date}</td><td>The date of the qualification record.</td></tr>
+
+            <!-- Rank Record -->
+            <tr><th colspan="2" class="border-b border-t p-2">Rank Record</th></tr>
+            <tr><td>{rank_record_rank}</td><td>The rank of the rank record.</td></tr>
+            <tr><td>{rank_record_rank_abbreviation}</td><td>The rank of the rank record as an abbreviation.</td></tr>
+            <tr><td>{rank_record_rank_image}</td><td>The rank image of the rank record.</td></tr>
+            <tr><td>{rank_record_type}</td><td>The type of rank record, either Promotion, Demotion, Lateral, or Transfer.</td></tr>
+            <tr><td>{rank_record_text}</td><td>The text of the rank record.</td></tr>
+            <tr><td>{rank_record_date}</td><td>The date of the rank record.</td></tr>
+
+            <!-- Service Record -->
+            <tr><th colspan="2" class="border-b border-t p-2">Service Record</th></tr>
+            <tr><td>{service_record_text}</td><td>The text of the service record.</td></tr>
+            <tr><td>{service_record_date}</td><td>The date of the service record.</td></tr>
+
+            <!-- User -->
+            <tr><th colspan="2" class="border-b border-t p-2">User</th></tr>
+            <tr><td>{user_name}</td><td>The user's name.</td></tr>
+            <tr><td>{user_email}</td><td>The user's email.</td></tr>
+            <tr><td>{user_status}</td><td>The user's status.</td></tr>
+            <tr><td>{user_assignment_position}</td><td>The user's current assignment position.</td></tr>
+            <tr><td>{user_assignment_specialty}</td><td>The user's current assignment specialty.</td></tr>
+            <tr><td>{user_assignment_unit}</td><td>The user's current assignment unit.</td></tr>
+            <tr><td>{user_rank}</td><td>The user's current rank.</td></tr>
+            <tr><td>{user_rank_abbreviation}</td><td>The user's current rank as an abbreviation.</td></tr>
+          </tbody>
+        </table>
+    {% endblock %}
+{% endembed %}

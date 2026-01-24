@@ -1,0 +1,16 @@
+admin:
+  resource: ../src/Admin/Controller
+  type: attribute
+  prefix: admin/milhq/
+  name_prefix: milhq_admin_
+
+forum:
+    resource: ../src/Controller
+    type: attribute
+    prefix: milhq/
+    name_prefix: milhq_
+
+squadxml:
+    resource: ../src/Controller/SquadXMLController.php
+    type: attribute
+    name_prefix: milhq_squadxml_

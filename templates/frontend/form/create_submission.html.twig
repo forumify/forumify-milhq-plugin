@@ -1,0 +1,19 @@
+{% extends '@Forumify/frontend/base.html.twig' %}
+{% block title_page %}{{ submissionForm.name }}{% endblock %}
+{% block body %}
+    <h1 class="mb-6">{{ submissionForm.name }}</h1>
+    <div class="box">
+        {% if submissionForm.instructions %}
+            <div class="rich-text mb-6">
+                {{ submissionForm.instructions|milhq_text }}
+            </div>
+        {% endif %}
+        {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <div class="flex justify-center gap-4">
+            <button class="btn-primary">{{ 'save'|trans }}</button>
+            <a href="{{ path('milhq_operations_center') }}" class="btn-outlined">{{ 'cancel'|trans }}</a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

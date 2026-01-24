@@ -1,0 +1,8 @@
+{% extends '@Forumify/admin/base.html.twig' %}
+{% block body %}
+    {% include '@Forumify/admin/components/confirm.html.twig' with {
+        warningText: 'You are about to delete this submission.',
+        confirmPath: path('milhq_admin_submission_delete', { id: submission.id, confirmed: 1 }),
+        cancelPath: path('milhq_admin_submission_list')
+    } only %}
+{% endblock %}

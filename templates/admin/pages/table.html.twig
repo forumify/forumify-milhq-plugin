@@ -1,0 +1,10 @@
+{% extends '@Forumify/admin/base.html.twig' %}
+{% block title_page %}
+    {{ title|trans }}
+{% endblock %}
+{% block body %}
+    <h1>
+        {{ title|trans }}
+    </h1>
+    {{ component(table) }}
+{% endblock %}
