@@ -39,7 +39,7 @@ class MissionRSVPButton extends AbstractController
 
         return $this->missionRSVPRepository->findOneBy([
             'mission' => $this->mission,
-            'user' => $soldier,
+            'soldier' => $soldier,
         ]);
     }
 

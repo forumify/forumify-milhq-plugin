@@ -22,7 +22,7 @@
         {% if roster is not null %}
             <ul id="roster-{{ roster.id }}">
                 {% for unit in roster.units %}
-                    {% set users = this.usersInUnit(unit) %}
+                    {% set users = this.soldiersInUnit(unit) %}
                     {% if users is not empty %}
                         {% block roster_unit %}
                             <li class="card mb-4">
@@ -33,7 +33,7 @@
                                     <ul class="card-body">
                                         {% for user in users %}
                                             <li class="text-small">
-                                                <a href="{{ path('soldier', { id: user.id }) }}" class="btn-link w-100">
+                                                <a href="{{ path('milhq_soldier', { id: user.id }) }}" class="btn-link w-100">
                                                     {% include '@ForumifyMilhqPlugin/frontend/roster/components/soldier_row.html.twig' with {
                                                         soldier: user,
                                                         unit: unit,

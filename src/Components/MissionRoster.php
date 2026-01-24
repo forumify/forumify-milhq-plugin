@@ -12,7 +12,7 @@ use Forumify\Milhq\Service\SoldierService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
-#[AsTwigComponent('Forumify\\Milhq\\MissionRoster', '@ForumifyMilhqPlugin/frontend/components/mission_roster.html.twig')]
+#[AsTwigComponent('Milhq\\MissionRoster', '@ForumifyMilhqPlugin/frontend/components/mission_roster.html.twig')]
 class MissionRoster extends AbstractController
 {
 
@@ -36,7 +36,7 @@ class MissionRoster extends AbstractController
         $units = [];
 
         foreach ($this->rsvpsByUserId as $rsvp) {
-            $user = $rsvp->getUser();
+            $user = $rsvp->getSoldier();
             $unit = $user?->getUnit();
 
             if ($unit && !isset($units[$unit->getId()])) {
@@ -70,6 +70,9 @@ class MissionRoster extends AbstractController
         return $rsvps[$user->getId()] ?? null;
     }
 
+    /**
+     * @return array<MissionRsvp>
+     */
     private function getRSVPsByUserId(): array
     {
         if (!empty($this->rsvpsByUserId)) {

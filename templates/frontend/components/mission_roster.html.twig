@@ -11,7 +11,7 @@
                         <ul class="card-body">
                             {% for user in users %}
                                 <li class="text-small">
-                                    <a href="{{ path('soldier', { id: user.id }) }}" class="btn-link w-100">
+                                    <a href="{{ path('milhq_soldier', { id: user.id }) }}" class="btn-link w-100">
                                         {% include '@ForumifyMilhqPlugin/frontend/mission/components/soldier_row.html.twig' with {
                                             soldier: user,
                                             rsvp: this.getRSVPForUser(user)
