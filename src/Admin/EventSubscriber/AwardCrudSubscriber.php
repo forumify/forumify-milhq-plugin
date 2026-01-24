@@ -38,6 +38,5 @@ class AwardCrudSubscriber implements EventSubscriberInterface
 
         $image = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newImage);
         $award->setImage($image);
-        $award->setImageDirty();
     }
 }

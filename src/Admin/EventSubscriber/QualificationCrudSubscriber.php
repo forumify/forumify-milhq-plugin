@@ -38,6 +38,5 @@ class QualificationCrudSubscriber implements EventSubscriberInterface
 
         $image = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newImage);
         $qualification->setImage($image);
-        $qualification->setImageDirty();
     }
 }

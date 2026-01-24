@@ -14,7 +14,6 @@ use Forumify\Milhq\Entity\AfterActionReport;
 use Forumify\Milhq\Entity\Mission;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Status;
-use Forumify\Milhq\Exception\AfterActionReportAlreadyExistsException;
 use Forumify\Milhq\Repository\AfterActionReportRepository;
 use Forumify\Milhq\Repository\SoldierRepository;
 use Forumify\Milhq\Repository\StatusRepository;
@@ -36,15 +35,8 @@ class AfterActionReportService
     ) {
     }
 
-    /**
-     * @throws AfterActionReportAlreadyExistsException
-     */
     public function createOrUpdate(AfterActionReport $aar, string $attendanceJson, bool $isNew): void
     {
-        if ($isNew) {
-            $this->ensureNotDuplicate($aar);
-        }
-
         try {
             $attendance = json_decode($attendanceJson, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
@@ -64,21 +56,6 @@ class AfterActionReportService
             $this->createCombatRecords($aar);
         }
         $this->handleAbsence($aar);
-    }
-
-    /**
-     * @throws AfterActionReportAlreadyExistsException
-     */
-    private function ensureNotDuplicate(AfterActionReport $aar): void
-    {
-        $existing = $this->afterActionReportRepository->findBy([
-            'mission' => $aar->getMission(),
-            'unit' => $aar->getUnit(),
-        ]);
-
-        if (!empty($existing)) {
-            throw new AfterActionReportAlreadyExistsException();
-        }
     }
 
     public function getAttendanceStates(): array

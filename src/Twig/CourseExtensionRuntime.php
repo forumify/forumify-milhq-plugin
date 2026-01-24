@@ -17,7 +17,7 @@ use Twig\Extension\RuntimeExtensionInterface;
 class CourseExtensionRuntime implements RuntimeExtensionInterface
 {
     public function __construct(
-        private readonly SoldierService $userService,
+        private readonly SoldierService $soldierService,
         private readonly QualificationRepository $qualificationRepository,
     ) {
     }
@@ -59,14 +59,12 @@ class CourseExtensionRuntime implements RuntimeExtensionInterface
             return [];
         }
 
-        $soldierIds = $soldiersInClass
-            ->map(fn (CourseClassInstructor|CourseClassStudent $user) => $user->getSoldier()->getId())
-            ->toArray()
-        ;
-        $courseUsers = array_combine($soldierIds, $soldiersInClass->toArray());
-        $soldiers = array_combine($soldierIds, $soldiersInClass->map((fn ($user) => $user->getUser()))->toArray());
+        $soldiers = $soldiersInClass->map(fn (CourseClassInstructor|CourseClassStudent $ccx) => $ccx->getSoldier());
 
-        $this->userService->sortSoldiers($soldiers);
+        $soldierIds = $soldiers->map(fn (Soldier $soldier) => $soldier->getId())->toArray();
+        $courseUsers = array_combine($soldierIds, $soldiersInClass->toArray());
+
+        $this->soldierService->sortSoldiers($soldiers);
 
         $return = [];
         foreach ($soldiers as $soldier) {

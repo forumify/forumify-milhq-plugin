@@ -11,7 +11,6 @@ use Forumify\Milhq\Entity\AfterActionReport;
 use Forumify\Milhq\Entity\MissionRsvp;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Unit;
-use Forumify\Milhq\Exception\AfterActionReportAlreadyExistsException;
 use Forumify\Milhq\Repository\AfterActionReportRepository;
 use Forumify\Milhq\Repository\MissionRepository;
 use Forumify\Milhq\Repository\MissionRSVPRepository;
@@ -150,13 +149,9 @@ class AfterActionReportController extends AbstractController
             $aar = $form->getData();
             $attendance = $form->get('attendanceJson')->getData();
 
-            try {
-                $this->afterActionReportService->createOrUpdate($aar, $attendance, $isNew);
-                $this->addFlash('success', $isNew ? 'milhq.aar.created' : 'milhq.aar.edited');
-                return $this->redirectToRoute('milhq_aar_view', ['id' => $aar->getId()]);
-            } catch (AfterActionReportAlreadyExistsException) {
-                $this->addFlash('error', 'milhq.aar.already_exists');
-            }
+            $this->afterActionReportService->createOrUpdate($aar, $attendance, $isNew);
+            $this->addFlash('success', $isNew ? 'milhq.aar.created' : 'milhq.aar.edited');
+            return $this->redirectToRoute('milhq_aar_view', ['id' => $aar->getId()]);
         }
 
         return $this->render('@ForumifyMilhqPlugin/frontend/aar/form.html.twig', [

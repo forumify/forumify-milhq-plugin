@@ -49,4 +49,14 @@ class Qualification implements SortableEntityInterface
     {
         $this->description = $description;
     }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): void
+    {
+        $this->image = $image;
+    }
 }

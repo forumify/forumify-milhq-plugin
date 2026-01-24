@@ -21,7 +21,7 @@ class UserCrudSubscriber implements EventSubscriberInterface
         private readonly MediaService $mediaService,
         private readonly FilesystemOperator $milhqAssetStorage,
         private readonly AssignmentRecordRepository $assignmentRecordRepository,
-        private readonly SyncSoldierService $syncUserService,
+        private readonly SyncSoldierService $syncSoldierService,
     ) {
     }
 
@@ -45,7 +45,6 @@ class UserCrudSubscriber implements EventSubscriberInterface
         if ($newUniform instanceof UploadedFile) {
             $uniform = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newUniform);
             $user->setUniform($uniform);
-            $user->setUniformDirty(true);
         }
 
         $newSignature = $form->get('newSignature')->getData();
@@ -55,7 +54,6 @@ class UserCrudSubscriber implements EventSubscriberInterface
 
         $signature = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newSignature);
         $user->setSignature($signature);
-        $user->setSignatureDirty(true);
     }
 
     /**
@@ -69,17 +67,17 @@ class UserCrudSubscriber implements EventSubscriberInterface
         $this->deleteRemovedAssignmentRecords($user, $form);
         $forumifyUser = $user->getUser()?->getId();
         if ($forumifyUser !== null) {
-            $this->syncUserService->sync($user->getUser()?->getId());
+            $this->syncSoldierService->sync($user->getUser()?->getId());
         }
     }
 
-    private function deleteRemovedAssignmentRecords(Soldier $user, FormInterface $form): void
+    private function deleteRemovedAssignmentRecords(Soldier $soldier, FormInterface $form): void
     {
         $qb = $this
             ->assignmentRecordRepository
             ->createQueryBuilder('ar')
-            ->where('ar.user = :user')
-            ->setParameter('user', $user)
+            ->where('ar.soldier = :soldier')
+            ->setParameter('soldier', $soldier)
             ->andWhere('ar.type = :typeSecondary')
             ->setParameter('typeSecondary', 'secondary');
 

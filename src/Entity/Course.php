@@ -103,9 +103,9 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
     }
 
     /**
-     * @param array<string|int> $prerequisites
+     * @param array<string|int>|null $prerequisites
      */
-    public function setPrerequisites(array $prerequisites): void
+    public function setPrerequisites(?array $prerequisites): void
     {
         $this->prerequisites = $prerequisites;
     }
@@ -119,9 +119,9 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
     }
 
     /**
-     * @param array<string|int> $qualifications
+     * @param array<string|int>|null $qualifications
      */
-    public function setQualifications(array $qualifications): void
+    public function setQualifications(?array $qualifications): void
     {
         $this->qualifications = $qualifications;
     }

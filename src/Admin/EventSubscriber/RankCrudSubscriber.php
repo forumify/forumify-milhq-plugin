@@ -38,6 +38,5 @@ class RankCrudSubscriber implements EventSubscriberInterface
 
         $image = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newImage);
         $rank->setImage($image);
-        $rank->setImageDirty();
     }
 }
