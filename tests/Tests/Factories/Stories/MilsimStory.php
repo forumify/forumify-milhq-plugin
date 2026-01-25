@@ -30,6 +30,7 @@ use Zenstruck\Foundry\Story;
  * @method static Entity\Status statusPending()
  * @method static Entity\Status statusApproved()
  * @method static Entity\Status statusCivilian()
+ * @method static Entity\Status statusAwol()
  * @method static Entity\Form formEnlistment()
  * @method static Entity\Unit unitFirstSquad()
  * @method static Entity\Unit unitSecondSquad()
@@ -69,6 +70,8 @@ class MilsimStory extends Story
         StatusFactory::createOne(['name' => 'Denied']);
         $civilian = StatusFactory::createOne(['name' => 'Civilian']);
         $this->addState('statusCivilian', $civilian);
+        $awol = StatusFactory::createOne(['name' => 'AWOL']);
+        $this->addState('statusAwol', $awol);
 
         $this->settingRepository->set('milhq.enlistment.status', [$retired->getId()]);
 

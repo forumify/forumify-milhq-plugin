@@ -92,7 +92,7 @@ class ReportInService
             'status' => $failureStatus,
             'text' => "Status updated to {$failureStatus->getName()} due to a failure to report in.",
             'type' => 'primary',
-            'users' => $failures,
+            'soldiers' => $failures,
         ]);
 
         foreach ($failures as $soldier) {
@@ -150,7 +150,7 @@ class ReportInService
                 'status' => $returnStatus,
                 'text' => "Status reverted back to original due to reporting in.",
                 'type' => 'primary',
-                'users' => [$soldier],
+                'soldiers' => [$soldier],
             ]);
             $updated = true;
         }
