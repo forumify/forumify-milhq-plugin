@@ -37,7 +37,7 @@ class SyncSoldierServiceTest extends KernelTestCase
         $sgt->setImage('rank.png');
 
         $user = $this->createUser();
-        $soldier = SoldierFactory::createOne([
+        SoldierFactory::createOne([
             'name' => 'Blippy Bloppy',
             'user' => $user,
             'rank' => $sgt,
