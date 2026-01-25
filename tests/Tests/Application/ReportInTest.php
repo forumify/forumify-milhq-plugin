@@ -21,8 +21,7 @@ class ReportInTest extends MilhqWebTestCase
 
     public function testReportInWarning(): void
     {
-        $s = self::getContainer()->get(SettingRepository::class);
-        $s->setBulk([
+        self::getContainer()->get(SettingRepository::class)->setBulk([
             'milhq.report_in.enabled' => true,
             'milhq.report_in.period' => 5,
             'milhq.report_in.warning_period' => 3,
@@ -48,8 +47,7 @@ class ReportInTest extends MilhqWebTestCase
 
     public function testReportInFailure(): void
     {
-        $s = self::getContainer()->get(SettingRepository::class);
-        $s->setBulk([
+        self::getContainer()->get(SettingRepository::class)->setBulk([
             'milhq.report_in.enabled' => true,
             'milhq.report_in.period' => 5,
             'milhq.report_in.warning_period' => 3,

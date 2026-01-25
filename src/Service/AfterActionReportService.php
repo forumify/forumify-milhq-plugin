@@ -218,7 +218,7 @@ class AfterActionReportService
             'status' => $consecutiveStatus,
             'text' => "Status updated to {$consecutiveStatus->getName()} due to consecutive absences.",
             'type' => 'primary',
-            'users' => $absentUsers,
+            'soldiers' => $absentUsers,
         ]);
     }
 

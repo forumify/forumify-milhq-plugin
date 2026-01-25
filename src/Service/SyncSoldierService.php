@@ -35,6 +35,10 @@ class SyncSoldierService
 
     public function sync(int $userId, bool $async = true): void
     {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
         $message = new SyncSoldierMessage($userId);
         if ($async) {
             $this->messageBus->dispatch($message);
@@ -47,14 +51,18 @@ class SyncSoldierService
         }
     }
 
+    private function isEnabled(): bool
+    {
+        return $this->settingRepository->get('milhq.profile.overwrite_display_names')
+            || $this->settingRepository->get('milhq.profile.overwrite_signatures')
+            || $this->settingRepository->get('milhq.profile.overwrite_avatars');
+    }
+
     public function doSync(SyncSoldierMessage $message): void
     {
         $displayNameEnabled = $this->settingRepository->get('milhq.profile.overwrite_display_names');
         $signatureEnabled = $this->settingRepository->get('milhq.profile.overwrite_signatures');
         $avatarEnabled = $this->settingRepository->get('milhq.profile.overwrite_avatars');
-        if (!$displayNameEnabled && !$signatureEnabled && !$avatarEnabled) {
-            return;
-        }
 
         $forumifyUser = $this->userRepository->find($message->userId);
         if ($forumifyUser === null) {

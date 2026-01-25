@@ -12,6 +12,6 @@ if (method_exists(Dotenv::class, 'bootEnv')) {
 
 umask(0000);
 
-const TEST_DATA_DIR = __DIR__ . '/Data';
+const TEST_DATA_DIR = __DIR__ . '/data';
 
 DG\BypassFinals::enable();

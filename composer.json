@@ -36,6 +36,7 @@
     "config": {
         "allow-plugins": {
             "symfony/flex": false,
+            "symfony/runtime": true,
             "dealerdirect/phpcodesniffer-composer-installer": true
         },
         "lock": false

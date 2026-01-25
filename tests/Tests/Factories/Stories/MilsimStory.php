@@ -41,6 +41,7 @@ use Zenstruck\Foundry\Story;
  * @method static Entity\Specialty specialtyInfantry()
  * @method static Entity\Rank rankPVT()
  * @method static Entity\Rank rankPFC()
+ * @method static Entity\Rank rankSGT()
  * @method static Entity\Qualification qualificationLandNav()
  * @method static Entity\Qualification qualificationCLS()
  * @method static array<Entity\Soldier> firstSquad()
@@ -123,6 +124,7 @@ class MilsimStory extends Story
 
         // Ranks
         $sgt = RankFactory::createOne(['name' => 'Sergeant', 'abbreviation' => 'SGT', 'paygrade' => 'E5']);
+        $this->addState('rankSGT', $sgt);
         $cpl = RankFactory::createOne(['name' => 'Corporal', 'abbreviation' => 'CPL', 'paygrade' => 'E4']);
         $spc = RankFactory::createOne(['name' => 'Specialist', 'abbreviation' => 'SPC', 'paygrade' => 'E4']);
         $pfc = RankFactory::createOne(['name' => 'Private First Class', 'abbreviation' => 'PFC', 'paygrade' => 'E3']);
