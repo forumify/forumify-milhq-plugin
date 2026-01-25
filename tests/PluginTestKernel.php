@@ -40,8 +40,8 @@ class PluginTestKernel extends ForumifyKernel
             new \ApiPlatform\Symfony\Bundle\ApiPlatformBundle(),
         ];
 
-        if (class_exists(Forumify\Calendar\ForumifyCalendarPlugin::class)) {
-            yield new Forumify\Calendar\ForumifyCalendarPlugin();
+        if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
+            yield new \Forumify\Calendar\ForumifyCalendarPlugin();
         }
     }
 }

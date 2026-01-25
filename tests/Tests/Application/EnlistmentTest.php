@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace PluginTests\Tests\Application;
 
+use Forumify\Core\Repository\SettingRepository;
+use Forumify\Core\Repository\UserRepository;
 use Forumify\Milhq\Repository\FormSubmissionRepository;
 use Forumify\Milhq\Repository\SoldierRepository;
+use PluginTests\Tests\Factories\Forumify\RoleFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use PluginTests\Tests\Factories\Stories\MilsimStory;
 
@@ -13,6 +16,11 @@ class EnlistmentTest extends MilhqWebTestCase
 {
     public function testEnlistNewUser(): void
     {
+        $role = RoleFactory::createOne(['title' => 'enlistee']);
+        self::getContainer()->get(SettingRepository::class)->setBulk([
+            'milhq.enlistment.role' => $role->getId(),
+        ]);
+
         $this->client->request('GET', '/');
         $this->client->clickLink('Enlist');
 
@@ -39,6 +47,9 @@ class EnlistmentTest extends MilhqWebTestCase
         self::assertAnySelectorTextContains('p', 'Your enlistment is being processed');
         self::assertAnySelectorTextSame('a', 'View enlistment topic');
         self::assertAnySelectorTextSame('a', 'Start another enlistment');
+
+        $user = self::getContainer()->get(UserRepository::class)->find($this->user->getId());
+        self::assertNotEmpty($user->getRoleEntities()->filter(fn ($r) => $r->getTitle() === 'enlistee'));
     }
 
     public function testEnlistExistingUser(): void
