@@ -1,11 +1,14 @@
 parameters:
+    forumify.vendor_dir: '%kernel.project_dir%/../vendor'
+    forumify.project_dir: '%kernel.project_dir%/..'
 
 services:
     _defaults:
         autowire: true
         autoconfigure: true
 
-    PluginTests\:
+    PluginTests\Tests\:
         resource: '../Tests/'
         exclude:
-            - '../Tests/PluginTestKernel.php'
+            - '../Tests/Application/'
+            - '../Tests/Unit/'

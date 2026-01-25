@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Application;
+namespace PluginTests\Tests\Application;
 
 use DateInterval;
 use DateTimeImmutable;
 use Forumify\Milhq\Repository\CourseClassRepository;
 use Forumify\Milhq\Repository\QualificationRecordRepository;
 use Forumify\Milhq\Repository\ServiceRecordRepository;
-use PluginTests\Application\MilhqWebTestCase;
-use PluginTests\Factories\Milhq\Record\QualificationRecordFactory;
-use PluginTests\Factories\Milhq\SoldierFactory;
-use PluginTests\Factories\Stories\MilsimStory;
-use PluginTests\Traits\SessionTrait;
+use PluginTests\Tests\Application\MilhqWebTestCase;
+use PluginTests\Tests\Factories\Milhq\Record\QualificationRecordFactory;
+use PluginTests\Tests\Factories\Milhq\SoldierFactory;
+use PluginTests\Tests\Factories\Stories\MilsimStory;
+use PluginTests\Tests\Traits\SessionTrait;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
 
 class CoursesTest extends MilhqWebTestCase

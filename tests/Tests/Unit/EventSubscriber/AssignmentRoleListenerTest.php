@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Unit\EventSubscriber;
+namespace PluginTests\Tests\Unit\EventSubscriber;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Forumify\Core\Entity\Role;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
-use PluginTests\Factories\Forumify\RoleFactory;
-use PluginTests\Factories\Milhq\StatusFactory;
-use PluginTests\Factories\Milhq\UnitFactory;
-use PluginTests\Factories\Milhq\SoldierFactory;
-use PluginTests\Traits\UserTrait;
+use PluginTests\Tests\Factories\Forumify\RoleFactory;
+use PluginTests\Tests\Factories\Milhq\StatusFactory;
+use PluginTests\Tests\Factories\Milhq\UnitFactory;
+use PluginTests\Tests\Factories\Milhq\SoldierFactory;
+use PluginTests\Tests\Traits\UserTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 

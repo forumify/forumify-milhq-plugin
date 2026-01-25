@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Unit\EventSubscriber;
+namespace PluginTests\Tests\Unit\EventSubscriber;
 
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
-use PluginTests\Factories\Milhq\SoldierFactory;
-use PluginTests\Factories\Stories\MilsimStory;
+use PluginTests\Tests\Factories\Milhq\SoldierFactory;
+use PluginTests\Tests\Factories\Stories\MilsimStory;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Foundry\Test\Factories;
 

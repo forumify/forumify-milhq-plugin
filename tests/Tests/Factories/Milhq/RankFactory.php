@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Factories\Milhq;
+namespace PluginTests\Tests\Factories\Milhq;
 
 use Forumify\Milhq\Entity\Rank;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;

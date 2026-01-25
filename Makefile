@@ -14,9 +14,8 @@ tests:
 
 .PHONY: setup-tests
 setup-tests:
-	rm -rf tests/var
-	@cd tests && composer update
-	@cd tests && php bin/console doctrine:database:drop --if-exists --force --env=test
+	@rm -rf tests/var
+	@cd tests && php bin/console doctrine:database:drop --force --env=test
 	@cd tests && php bin/console doctrine:database:create --env=test
 	@cd tests && php bin/console doctrine:migrations:migrate --no-interaction --env=test
 	@cd tests && php bin/console forumify:platform:setting -k forumify.platform_installed --value true
@@ -25,4 +24,4 @@ setup-tests:
 
 .PHONY: run-tests
 run-tests:
-	@cd tests && ./vendor/bin/phpunit -c phpunit.xml.dist
+	@./vendor/bin/phpunit

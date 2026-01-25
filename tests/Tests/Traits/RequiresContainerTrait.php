@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Traits;
+namespace PluginTests\Tests\Traits;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Application;
+namespace PluginTests\Tests\Application;
 
 class RosterTest extends MilhqWebTestCase
 {

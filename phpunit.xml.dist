@@ -3,7 +3,7 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
     colors="true"
-    bootstrap="bootstrap.php"
+    bootstrap="tests/bootstrap.php"
     displayDetailsOnTestsThatTriggerDeprecations="true"
     displayDetailsOnTestsThatTriggerErrors="true"
     displayDetailsOnTestsThatTriggerNotices="true"
@@ -14,23 +14,24 @@
         <ini name="display_errors" value="1"/>
         <ini name="error_reporting" value="-1"/>
         <env name="SHELL_VERBOSITY" value="-1"/>
+        <server name="APP_ENV" value="test"/>
     </php>
 
     <testsuites>
         <testsuite name="Application Tests">
-            <directory>Tests/Application</directory>
+        <directory>tests/Tests/Application</directory>
         </testsuite>
         <testsuite name="Unit Tests">
-            <directory>Tests/Unit</directory>
+            <directory>tests/Tests/Unit</directory>
         </testsuite>
     </testsuites>
 
     <source ignoreIndirectDeprecations="true">
         <include>
-            <directory suffix=".php">../src</directory>
+            <directory suffix=".php">src</directory>
         </include>
         <exclude>
-            <directory>../src/*/Entity</directory>
+            <directory>src/*/Entity</directory>
         </exclude>
     </source>
 

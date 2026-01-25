@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Application;
+namespace PluginTests\Tests\Application;
 
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Repository\SoldierRepository;
-use PluginTests\Factories\Milhq\SoldierFactory;
-use PluginTests\Factories\Stories\MilsimStory;
-use PluginTests\Traits\UserTrait;
+use PluginTests\Tests\Factories\Milhq\SoldierFactory;
+use PluginTests\Tests\Factories\Stories\MilsimStory;
+use PluginTests\Tests\Traits\UserTrait;
 use Zenstruck\Foundry\Test\Factories;
 
 class RankRecordTest extends MilhqWebTestCase

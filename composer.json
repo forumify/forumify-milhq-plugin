@@ -12,17 +12,30 @@
         "phpstan/phpstan": "^2.1",
         "squizlabs/php_codesniffer": "^3.13",
         "phpstan/phpstan-symfony": "^2.0",
-        "slevomat/coding-standard": "^8.15"
+        "slevomat/coding-standard": "^8.15",
+        "dama/doctrine-test-bundle": "^8.0",
+        "dg/bypass-finals": "^1.9",
+        "phpunit/phpunit": "^11.5",
+        "symfony/browser-kit": "7.4.*",
+        "symfony/css-selector": "7.4.*",
+        "symfony/debug-bundle": "7.4.*",
+        "symfony/stopwatch": "7.4.*",
+        "symfony/web-profiler-bundle": "7.4.*",
+        "zenstruck/foundry": "2.x-dev"
     },
     "autoload": {
         "psr-4": {
             "Forumify\\Milhq\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "PluginTests\\": "tests/"
+        }
+    },
     "config": {
         "allow-plugins": {
             "symfony/flex": false,
-            "symfony/runtime": false,
             "dealerdirect/phpcodesniffer-composer-installer": true
         },
         "lock": false

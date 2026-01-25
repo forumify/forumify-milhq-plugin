@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Traits;
+namespace PluginTests\Tests\Traits;
 
 use Forumify\Core\Entity\User;
 use Forumify\Core\Form\DTO\NewUser;

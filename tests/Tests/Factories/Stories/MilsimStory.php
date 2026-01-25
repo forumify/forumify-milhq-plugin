@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Factories\Stories;
+namespace PluginTests\Tests\Factories\Stories;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Forumify\Core\Entity\MenuItem;
 use Forumify\Core\Repository\MenuItemRepository;
 use Forumify\Core\Repository\SettingRepository;
 use Forumify\Milhq\Entity;
-use PluginTests\Factories\Forumify\ForumFactory;
-use PluginTests\Factories\Milhq\FormFactory;
-use PluginTests\Factories\Milhq\FormFieldFactory;
-use PluginTests\Factories\Milhq\PositionFactory;
-use PluginTests\Factories\Milhq\QualificationFactory;
-use PluginTests\Factories\Milhq\RankFactory;
-use PluginTests\Factories\Milhq\RosterFactory;
-use PluginTests\Factories\Milhq\SpecialtyFactory;
-use PluginTests\Factories\Milhq\StatusFactory;
-use PluginTests\Factories\Milhq\UnitFactory;
-use PluginTests\Factories\Milhq\SoldierFactory;
+use PluginTests\Tests\Factories\Forumify\ForumFactory;
+use PluginTests\Tests\Factories\Milhq\FormFactory;
+use PluginTests\Tests\Factories\Milhq\FormFieldFactory;
+use PluginTests\Tests\Factories\Milhq\PositionFactory;
+use PluginTests\Tests\Factories\Milhq\QualificationFactory;
+use PluginTests\Tests\Factories\Milhq\RankFactory;
+use PluginTests\Tests\Factories\Milhq\RosterFactory;
+use PluginTests\Tests\Factories\Milhq\SpecialtyFactory;
+use PluginTests\Tests\Factories\Milhq\StatusFactory;
+use PluginTests\Tests\Factories\Milhq\UnitFactory;
+use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use Zenstruck\Foundry\Story;
 
 /**

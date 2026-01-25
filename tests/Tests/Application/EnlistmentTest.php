@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Application;
+namespace PluginTests\Tests\Application;
 
 use Forumify\Milhq\Repository\FormSubmissionRepository;
 use Forumify\Milhq\Repository\SoldierRepository;
-use PluginTests\Factories\Milhq\SoldierFactory;
-use PluginTests\Factories\Stories\MilsimStory;
+use PluginTests\Tests\Factories\Milhq\SoldierFactory;
+use PluginTests\Tests\Factories\Stories\MilsimStory;
 
 class EnlistmentTest extends MilhqWebTestCase
 {

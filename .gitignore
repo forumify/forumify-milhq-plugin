@@ -1,4 +1,6 @@
-vendor
+vendor/
+!tests/vendor/
+
 composer.lock
 
 assets/node_modules

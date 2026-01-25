@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Factories\Forumify;
+namespace PluginTests\Tests\Factories\Forumify;
 
 use Forumify\Calendar\Entity\Calendar;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;

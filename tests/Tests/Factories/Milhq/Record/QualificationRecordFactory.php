@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PluginTests\Factories\Milhq\Record;
+namespace PluginTests\Tests\Factories\Milhq\Record;
 
 use Forumify\Milhq\Entity\Record\QualificationRecord;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
