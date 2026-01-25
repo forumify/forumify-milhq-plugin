@@ -9,7 +9,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
 #[AsLiveComponent('Milhq\\AdminCombatRecordTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.records.combat_records.view')]
+#[IsGranted('milhq.admin.records.combat_records.view')]
 class CombatRecordTable extends AbstractAdminRecordTable
 {
     protected function getEntityClass(): string

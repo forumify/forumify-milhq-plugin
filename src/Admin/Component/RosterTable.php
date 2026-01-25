@@ -10,10 +10,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
 #[AsLiveComponent('Milhq\\RosterTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.organization.rosters.view')]
+#[IsGranted('milhq.admin.organization.rosters.view')]
 class RosterTable extends AbstractDoctrineTable
 {
-    protected ?string $permissionReorder = 'forumify-milhq.admin.organization.rosters.manage';
+    protected ?string $permissionReorder = 'milhq.admin.organization.rosters.manage';
 
     protected function getEntityClass(): string
     {
@@ -40,11 +40,11 @@ class RosterTable extends AbstractDoctrineTable
     private function renderActions(int $id): string
     {
         $actions = '';
-        if ($this->security->isGranted('forumify-milhq.admin.organization.rosters.manage')) {
+        if ($this->security->isGranted('milhq.admin.organization.rosters.manage')) {
             $actions .= $this->renderAction('milhq_admin_roster_edit', ['identifier' => $id], 'pencil-simple-line');
         }
 
-        if ($this->security->isGranted('forumify-milhq.admin.organization.rosters.delete')) {
+        if ($this->security->isGranted('milhq.admin.organization.rosters.delete')) {
             $actions .= $this->renderAction('milhq_admin_roster_delete', ['identifier' => $id], 'x');
         }
 

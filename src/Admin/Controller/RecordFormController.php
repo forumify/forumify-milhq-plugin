@@ -27,7 +27,7 @@ class RecordFormController extends AbstractController
         Request $request,
         string $type
     ): Response {
-        $this->denyAccessUnlessGranted("forumify-milhq.admin.records.{$type}_records.create");
+        $this->denyAccessUnlessGranted("milhq.admin.records.{$type}_records.create");
 
         $data = ['created_at' => new DateTime()];
 

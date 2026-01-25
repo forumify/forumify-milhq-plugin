@@ -18,10 +18,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/operations', 'operations')]
 class OperationController extends AbstractCrudController
 {
-    protected ?string $permissionView = 'forumify-milhq.admin.operations.view';
-    protected ?string $permissionCreate = 'forumify-milhq.admin.operations.manage';
-    protected ?string $permissionEdit = 'forumify-milhq.admin.operations.manage';
-    protected ?string $permissionDelete = 'forumify-milhq.admin.operations.delete';
+    protected ?string $permissionView = 'milhq.admin.operations.view';
+    protected ?string $permissionCreate = 'milhq.admin.operations.manage';
+    protected ?string $permissionEdit = 'milhq.admin.operations.manage';
+    protected ?string $permissionDelete = 'milhq.admin.operations.delete';
 
     protected function getTranslationPrefix(): string
     {

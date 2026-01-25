@@ -16,10 +16,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/forms', 'form')]
 class FormController extends AbstractCrudController
 {
-    protected ?string $permissionView = 'forumify-milhq.admin.organization.forms.view';
-    protected ?string $permissionCreate = 'forumify-milhq.admin.organization.forms.create';
-    protected ?string $permissionEdit = 'forumify-milhq.admin.organization.forms.manage';
-    protected ?string $permissionDelete = 'forumify-milhq.admin.organization.forms.delete';
+    protected ?string $permissionView = 'milhq.admin.organization.forms.view';
+    protected ?string $permissionCreate = 'milhq.admin.organization.forms.create';
+    protected ?string $permissionEdit = 'milhq.admin.organization.forms.manage';
+    protected ?string $permissionDelete = 'milhq.admin.organization.forms.delete';
 
     protected function getTranslationPrefix(): string
     {

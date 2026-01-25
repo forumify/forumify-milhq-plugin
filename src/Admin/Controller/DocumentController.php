@@ -16,10 +16,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/documents', 'document')]
 class DocumentController extends AbstractCrudController
 {
-    protected ?string $permissionView = 'forumify-milhq.admin.organization.documents.view';
-    protected ?string $permissionCreate = 'forumify-milhq.admin.organization.documents.create';
-    protected ?string $permissionEdit = 'forumify-milhq.admin.organization.documents.manage';
-    protected ?string $permissionDelete = 'forumify-milhq.admin.organization.documents.delete';
+    protected ?string $permissionView = 'milhq.admin.organization.documents.view';
+    protected ?string $permissionCreate = 'milhq.admin.organization.documents.create';
+    protected ?string $permissionEdit = 'milhq.admin.organization.documents.manage';
+    protected ?string $permissionDelete = 'milhq.admin.organization.documents.delete';
 
     protected function getTranslationPrefix(): string
     {

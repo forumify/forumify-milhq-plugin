@@ -10,10 +10,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
 #[AsLiveComponent('Milhq\\AwardTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.organization.awards.view')]
+#[IsGranted('milhq.admin.organization.awards.view')]
 class AwardTable extends AbstractDoctrineTable
 {
-    protected ?string $permissionReorder = 'forumify-milhq.admin.organization.awards.manage';
+    protected ?string $permissionReorder = 'milhq.admin.organization.awards.manage';
 
     protected function getEntityClass(): string
     {
@@ -41,11 +41,11 @@ class AwardTable extends AbstractDoctrineTable
     {
         $actions = '';
 
-        if ($this->security->isGranted('forumify-milhq.admin.organization.awards.manage')) {
+        if ($this->security->isGranted('milhq.admin.organization.awards.manage')) {
             $actions .= $this->renderAction('milhq_admin_award_edit', ['identifier' => $id], 'pencil-simple-line');
         }
 
-        if ($this->security->isGranted('forumify-milhq.admin.organization.awards.delete')) {
+        if ($this->security->isGranted('milhq.admin.organization.awards.delete')) {
             $actions .= $this->renderAction('milhq_admin_award_delete', ['identifier' => $id], 'x');
         }
 

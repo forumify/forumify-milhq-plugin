@@ -14,7 +14,7 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 use Twig\Environment;
 
 #[AsLiveComponent('Milhq\\SubmissionTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.submissions.view')]
+#[IsGranted('milhq.admin.submissions.view')]
 class FormSubmissionTable extends AbstractDoctrineTable
 {
     #[LiveProp]
@@ -68,7 +68,7 @@ class FormSubmissionTable extends AbstractDoctrineTable
     private function renderActions(int $id): string
     {
         $actions = $this->renderAction('milhq_admin_submission_view', ['id' => $id], 'eye');
-        if ($this->security->isGranted('forumify-milhq.admin.submissions.delete')) {
+        if ($this->security->isGranted('milhq.admin.submissions.delete')) {
             $actions .= $this->renderAction('milhq_admin_submission_delete', ['id' => $id], 'x');
         }
 

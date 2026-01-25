@@ -22,7 +22,7 @@ class DischargeController extends AbstractController
     }
 
     #[Route('/users/{id}/discharge', 'soldier_discharge')]
-    #[IsGranted('forumify-milhq.admin.soldiers.discharge')]
+    #[IsGranted('milhq.admin.soldiers.discharge')]
     public function __invoke(Request $request, Soldier $soldier): Response
     {
         $discharge = new Discharge($soldier);

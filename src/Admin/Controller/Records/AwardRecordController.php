@@ -9,12 +9,12 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/records/award', 'award_records')]
-#[IsGranted('forumify-milhq.admin.records.award_records.view')]
+#[IsGranted('milhq.admin.records.award_records.view')]
 class AwardRecordController extends AbstractRecordCrudController
 {
-    protected ?string $permissionView = 'forumify-milhq.admin.records.award_records.view';
-    protected ?string $permissionCreate = 'forumify-milhq.admin.records.award_records.create';
-    protected ?string $permissionDelete = 'forumify-milhq.admin.records.award_records.delete';
+    protected ?string $permissionView = 'milhq.admin.records.award_records.view';
+    protected ?string $permissionCreate = 'milhq.admin.records.award_records.create';
+    protected ?string $permissionDelete = 'milhq.admin.records.award_records.delete';
 
     protected function getRecordType(): string
     {

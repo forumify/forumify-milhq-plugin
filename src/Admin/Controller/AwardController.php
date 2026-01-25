@@ -15,15 +15,15 @@ use Symfony\Component\Form\FormInterface;
  * @extends AbstractCrudController<Award>
  */
 #[Route('/awards', 'award')]
-#[IsGranted('forumify-milhq.admin.organization.awards.view')]
+#[IsGranted('milhq.admin.organization.awards.view')]
 class AwardController extends AbstractCrudController
 {
     protected string $listTemplate = '@ForumifyMilhqPlugin/admin/crud/list.html.twig';
 
-    protected ?string $permissionView = 'forumify-milhq.admin.organization.awards.view';
-    protected ?string $permissionCreate = 'forumify-milhq.admin.organization.awards.create';
-    protected ?string $permissionEdit = 'forumify-milhq.admin.organization.awards.manage';
-    protected ?string $permissionDelete = 'forumify-milhq.admin.organization.awards.delete';
+    protected ?string $permissionView = 'milhq.admin.organization.awards.view';
+    protected ?string $permissionCreate = 'milhq.admin.organization.awards.create';
+    protected ?string $permissionEdit = 'milhq.admin.organization.awards.manage';
+    protected ?string $permissionDelete = 'milhq.admin.organization.awards.delete';
 
     protected function getTranslationPrefix(): string
     {

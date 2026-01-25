@@ -1,5 +1,5 @@
 <div class="flex">
-    {% if is_granted('forumify-milhq.admin.soldiers.manage') %}
+    {% if is_granted('milhq.admin.soldiers.manage') %}
         <a class="btn-link btn-icon btn-small" href="{{ path('milhq_admin_soldier_edit', { identifier: row.id }) }}">
             <i class="ph ph-pencil-simple-line"></i>
         </a>
@@ -12,7 +12,7 @@
         'records.combat_records.create',
         'records.rank_records.create',
         'records.qualification_records.create',
-    ] has some perm => is_granted('forumify-milhq.admin.' ~ perm) %}
+    ] has some perm => is_granted('milhq.admin.' ~ perm) %}
         {% embed '@Forumify/components/menu.html.twig' with {
             placement: 'bottom-end',
             hideAdornment: true,

@@ -14,13 +14,13 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 
 #[AsLiveComponent('Milhq\\FormFieldTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.organization.forms.manage')]
+#[IsGranted('milhq.admin.organization.forms.manage')]
 class FormFieldTable extends AbstractDoctrineTable
 {
     #[LiveProp]
     public Form $form;
 
-    protected ?string $permissionReorder = 'forumify-milhq.admin.organization.forms.manage';
+    protected ?string $permissionReorder = 'milhq.admin.organization.forms.manage';
 
     public function __construct()
     {

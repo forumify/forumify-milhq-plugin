@@ -15,7 +15,7 @@ class ForumifyMilhqPlugin extends AbstractForumifyPlugin
     public function getPluginMetadata(): PluginMetadata
     {
         return new PluginMetadata(
-            'forumify MILHQ',
+            'MILHQ',
             'forumify',
             'forumify MILHQ - Personnel & Unit Management.',
             'https://forumify.net',
@@ -35,7 +35,6 @@ class ForumifyMilhqPlugin extends AbstractForumifyPlugin
         return [
             'admin' => [
                 'view',
-                'run_sync',
                 'configuration' => [
                     'manage',
                 ],

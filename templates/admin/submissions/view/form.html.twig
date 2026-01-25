@@ -30,7 +30,7 @@
             </div>
         </div>
         <ul class="w-50">
-            {% if is_granted('forumify-milhq.admin.submissions.assign_statuses') %}
+            {% if is_granted('milhq.admin.submissions.assign_statuses') %}
                 <li class="mb-4">
                     {% include '@Forumify/admin/components/simple_form.html.twig' %}
                 </li>

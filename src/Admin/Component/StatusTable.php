@@ -11,10 +11,10 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Twig\Environment;
 
 #[AsLiveComponent('Milhq\\StatusTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.organization.statuses.view')]
+#[IsGranted('milhq.admin.organization.statuses.view')]
 class StatusTable extends AbstractDoctrineTable
 {
-    protected ?string $permissionReorder = 'forumify-milhq.admin.organization.statuses.manage';
+    protected ?string $permissionReorder = 'milhq.admin.organization.statuses.manage';
 
     public function __construct(private readonly Environment $twig)
     {
@@ -50,11 +50,11 @@ class StatusTable extends AbstractDoctrineTable
     private function renderActions(int $id): string
     {
         $actions = '';
-        if ($this->security->isGranted('forumify-milhq.admin.organization.statuses.manage')) {
+        if ($this->security->isGranted('milhq.admin.organization.statuses.manage')) {
             $actions .= $this->renderAction('milhq_admin_status_edit', ['identifier' => $id], 'pencil-simple-line');
         }
 
-        if ($this->security->isGranted('forumify-milhq.admin.organization.statuses.delete')) {
+        if ($this->security->isGranted('milhq.admin.organization.statuses.delete')) {
             $actions .= $this->renderAction('milhq_admin_status_delete', ['identifier' => $id], 'x');
         }
 

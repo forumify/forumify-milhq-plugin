@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/submissions', 'submission_')]
-#[IsGranted('forumify-milhq.admin.submissions.view')]
+#[IsGranted('milhq.admin.submissions.view')]
 class SubmissionController extends AbstractController
 {
     public function __construct(
@@ -46,7 +46,7 @@ class SubmissionController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->denyAccessUnlessGranted('forumify-milhq.admin.submissions.assign_statuses');
+            $this->denyAccessUnlessGranted('milhq.admin.submissions.assign_statuses');
 
             $statusRecord = $form->getData();
             $submissionStatusUpdateService->createStatusRecord($submission, $statusRecord);
@@ -64,7 +64,7 @@ class SubmissionController extends AbstractController
     #[Route('/{id}/delete', 'delete')]
     public function delete(Request $request, FormSubmission $formSubmission): Response
     {
-        if (!$this->isGranted('forumify-milhq.admin.submissions.delete')) {
+        if (!$this->isGranted('milhq.admin.submissions.delete')) {
             $this->addFlash('error', 'You are not allowed to delete submissions.');
             return $this->redirectToRoute('milhq_admin_submission_list');
         }

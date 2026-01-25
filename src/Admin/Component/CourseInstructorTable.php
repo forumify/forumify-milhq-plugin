@@ -15,13 +15,13 @@ use Symfony\UX\LiveComponent\Attribute\LiveProp;
 
 #[PluginVersion('forumify/forumify-milhq-plugin', 'premium')]
 #[AsLiveComponent('Milhq\\CourseInstructorTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.courses.manage')]
+#[IsGranted('milhq.admin.courses.manage')]
 class CourseInstructorTable extends AbstractDoctrineTable
 {
     #[LiveProp]
     public int $courseId;
 
-    protected ?string $permissionReorder = 'forumify-milhq.admin.courses.manage';
+    protected ?string $permissionReorder = 'milhq.admin.courses.manage';
 
     protected function getEntityClass(): string
     {

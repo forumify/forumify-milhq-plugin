@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * @extends AbstractCrudController<FormField>
  */
 #[Route('/forms/{formId}/fields', 'form_field')]
-#[IsGranted('forumify-milhq.admin.organization.forms.manage')]
+#[IsGranted('milhq.admin.organization.forms.manage')]
 class FormFieldController extends AbstractCrudController
 {
     protected string $listTemplate = '@ForumifyMilhqPlugin/admin/forms/field_list.html.twig';

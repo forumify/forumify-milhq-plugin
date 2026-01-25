@@ -20,10 +20,10 @@ class SoldierController extends AbstractCrudController
     protected string $listTemplate = '@ForumifyMilhqPlugin/admin/soldiers/list/list.html.twig';
     protected string $formTemplate = '@ForumifyMilhqPlugin/admin/soldiers/edit/form.html.twig';
 
-    protected ?string $permissionView = 'forumify-milhq.admin.soldiers.view';
-    protected ?string $permissionCreate = 'forumify-milhq.admin.soldiers.create';
-    protected ?string $permissionEdit = 'forumify-milhq.admin.soldiers.manage';
-    protected ?string $permissionDelete = 'forumify-milhq.admin.soldiers.delete';
+    protected ?string $permissionView = 'milhq.admin.soldiers.view';
+    protected ?string $permissionCreate = 'milhq.admin.soldiers.create';
+    protected ?string $permissionEdit = 'milhq.admin.soldiers.manage';
+    protected ?string $permissionDelete = 'milhq.admin.soldiers.delete';
 
     public function __construct(
         private readonly AssignmentRecordRepository $assignmentRecordRepository,

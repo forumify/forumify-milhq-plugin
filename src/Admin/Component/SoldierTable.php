@@ -12,7 +12,7 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Twig\Environment;
 
 #[AsLiveComponent('Milhq\\SoldierTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.soldiers.view')]
+#[IsGranted('milhq.admin.soldiers.view')]
 class SoldierTable extends AbstractDoctrineTable
 {
     public function __construct(private readonly Environment $twig)

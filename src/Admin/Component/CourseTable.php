@@ -12,10 +12,10 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
 #[PluginVersion('forumify/forumify-milhq-plugin', 'premium')]
 #[AsLiveComponent('Milhq\\CourseTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.courses.view')]
+#[IsGranted('milhq.admin.courses.view')]
 class CourseTable extends AbstractDoctrineTable
 {
-    protected ?string $permissionReorder = 'forumify-milhq.admin.courses.manage';
+    protected ?string $permissionReorder = 'milhq.admin.courses.manage';
 
     protected function getEntityClass(): string
     {
@@ -41,11 +41,11 @@ class CourseTable extends AbstractDoctrineTable
     private function renderActions(int $id, Course $course): string
     {
         $actions = '';
-        if ($this->security->isGranted('forumify-milhq.admin.courses.manage')) {
+        if ($this->security->isGranted('milhq.admin.courses.manage')) {
             $actions .= $this->renderAction('milhq_admin_courses_edit', ['identifier' => $id], 'pencil-simple-line');
             $actions .= $this->renderAction('forumify_admin_acl', (array)$course->getACLParameters(), 'lock-simple');
         }
-        if ($this->security->isGranted('forumify-milhq.admin.courses.delete')) {
+        if ($this->security->isGranted('milhq.admin.courses.delete')) {
             $actions .= $this->renderAction('milhq_admin_courses_delete', ['identifier' => $id], 'x');
         }
 

@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
-#[IsGranted('forumify-milhq.admin.configuration.manage')]
+#[IsGranted('milhq.admin.configuration.manage')]
 class ConfigurationController extends AbstractController
 {
     /**

@@ -22,7 +22,7 @@ use Symfony\UX\LiveComponent\DefaultActionTrait;
 
 #[PluginVersion('forumify/forumify-milhq-plugin', 'premium')]
 #[AsLiveComponent('Milhq\\AttendanceSheet', '@ForumifyMilhqPlugin/frontend/components/attendance_sheet.html.twig')]
-#[IsGranted('forumify-milhq.frontend.attendance_sheet.view')]
+#[IsGranted('milhq.frontend.attendance_sheet.view')]
 class AttendanceSheet extends AbstractController
 {
     use DefaultActionTrait;

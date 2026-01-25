@@ -15,13 +15,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * @extends AbstractCrudController<Status>
  */
 #[Route('/statuses', 'status')]
-#[IsGranted('forumify-milhq.admin.organization.view')]
+#[IsGranted('milhq.admin.organization.view')]
 class StatusController extends AbstractCrudController
 {
-    protected ?string $permissionView = 'forumify-milhq.admin.organization.statuses.view';
-    protected ?string $permissionCreate = 'forumify-milhq.admin.organization.statuses.create';
-    protected ?string $permissionEdit = 'forumify-milhq.admin.organization.statuses.manage';
-    protected ?string $permissionDelete = 'forumify-milhq.admin.organization.statuses.delete';
+    protected ?string $permissionView = 'milhq.admin.organization.statuses.view';
+    protected ?string $permissionCreate = 'milhq.admin.organization.statuses.create';
+    protected ?string $permissionEdit = 'milhq.admin.organization.statuses.manage';
+    protected ?string $permissionDelete = 'milhq.admin.organization.statuses.delete';
 
     protected function getTranslationPrefix(): string
     {

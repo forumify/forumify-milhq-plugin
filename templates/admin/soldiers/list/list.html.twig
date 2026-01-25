@@ -19,7 +19,7 @@
             'records.combat_records.create',
             'records.rank_records.create',
             'records.qualification_records.create',
-        ] has some perm => is_granted('forumify-milhq.admin.' ~ perm) %}
+        ] has some perm => is_granted('milhq.admin.' ~ perm) %}
             <div {{ stimulus_controller('forumify/menu', { placement: 'bottom-end' }) }}>
                 <a class="btn-primary" {{ stimulus_target('forumify/menu', 'openButton') }}>
                     <i class="ph ph-plus"></i>{{ 'milhq.admin.soldiers.quick_actions'|trans }}

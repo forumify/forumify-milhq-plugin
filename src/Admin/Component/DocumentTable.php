@@ -12,7 +12,7 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use function Symfony\Component\String\u;
 
 #[AsLiveComponent('Milhq\\DocumentTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.organization.documents.view')]
+#[IsGranted('milhq.admin.organization.documents.view')]
 class DocumentTable extends AbstractDoctrineTable
 {
     protected function getEntityClass(): string
@@ -47,10 +47,10 @@ class DocumentTable extends AbstractDoctrineTable
     {
         $actions = '';
 
-        if ($this->security->isGranted('forumify-milhq.admin.organization.documents.manage')) {
+        if ($this->security->isGranted('milhq.admin.organization.documents.manage')) {
             $actions .= $this->renderAction('milhq_admin_document_edit', ['identifier' => $id], 'pencil-simple-line');
         }
-        if ($this->security->isGranted('forumify-milhq.admin.organization.documents.delete')) {
+        if ($this->security->isGranted('milhq.admin.organization.documents.delete')) {
             $actions .= $this->renderAction('milhq_admin_document_delete', ['identifier' => $id], 'x');
         }
 

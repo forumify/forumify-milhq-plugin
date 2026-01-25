@@ -13,7 +13,7 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
 #[PluginVersion('forumify/forumify-milhq-plugin', 'premium')]
 #[AsLiveComponent('Milhq\\OperationTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.operations.view')]
+#[IsGranted('milhq.admin.operations.view')]
 class OperationTable extends AbstractDoctrineTable
 {
     public function __construct()
@@ -52,12 +52,12 @@ class OperationTable extends AbstractDoctrineTable
     private function renderActions(int $id, Operation $operation): string
     {
         $actions = '';
-        if ($this->security->isGranted('forumify-milhq.admin.operations.manage')) {
+        if ($this->security->isGranted('milhq.admin.operations.manage')) {
             $actions .= $this->renderAction('milhq_admin_operations_edit', ['identifier' => $id], 'pencil-simple-line');
             $actions .= $this->renderAction('forumify_admin_acl', (array)$operation->getACLParameters(), 'lock-simple');
         }
 
-        if ($this->security->isGranted('forumify-milhq.admin.operations.delete')) {
+        if ($this->security->isGranted('milhq.admin.operations.delete')) {
             $actions .= $this->renderAction('milhq_admin_operations_delete', ['identifier' => $id], 'x');
         }
 

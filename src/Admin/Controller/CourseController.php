@@ -23,10 +23,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/courses', 'courses')]
 class CourseController extends AbstractCrudController
 {
-    protected ?string $permissionView = 'forumify-milhq.admin.courses.view';
-    protected ?string $permissionCreate = 'forumify-milhq.admin.courses.manage';
-    protected ?string $permissionEdit = 'forumify-milhq.admin.courses.manage';
-    protected ?string $permissionDelete = 'forumify-milhq.admin.courses.delete';
+    protected ?string $permissionView = 'milhq.admin.courses.view';
+    protected ?string $permissionCreate = 'milhq.admin.courses.manage';
+    protected ?string $permissionEdit = 'milhq.admin.courses.manage';
+    protected ?string $permissionDelete = 'milhq.admin.courses.delete';
 
     protected string $formTemplate = '@ForumifyMilhqPlugin/admin/courses/form.html.twig';
 

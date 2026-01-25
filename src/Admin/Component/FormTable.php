@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
 #[AsLiveComponent('Milhq\\FormTable', '@Forumify/components/table/table.html.twig')]
-#[IsGranted('forumify-milhq.admin.organization.forms.view')]
+#[IsGranted('milhq.admin.organization.forms.view')]
 class FormTable extends AbstractDoctrineTable
 {
     protected function getEntityClass(): string
@@ -42,13 +42,13 @@ class FormTable extends AbstractDoctrineTable
     {
         $actions = '';
 
-        if ($this->security->isGranted('forumify-milhq.admin.organization.forms.manage')) {
+        if ($this->security->isGranted('milhq.admin.organization.forms.manage')) {
             $actions .= $this->renderAction('milhq_admin_form_edit', ['identifier' => $id], 'pencil-simple-line');
             $actions .= $this->renderAction('forumify_admin_acl', (array)$form->getACLParameters(), 'lock-simple');
             $actions .= $this->renderAction('milhq_admin_form_field_list', ['formId' => $id], 'textbox');
         }
 
-        if ($this->security->isGranted('forumify-milhq.admin.organization.forms.delete')) {
+        if ($this->security->isGranted('milhq.admin.organization.forms.delete')) {
             $actions .= $this->renderAction('milhq_admin_form_delete', ['identifier' => $id], 'x');
         }
 

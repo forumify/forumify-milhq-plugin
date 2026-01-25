@@ -54,7 +54,7 @@ abstract class AbstractAdminRecordTable extends AbstractDoctrineTable
     {
         $recordType = $this->getRecordType();
 
-        return $this->security->isGranted("forumify-milhq.admin.records.$recordType.delete")
+        return $this->security->isGranted("milhq.admin.records.$recordType.delete")
             ? $this->renderAction("milhq_admin_{$recordType}_delete", ['identifier' => $id], 'x')
             : '';
     }
