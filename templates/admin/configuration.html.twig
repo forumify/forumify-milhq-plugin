@@ -6,8 +6,8 @@
         {% embed '@Forumify/components/tabs.html.twig' %}
             {% block tabs %}
                 <button type="button" class="btn-link" data-tab-id="general">{{ 'milhq.settings.tab_general'|trans }}</button>
-                <button type="button" class="btn-link" data-tab-id="profile">{{ 'milhq.settings.tab_profile'|trans }}</button>
                 {% if plugin_version('forumify/forumify-milhq-plugin', 'premium') %}
+                    <button type="button" class="btn-link" data-tab-id="profile">{{ 'milhq.settings.tab_profile'|trans }}</button>
                     <button type="button" class="btn-link" data-tab-id="report-in">{{ 'milhq.settings.tab_report_in'|trans }}</button>
                     <button type="button" class="btn-link" data-tab-id="operations">{{ 'milhq.settings.tab_operations'|trans }}</button>
                     <button type="button" class="btn-link" data-tab-id="squadxml">{{ 'milhq.settings.tab_squadxml'|trans }}</button>
@@ -27,13 +27,13 @@
                     {{ form_row(form.milhq__enlistment__forum) }}
                     {{ form_row(form.milhq__enlistment__role) }}
                 </div>
-                <div id="profile">
-                    {{ form_row(form.milhq__profile__overwrite_display_names) }}
-                    {{ form_row(form.milhq__profile__display_name_format) }}
-                    {{ form_row(form.milhq__profile__overwrite_avatars) }}
-                    {{ form_row(form.milhq__profile__overwrite_signatures) }}
-                </div>
                 {% if plugin_version('forumify/forumify-milhq-plugin', 'premium') %}
+                    <div id="profile">
+                        {{ form_row(form.milhq__profile__overwrite_display_names) }}
+                        {{ form_row(form.milhq__profile__display_name_format) }}
+                        {{ form_row(form.milhq__profile__overwrite_avatars) }}
+                        {{ form_row(form.milhq__profile__overwrite_signatures) }}
+                    </div>
                     <div id="report-in">
                         {{ form_row(form.milhq__report_in__enabled) }}
                         {{ form_row(form.milhq__report_in__enabled_status) }}

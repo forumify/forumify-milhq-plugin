@@ -11,6 +11,7 @@ use Forumify\Core\Repository\UserRepository;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Message\SyncSoldierMessage;
 use Forumify\Milhq\Repository\SoldierRepository;
+use Forumify\Plugin\Service\PluginVersionChecker;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Asset\Packages;
@@ -30,6 +31,7 @@ class SyncSoldierService
         private readonly FilesystemOperator $milhqAssetStorage,
         private readonly SluggerInterface $slugger,
         private readonly Packages $packages,
+        private readonly PluginVersionChecker $pluginVersionChecker,
     ) {
     }
 
@@ -53,9 +55,10 @@ class SyncSoldierService
 
     private function isEnabled(): bool
     {
-        return $this->settingRepository->get('milhq.profile.overwrite_display_names')
+        return $this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', 'premium')
+            && ($this->settingRepository->get('milhq.profile.overwrite_display_names')
             || $this->settingRepository->get('milhq.profile.overwrite_signatures')
-            || $this->settingRepository->get('milhq.profile.overwrite_avatars');
+            || $this->settingRepository->get('milhq.profile.overwrite_avatars'));
     }
 
     public function doSync(SyncSoldierMessage $message): void

@@ -88,33 +88,33 @@ class ConfigurationType extends AbstractType
                 'placeholder' => 'Do not assign a role',
                 'required' => false,
             ])
-            // Profiles
-            ->add('milhq__profile__overwrite_display_names', CheckboxType::class, [
-                'help' => 'Automatically set a user\'s forum display name to match their soldier name.',
-                'label' => 'Overwrite user display names',
-                'required' => false,
-            ])
-            ->add('milhq__profile__display_name_format', TextType::class, [
-                'empty_data' => '{user.rank.abbreviation} {user.name}',
-                'help' => 'milhq.settings.profile.display_name_format_help',
-                'help_html' => true,
-                'label' => 'Display name format',
-                'required' => false,
-            ])
-            ->add('milhq__profile__overwrite_avatars', CheckboxType::class, [
-                'help' => 'Automatically set the user\'s avatar to match their soldier rank.',
-                'label' => 'Overwrite user avatar',
-                'required' => false,
-            ])
-            ->add('milhq__profile__overwrite_signatures', CheckboxType::class, [
-                'help' => 'Automatically set the user\'s signature to match their soldier signature.',
-                'label' => 'Overwrite user signature',
-                'required' => false,
-            ])
         ;
 
         if ($this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', 'premium')) {
             $builder
+                // Profiles
+                ->add('milhq__profile__overwrite_display_names', CheckboxType::class, [
+                    'help' => 'Automatically set a user\'s forum display name to match their soldier name.',
+                    'label' => 'Overwrite user display names',
+                    'required' => false,
+                ])
+                ->add('milhq__profile__display_name_format', TextType::class, [
+                    'empty_data' => '{user.rank.abbreviation} {user.name}',
+                    'help' => 'milhq.settings.profile.display_name_format_help',
+                    'help_html' => true,
+                    'label' => 'Display name format',
+                    'required' => false,
+                ])
+                ->add('milhq__profile__overwrite_avatars', CheckboxType::class, [
+                    'help' => 'Automatically set the user\'s avatar to match their soldier rank.',
+                    'label' => 'Overwrite user avatar',
+                    'required' => false,
+                ])
+                ->add('milhq__profile__overwrite_signatures', CheckboxType::class, [
+                    'help' => 'Automatically set the user\'s signature to match their soldier signature.',
+                    'label' => 'Overwrite user signature',
+                    'required' => false,
+                ])
                 // Reporting In
                 ->add('milhq__report_in__enabled', CheckboxType::class, [
                     'help' => 'Enforces users to press the "Report In" button on the operations center at least once every x days',

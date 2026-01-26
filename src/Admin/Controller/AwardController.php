@@ -18,8 +18,6 @@ use Symfony\Component\Form\FormInterface;
 #[IsGranted('milhq.admin.organization.awards.view')]
 class AwardController extends AbstractCrudController
 {
-    protected string $listTemplate = '@ForumifyMilhqPlugin/admin/crud/list.html.twig';
-
     protected ?string $permissionView = 'milhq.admin.organization.awards.view';
     protected ?string $permissionCreate = 'milhq.admin.organization.awards.create';
     protected ?string $permissionEdit = 'milhq.admin.organization.awards.manage';
