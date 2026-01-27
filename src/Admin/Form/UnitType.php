@@ -9,6 +9,7 @@ use Forumify\Core\Form\RichTextEditorType;
 use Forumify\Milhq\Entity\Position;
 use Forumify\Milhq\Entity\Unit;
 use Forumify\Milhq\Repository\PositionRepository;
+use Forumify\Plugin\Service\PluginVersionChecker;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -18,6 +19,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UnitType extends AbstractType
 {
+    public function __construct(private readonly PluginVersionChecker $pluginVersionChecker)
+    {
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -32,6 +37,16 @@ class UnitType extends AbstractType
             ->add('description', RichTextEditorType::class, [
                 'required' => false,
             ])
+        ;
+
+        if ($this->pluginVersionChecker->isVersionInstalled('forumify-milhq-plugin', 'premium')) {
+            $builder->add('role', UserRoleType::class, [
+                'placeholder' => 'Do not assign any role',
+                'required' => false,
+            ]);
+        }
+
+        $builder
             ->add('role', UserRoleType::class, [
                 'placeholder' => 'Do not assign any role',
                 'required' => false,

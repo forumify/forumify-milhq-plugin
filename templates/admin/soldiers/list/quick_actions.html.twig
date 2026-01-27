@@ -29,14 +29,14 @@
         <i class="ph ph-certificate"></i>{{ 'milhq.admin.soldiers.list.actions.qualification'|trans }}
     </a>
 {% endif %}
-{% if user is defined and is_granted('milhq.admin.soldiers.discharge') %}
-    <a class="btn-link" href="{{ path('milhq_admin_soldier_discharge', { id: user.id }) }}">
+{% if soldier is defined and is_granted('milhq.admin.soldiers.discharge') %}
+    <a class="btn-link" href="{{ path('milhq_admin_soldier_discharge', { id: soldier.id }) }}">
         <i class="ph ph-door-open"></i> {{ 'milhq.admin.soldiers.list.actions.discharge'|trans }}
     </a>
 {% endif %}
-{% if user is defined and is_granted('milhq.admin.soldiers.delete') %}
+{% if soldier is defined and is_granted('milhq.admin.soldiers.delete') %}
     <hr>
-    <a class="btn-link" href="{{ path('milhq_admin_soldier_delete', { identifier: user.id }) }}">
+    <a class="btn-link" href="{{ path('milhq_admin_soldier_delete', { identifier: soldier.id }) }}">
         <i class="ph ph-x"></i>{{ 'milhq.admin.soldiers.list.actions.delete'|trans }}
     </a>
 {% endif %}

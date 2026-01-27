@@ -11,6 +11,7 @@ use Forumify\Core\Entity\User;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
 use Forumify\Milhq\Repository\AssignmentRecordRepository;
+use Forumify\Plugin\Service\PluginVersionChecker;
 
 #[AsEntityListener(Events::prePersist, 'prePersist', entity: AssignmentRecord::class, priority: 100)]
 #[AsEntityListener(Events::preRemove, 'preRemove', entity: AssignmentRecord::class, priority: -100)]
@@ -18,11 +19,16 @@ class AssignmentRoleListener
 {
     public function __construct(
         private readonly AssignmentRecordRepository $assignmentRecordRepository,
+        private readonly PluginVersionChecker $pluginVersionChecker,
     ) {
     }
 
     public function prePersist(AssignmentRecord $addedRecord): void
     {
+        if (!$this->pluginVersionChecker->isVersionInstalled('forumify-milhq-plugin', 'premium')) {
+            return;
+        }
+
         $soldier = $addedRecord->getSoldier();
         $forumUser = $soldier->getUser();
         if ($forumUser === null) {
@@ -62,6 +68,10 @@ class AssignmentRoleListener
 
     public function preRemove(AssignmentRecord $deletedRecord): void
     {
+        if (!$this->pluginVersionChecker->isVersionInstalled('forumify-milhq-plugin', 'premium')) {
+            return;
+        }
+
         $soldier = $deletedRecord->getSoldier();
         $forumUser = $soldier->getUser();
         if ($forumUser === null) {
