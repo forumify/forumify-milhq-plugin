@@ -9,13 +9,11 @@ use Forumify\Core\Entity\User;
 use Forumify\Core\Repository\SettingRepository;
 use Forumify\Core\Repository\UserRepository;
 use Forumify\Milhq\Entity\Soldier;
-use Forumify\Milhq\Message\SyncSoldierMessage;
 use Forumify\Milhq\Repository\SoldierRepository;
 use Forumify\Plugin\Service\PluginVersionChecker;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Asset\Packages;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Twig\Environment;
 
@@ -26,7 +24,6 @@ class SyncSoldierService
         private readonly UserRepository $userRepository,
         private readonly Environment $twig,
         private readonly SettingRepository $settingRepository,
-        private readonly MessageBusInterface $messageBus,
         private readonly FilesystemOperator $avatarStorage,
         private readonly FilesystemOperator $milhqAssetStorage,
         private readonly SluggerInterface $slugger,
@@ -35,20 +32,14 @@ class SyncSoldierService
     ) {
     }
 
-    public function sync(int $userId, bool $async = true): void
+    public function sync(int $userId): void
     {
         if (!$this->isEnabled()) {
             return;
         }
 
-        $message = new SyncSoldierMessage($userId);
-        if ($async) {
-            $this->messageBus->dispatch($message);
-            return;
-        }
-
         try {
-            $this->doSync($message);
+            $this->doSync($userId);
         } catch (\Exception) {
         }
     }
@@ -61,13 +52,13 @@ class SyncSoldierService
             || $this->settingRepository->get('milhq.profile.overwrite_avatars'));
     }
 
-    public function doSync(SyncSoldierMessage $message): void
+    private function doSync(int $userId): void
     {
         $displayNameEnabled = $this->settingRepository->get('milhq.profile.overwrite_display_names');
         $signatureEnabled = $this->settingRepository->get('milhq.profile.overwrite_signatures');
         $avatarEnabled = $this->settingRepository->get('milhq.profile.overwrite_avatars');
 
-        $forumifyUser = $this->userRepository->find($message->userId);
+        $forumifyUser = $this->userRepository->find($userId);
         if ($forumifyUser === null) {
             return;
         }
@@ -94,7 +85,6 @@ class SyncSoldierService
 
     private function syncDisplayName(User $user, Soldier $soldier): void
     {
-        // TODO: take into account during migration user. => soldier.
         $template = $this->settingRepository->get('milhq.profile.display_name_format');
         if ($template === null) {
             $template = '{{soldier.rank.abbreviation}} {{soldier.name}}';

@@ -8,6 +8,13 @@
                 {% if value %}
                     {{ value|format_date }}
                 {% endif %}
+            {% elseif field.type is same as 'select' and field.fieldOptions.options is defined %}
+                {% set option = field.fieldOptions.options|find(o => o.key == value) %}
+                {% if option is not null %}
+                    {{ option.label }}
+                {% else %}
+                    {{ value }}
+                {% endif %}
             {% elseif field.type is same as 'file' %}
                 <a href="{{ asset(value, 'milhq.asset') }}" target="_blank">{{ value }}</a>
             {% else %}

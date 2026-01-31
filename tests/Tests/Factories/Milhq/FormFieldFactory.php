@@ -17,7 +17,6 @@ class FormFieldFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'readonly' => false,
             'required' => false,
             'type' => 'text',
         ];

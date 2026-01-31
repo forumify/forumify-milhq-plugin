@@ -22,6 +22,7 @@ class FormFieldType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => FormField::class,
+            'new' => true,
         ]);
     }
 
@@ -32,20 +33,35 @@ class FormFieldType extends AbstractType
             $typeOptions[u($type)->replace('-', ' ')->title(false)->toString()] = $type;
         }
 
+        $isNew = $options['new'];
         $builder
             ->add('label', TextType::class)
             ->add('type', ChoiceType::class, [
                 'choices' => $typeOptions,
+                'disabled' => !$isNew,
             ])
+        ;
+
+        if ($isNew) {
+            return;
+        }
+
+        $builder
             ->add('help', RichTextEditorType::class, [
                 'required' => false,
             ])
             ->add('required', CheckboxType::class, [
                 'required' => false,
             ])
-            ->add('readonly', CheckboxType::class, [
-                'required' => false,
-            ])
         ;
+
+        /** @var FormField $field */
+        $field = $options['data'];
+        if (in_array($field->getType(), ['select'], true)) {
+            $builder->add('fieldOptions', FormFieldOptionsType::class, [
+                'label' => false,
+                'field' => $field,
+            ]);
+        }
     }
 }

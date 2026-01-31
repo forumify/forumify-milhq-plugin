@@ -39,12 +39,11 @@ class SubmissionFormType extends AbstractType implements DataMapperInterface
     }
 
     public const FIELD_MAP = [
-        'boolean' => CheckboxType::class,
-        'code' => TextareaType::class,
+        'checkbox' => CheckboxType::class,
         'color' => ColorType::class,
         'country' => CountryType::class,
         'date' => DateType::class,
-        'datetime-local' => DateTimeType::class,
+        'datetime' => DateTimeType::class,
         'email' => EmailType::class,
         'file' => FileType::class,
         'number' => NumberType::class,
@@ -82,7 +81,6 @@ class SubmissionFormType extends AbstractType implements DataMapperInterface
             }
 
             $fieldOptions = [
-                'disabled' => $options['disabled'] || $field->isReadonly(),
                 'help' => $field->getHelp(),
                 'help_html' => true,
                 'label' => $field->getLabel(),
@@ -90,7 +88,12 @@ class SubmissionFormType extends AbstractType implements DataMapperInterface
             ];
 
             if ($type === ChoiceType::class) {
-                $fieldOptions['choices'] = $field->getOptions();
+                $options = $field->fieldOptions['options'] ?? [];
+                $options = array_combine(
+                    array_column($options, 'label'),
+                    array_column($options, 'key'),
+                );
+                $fieldOptions['choices'] = $options;
             }
 
             if ($type === DateType::class || $type === DateTimeType::class) {

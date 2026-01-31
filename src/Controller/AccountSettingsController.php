@@ -31,7 +31,7 @@ class AccountSettingsController extends AbstractController
         if ($response instanceof RedirectResponse) {
             /** @var User $user */
             $user = $this->getUser();
-            $this->syncUserService->sync($user->getId(), false);
+            $this->syncUserService->sync($user->getId());
         }
 
         return $response;

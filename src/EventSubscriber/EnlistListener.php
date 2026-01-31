@@ -9,6 +9,7 @@ use Forumify\Forum\Entity\Topic;
 use Forumify\Forum\Form\TopicData;
 use Forumify\Forum\Repository\ForumRepository;
 use Forumify\Forum\Service\CreateTopicService;
+use Forumify\Milhq\Entity\FormField;
 use Forumify\Milhq\Entity\FormSubmission;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Event\SoldierEnlistedEvent;
@@ -68,8 +69,8 @@ class EnlistListener
             $value = match ($field->getType()) {
                 'boolean' => $value ? 'Yes' : 'No',
                 'date' => (new \DateTime($value))->format('Y-m-d'),
-                'datetime-local' => (new \DateTime($value))->format('Y-m-d H:i:s'),
-                'select' => array_find_key($field->getOptions(), fn($v) => $v === $value),
+                'datetime' => (new \DateTime($value))->format('Y-m-d H:i:s'),
+                'select' => $this->findOptionLabel($value, $field),
                 default => $value,
             };
 
@@ -77,5 +78,15 @@ class EnlistListener
         }
 
         return $content;
+    }
+
+    private function findOptionLabel(string $value, FormField $field): string
+    {
+        foreach ($field->fieldOptions['options'] ?? [] as $option) {
+            if (($option['key'] ?? null) === $value) {
+                return $option['label'] ?? '';
+            }
+        }
+        return '';
     }
 }

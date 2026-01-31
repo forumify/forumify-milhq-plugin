@@ -1,6 +1,41 @@
 {% extends '@Forumify/admin/crud/form.html.twig' %}
 {% block body %}
-    {% include '@Forumify/admin/components/simple_form.html.twig' with {
+    {% embed '@Forumify/admin/components/simple_form.html.twig' with {
         cancelPath: path(route ~ '_list', { formId: parentForm.id })
     } %}
+        {% block form_widget %}
+            <div {{ stimulus_controller('forumify/forumify-milhq-plugin/field_form') }}>
+                {{ form_row(form.label) }}
+                {{ form_row(form.type) }}
+                {% if data is not null %}
+                    {% if data.type == 'select' %}
+                        <div class="form-row">
+                            {{ form_label(form.fieldOptions.options) }}
+                            <div class="ml-8 mt-2 mb-1 grid-2 gap-2">
+                                <span>Key</span>
+                                <span>Label</span>
+                            </div>
+                            <div
+                                {{ stimulus_target('forumify/forumify-milhq-plugin/field_form', 'options') }}
+                                data-prototype="{{ form_widget(form.fieldOptions.options.vars.prototype)|e('html_attr') }}"
+                                data-index="{{ form.fieldOptions.options|length }}"
+                            >
+                                {{ form_widget(form.fieldOptions.options) }}
+                            </div>
+                            <button
+                                class="btn-link btn-small"
+                                type="button"
+                                {{ stimulus_action('forumify/forumify-milhq-plugin/field_form', 'addOption') }}
+                            >
+                                <i class="ph ph-plus"></i>
+                                Add Option
+                            </button>
+                        </div>
+                    {% endif %}
+                    {{ form_row(form.help) }}
+                    {{ form_row(form.required) }}
+                {% endif %}
+            </div>
+        {% endblock %}
+    {% endembed %}
 {% endblock %}

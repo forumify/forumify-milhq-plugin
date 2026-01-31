@@ -50,11 +50,13 @@ class FormFieldController extends AbstractCrudController
 
     protected function getForm(?object $data): FormInterface
     {
+        $new = false;
         if ($data === null) {
+            $new = true;
             $data = new FormField();
             $data->setForm($this->getParent());
         }
-        return $this->createForm(FormFieldType::class, $data);
+        return $this->createForm(FormFieldType::class, $data, ['new' => $new]);
     }
 
     protected function templateParams(array $params = []): array
@@ -67,7 +69,9 @@ class FormFieldController extends AbstractCrudController
 
     protected function redirectAfterSave(mixed $entity, bool $isNew): Response
     {
-        return $this->redirectToRoute($this->getRoute('list'), ['formId' => $this->getParent()->getId()]);
+        return $isNew
+            ? $this->redirectToRoute($this->getRoute('edit'), ['identifier' => $entity->getId()])
+            : $this->redirectToRoute($this->getRoute('list'), ['formId' => $this->getParent()->getId()]);
     }
 
     private function getParent(): Form

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace PluginTests\Tests\Unit\Service;
 
 use Forumify\Core\Repository\SettingRepository;
-use Forumify\Milhq\Message\SyncSoldierMessage;
 use Forumify\Milhq\Service\SyncSoldierService;
 use League\Flysystem\FilesystemOperator;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
@@ -19,7 +18,7 @@ class SyncSoldierServiceTest extends KernelTestCase
     use Factories;
     use UserTrait;
 
-    public function testDoSync(): void
+    public function testSync(): void
     {
         self::getContainer()->get(SettingRepository::class)->setBulk([
             'milhq.profile.overwrite_display_names' => true,
@@ -45,8 +44,7 @@ class SyncSoldierServiceTest extends KernelTestCase
             'signature' => 'blippy-bloppy.png',
         ]);
 
-        $msg = new SyncSoldierMessage($user->getId());
-        self::getContainer()->get(SyncSoldierService::class)->doSync($msg);
+        self::getContainer()->get(SyncSoldierService::class)->sync($user->getId());
 
         self::assertEquals('SGT Blippy Bloppy', $user->getDisplayName());
         self::assertStringContainsString('src="/storage/milhq/blippy-bloppy.png"', $user->getSignature());

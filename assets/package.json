@@ -16,6 +16,12 @@
                 "enabled": true,
                 "autoimport": {}
             },
+            "field_form": {
+                "main": "dist/field_form_controller.js",
+                "fetch": "lazy",
+                "enabled": true,
+                "autoimport": {}
+            },
             "user_edit": {
                 "main": "dist/user_edit_controller.js",
                 "fetch": "lazy",

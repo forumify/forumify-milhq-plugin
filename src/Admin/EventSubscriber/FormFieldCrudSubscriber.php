@@ -26,7 +26,13 @@ class FormFieldCrudSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $slugger = new AsciiSlugger();
-        $field->setKey($slugger->slug($field->getLabel())->slice(0, 64)->toString());
+        $key = new AsciiSlugger()
+            ->slug($field->getLabel())
+            ->slice(0, 64)
+            ->lower()
+            ->toString()
+        ;
+
+        $field->setKey($key);
     }
 }

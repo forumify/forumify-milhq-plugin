@@ -16,7 +16,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Entity(repositoryClass: FormFieldRepository::class)]
 #[ORM\Table('milhq_form_field')]
 #[ORM\UniqueConstraint(fields: ['form', 'key'])]
-#[UniqueEntity(fields: ['form', 'key'], message: 'This key is already used in this form.', errorPath: 'key')]
+#[UniqueEntity(fields: ['form', 'key'], message: 'This key is already used in this form.', errorPath: 'label')]
 class FormField implements SortableEntityInterface
 {
     use IdentifiableEntityTrait;
@@ -42,11 +42,8 @@ class FormField implements SortableEntityInterface
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $required = false;
 
-    #[ORM\Column(type: Types::BOOLEAN)]
-    private bool $readonly = false;
-
-    #[ORM\Column(type: Types::JSON, nullable: true)]
-    private ?array $options = null;
+    #[ORM\Column(type: Types::JSON)]
+    public ?array $fieldOptions = null;
 
     public function getForm(): Form
     {
@@ -106,25 +103,5 @@ class FormField implements SortableEntityInterface
     public function setRequired(bool $required): void
     {
         $this->required = $required;
-    }
-
-    public function isReadonly(): bool
-    {
-        return $this->readonly;
-    }
-
-    public function setReadonly(bool $readonly): void
-    {
-        $this->readonly = $readonly;
-    }
-
-    public function getOptions(): ?array
-    {
-        return $this->options;
-    }
-
-    public function setOptions(?array $options): void
-    {
-        $this->options = $options;
     }
 }
