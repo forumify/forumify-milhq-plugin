@@ -1,0 +1,15 @@
+{% extends '@Forumify/admin/base.html.twig' %}
+{% block body %}
+    <h1 class="mb-4">{{ 'milhq.settings.title'|trans }}</h1>
+    {% if setting('milhq.hide-perscom-migration-warning') != true and plugin_version('forumify/forumify-perscom-plugin') %}
+        <div class="border rounded mb-4 p-4">
+            <p class="text-black mb-2">PERSCOM.io integration plugin detected!</p>
+            <p class="mb-4">We've detected you have the PERSCOM.io integration plugin installed. If you wish to migrate your existing settings and personnel data to MILHQ, press the "Migrate data" button to start the migration process.</p>
+            <div class="flex flex-wrap gap-4 items-center">
+                <a class="btn-primary" href="{{ path('milhq_admin_migrate_perscom') }}">Migrate data</a>
+                <a class="btn-link" href="{{ path('milhq_admin_configuration', { 'ignore-perscom': 1 }) }}">Never ask again</a>
+            </div>
+        </div>
+    {% endif %}
+    {% include '@ForumifyMilhqPlugin/admin/configuration/settings.html.twig' %}
+{% endblock %}

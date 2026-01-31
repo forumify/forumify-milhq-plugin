@@ -15,7 +15,7 @@ class OperationCrudEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly MediaService $mediaService,
-        private readonly FilesystemOperator $assetStorage,
+        private readonly FilesystemOperator $milhqAssetStorage,
     ) {
     }
 
@@ -36,7 +36,7 @@ class OperationCrudEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $image = $this->mediaService->saveToFilesystem($this->assetStorage, $newImage);
+        $image = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newImage);
         $operation->setImage($image);
     }
 }

@@ -36,6 +36,11 @@ class ConfigurationController extends AbstractController
     #[Route('/configuration', 'configuration')]
     public function __invoke(Request $request): Response
     {
+        if ($request->query->get('ignore-perscom')) {
+            $this->settingRepository->set('milhq.hide-perscom-migration-warning', true);
+            return $this->redirectToRoute('milhq_admin_configuration');
+        }
+
         $form = $this->createForm(ConfigurationType::class, $this->settingRepository->toFormData('milhq'));
 
         $form->handleRequest($request);
@@ -53,7 +58,7 @@ class ConfigurationController extends AbstractController
             return $this->redirectToRoute('milhq_admin_configuration');
         }
 
-        return $this->render('@ForumifyMilhqPlugin/admin/configuration.html.twig', [
+        return $this->render('@ForumifyMilhqPlugin/admin/configuration/configuration.html.twig', [
             'form' => $form->createView(),
         ]);
     }
