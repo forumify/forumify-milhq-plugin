@@ -25,7 +25,7 @@ class AssignmentRoleListener
 
     public function prePersist(AssignmentRecord $addedRecord): void
     {
-        if (!$this->pluginVersionChecker->isVersionInstalled('forumify-milhq-plugin', 'premium')) {
+        if (!$this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', 'premium')) {
             return;
         }
 
@@ -68,7 +68,7 @@ class AssignmentRoleListener
 
     public function preRemove(AssignmentRecord $deletedRecord): void
     {
-        if (!$this->pluginVersionChecker->isVersionInstalled('forumify-milhq-plugin', 'premium')) {
+        if (!$this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', 'premium')) {
             return;
         }
 
