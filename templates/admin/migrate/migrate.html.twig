@@ -15,7 +15,12 @@
             </div>
         </div>
     {% else %}
-        <h2>Migration Results</h2>
+        <h3>Migration Complete!</h3>
+        <p class="mb-2">Please double check all of your data was migrated successfully, and then you can safely remove the PERSCOM.io integration plugin.</p>
+        <p class="mb-2">If anything is missing, please let us know in the forumify Discord or forums, you can re-run this migration as many times as you want, just keep in mind that any modifications to MILHQ will be removed in the process.</p>
+        <a class="btn-link mb-6" href="{{ path('milhq_admin_configuration') }}"><i class="ph ph-arrow-left"></i> Back to configuration</a>
+        <h4>Migration Results</h4>
+        <p class="mb-2">Took {{ took|number_format(2) }} seconds, using {{ memory|number_format(2) }} MB memory.</p>
         {% for entity, result in results %}
             <p>{{ entity|humanize }}: <span class="text-bold">{{ result.count }}</span></p>
             {% if result.messages is not empty %}

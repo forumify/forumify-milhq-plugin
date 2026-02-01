@@ -47,10 +47,6 @@ class UnitType extends AbstractType
         }
 
         $builder
-            ->add('role', UserRoleType::class, [
-                'placeholder' => 'Do not assign any role',
-                'required' => false,
-            ])
             ->add('supervisors', EntityType::class, [
                 'required' => false,
                 'multiple' => true,

@@ -6,12 +6,15 @@ namespace Forumify\Milhq\Admin\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Forumify\Core\Repository\SettingRepository;
+use Forumify\Core\Twig\Extension\MenuRuntime;
 use Forumify\Plugin\Service\PluginVersionChecker;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Throwable;
 
 /**
@@ -20,10 +23,14 @@ use Throwable;
 #[IsGranted('milhq.admin.configuration.manage')]
 class MigratePerscomController extends AbstractController
 {
+    /**
+     * @param CacheInterface&TagAwareCacheInterface $cache
+     */
     public function __construct(
         private readonly PluginVersionChecker $pluginVersionChecker,
         private readonly SettingRepository $settingRepository,
         private readonly EntityManagerInterface $em,
+        private readonly CacheInterface $cache,
         private readonly FilesystemOperator $milhqAssetStorage,
         private readonly FilesystemOperator $assetStorage,
         private readonly ?FilesystemOperator $perscomAssetStorage = null,
@@ -44,9 +51,24 @@ class MigratePerscomController extends AbstractController
     #[Route('/migrate-perscom/migrate', 'migrate_perscom_migrate')]
     public function migrate(): Response
     {
+        $start = microtime(true);
+        $results = $this->migrateAll();
+        $took = microtime(true) - $start;
+
+        return $this->render('@ForumifyMilhqPlugin/admin/migrate/migrate.html.twig', [
+            'results' => $results,
+            'took' => $took,
+            'memory' => memory_get_peak_usage(true) / 1000000,
+        ]);
+    }
+
+    private function migrateAll(): array
+    {
         $results = [];
 
         $results['settings'] = $this->migrateSettings();
+        $results['roles'] = $this->migrateRoles();
+        $results['menuItems'] = $this->migrateMenuItems();
 
         // Organization
         $results['awards'] = $this->migrateTable('perscom_award', 'milhq_award', ['id', 'name', 'description', 'image', 'position', 'created_at', 'updated_at'], ['image']);
@@ -91,9 +113,7 @@ class MigratePerscomController extends AbstractController
         $results['missionRsvps'] = $this->migrateTable('perscom_mission_rsvp', 'milhq_mission_rsvp', ['id', 'user_id' => 'soldier_id', 'mission_id', 'going', 'created_at', 'updated_at']);
         $results['missionAfterActionReports'] = $this->migrateTable('perscom_after_action_report', 'milhq_after_action_report', ['id', 'unit_id', 'mission_id', 'report', 'attendance', 'created_by', 'updated_by', 'created_at', 'updated_at']);
 
-        return $this->render('@ForumifyMilhqPlugin/admin/migrate/migrate.html.twig', [
-            'results' => $results,
-        ]);
+        return $results;
     }
 
     /**
@@ -129,6 +149,48 @@ class MigratePerscomController extends AbstractController
 
         $this->settingRepository->setBulk($milhqSettings);
         return ['count' => count($milhqSettings), 'messages' => []];
+    }
+
+    private function migrateRoles(): array
+    {
+        $conn = $this->em->getConnection();
+        $roles = $conn->executeQuery('SELECT id, permissions FROM role WHERE permissions IS NOT NULL AND permissions <> ""')->fetchAllKeyValue();
+
+        $cnt = 0;
+        foreach ($roles as $id => $permissions) {
+            $newPermissions = explode(',', $permissions);
+            foreach ($newPermissions as $perm) {
+                if (!str_starts_with($perm, 'perscom-io')) {
+                    continue;
+                }
+
+                $perm = str_replace('perscom-io', 'milhq', $perm);
+                $perm = str_replace('users', 'soldiers', $perm);
+
+                if (!in_array($perm, $newPermissions, true)) {
+                    $newPermissions[] = $perm;
+                }
+            }
+            $newPermissions = implode(',', $newPermissions);
+            if ($newPermissions !== $permissions) {
+                $cnt += $conn->executeStatement('UPDATE role SET permissions = ? WHERE id = ?', [$newPermissions, $id]);
+            }
+        }
+
+        return ['count' => $cnt, 'messages' => []];
+    }
+
+    /**
+     * @return Result
+     */
+    private function migrateMenuItems(): array
+    {
+        $conn = $this->em->getConnection();
+        $cnt = $conn->executeStatement('UPDATE menu_item SET name = ?, type = ? WHERE type = ?', ['MILHQ', 'milhq', 'perscom']);
+
+        $this->cache->invalidateTags([MenuRuntime::MENU_CACHE_TAG]);
+
+        return ['count' => $cnt, 'messages' => []];
     }
 
     /**
