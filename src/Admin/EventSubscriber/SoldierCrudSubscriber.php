@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class UserCrudSubscriber implements EventSubscriberInterface
+class SoldierCrudSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly MediaService $mediaService,
@@ -28,15 +28,15 @@ class UserCrudSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PostSaveCrudEvent::getName(Soldier::class) => 'postSaveUser',
-            PreSaveCrudEvent::getName(Soldier::class) => 'preSaveUser',
+            PostSaveCrudEvent::getName(Soldier::class) => 'postSaveSoldier',
+            PreSaveCrudEvent::getName(Soldier::class) => 'preSaveSoldier',
         ];
     }
 
     /**
      * @param PreSaveCrudEvent<Soldier> $event
      */
-    public function preSaveUser(PreSaveCrudEvent $event): void
+    public function preSaveSoldier(PreSaveCrudEvent $event): void
     {
         $form = $event->getForm();
         $user = $event->getEntity();
@@ -59,7 +59,7 @@ class UserCrudSubscriber implements EventSubscriberInterface
     /**
      * @param PostSaveCrudEvent<Soldier> $event
      */
-    public function postSaveUser(PostSaveCrudEvent $event): void
+    public function postSaveSoldier(PostSaveCrudEvent $event): void
     {
         $user = $event->getEntity();
         $form = $event->getForm();
