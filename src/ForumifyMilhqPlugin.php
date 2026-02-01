@@ -6,8 +6,6 @@ namespace Forumify\Milhq;
 
 use Forumify\Plugin\AbstractForumifyPlugin;
 use Forumify\Plugin\PluginMetadata;
-use Forumify\Milhq\DependencyInjection\CalendarPluginCompilerPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /** @codeCoverageIgnore */
 class ForumifyMilhqPlugin extends AbstractForumifyPlugin
@@ -21,13 +19,6 @@ class ForumifyMilhqPlugin extends AbstractForumifyPlugin
             'https://forumify.net',
             'milhq_admin_configuration',
         );
-    }
-
-    public function build(ContainerBuilder $container): void
-    {
-        parent::build($container);
-
-        $container->addCompilerPass(new CalendarPluginCompilerPass());
     }
 
     public function getPermissions(): array

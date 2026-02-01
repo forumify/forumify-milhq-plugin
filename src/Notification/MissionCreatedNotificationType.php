@@ -50,7 +50,7 @@ class MissionCreatedNotificationType extends AbstractEmailNotificationType
     {
         $image = $this->getMission($notification)?->getOperation()->getImage();
         if ($image !== null) {
-            return $this->packages->getUrl($image, 'forumify.asset');
+            return $this->packages->getUrl($image, 'milhq.asset');
         }
 
         return $this->packages->getUrl('bundles/forumifymilhqplugin/images/milhq.png');

@@ -42,7 +42,7 @@ class FormField implements SortableEntityInterface
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $required = false;
 
-    #[ORM\Column(type: Types::JSON)]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     public ?array $fieldOptions = null;
 
     public function getForm(): Form

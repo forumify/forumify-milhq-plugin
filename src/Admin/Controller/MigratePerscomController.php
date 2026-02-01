@@ -80,14 +80,14 @@ class MigratePerscomController extends AbstractController
         $results['courses'] = $this->migrateTable('perscom_course', 'milhq_course', ['id', 'slug', 'title', 'description', 'image', 'minimum_rank_id', 'prerequisites', 'qualifications', 'position']);
         $this->fixCourseImages($results['courses']);
         $results['courseInstructors'] = $this->migrateTable('perscom_course_instructor', 'milhq_course_instructor', ['id', 'course_id', 'title', 'description', 'position']);
-        $results['courseClasses'] = $this->migrateTable('perscom_course_class', 'milhq_course_class', ['id', 'title', 'description', 'signup_from', 'signup_until', 'start', 'end', 'student_slots', 'result', 'created_at', 'updated_at', 'course_id', 'created_by', 'updated_by']);
+        $results['courseClasses'] = $this->migrateTable('perscom_course_class', 'milhq_course_class', ['id', 'title', 'description', 'signup_from', 'signup_until', 'start', 'end', 'student_slots', 'result', 'created_at', 'updated_at', 'course_id', 'created_by', 'updated_by', 'calendar_id', 'event_id' => 'calendar_event_id']);
         $results['courseClassInstructors'] = $this->migrateTable('perscom_course_class_instructor', 'milhq_course_class_instructor', ['id', 'user_id' => 'soldier_id', 'class_id', 'instructor_id', 'present']);
         $results['courseClassStudents'] = $this->migrateTable('perscom_course_class_student', 'milhq_course_class_student', ['id', 'user_id' => 'soldier_id', 'class_id', 'result', 'qualifications', 'service_record_text_override']);
 
         // Missions
         $results['operations'] = $this->migrateTable('perscom_operation', 'milhq_operation', ['id', 'title', 'description', 'image', 'start', 'end', 'mission_briefing_template', 'after_action_report_template', 'slug', 'content', 'request_rsvp']);
         $this->fixOperationImages($results['operations']);
-        $results['missions'] = $this->migrateTable('perscom_mission', 'milhq_mission', ['id', 'operation_id', 'title', 'slug', 'briefing', 'start', 'end', 'send_notification', 'create_combat_records', 'combat_record_text', 'created_at', 'updated_at', 'created_by', 'updated_by']);
+        $results['missions'] = $this->migrateTable('perscom_mission', 'milhq_mission', ['id', 'operation_id', 'title', 'slug', 'briefing', 'start', 'end', 'send_notification', 'create_combat_records', 'combat_record_text', 'created_at', 'updated_at', 'created_by', 'updated_by', 'calendar_id', 'calendar_event_id']);
         $results['missionRsvps'] = $this->migrateTable('perscom_mission_rsvp', 'milhq_mission_rsvp', ['id', 'user_id' => 'soldier_id', 'mission_id', 'going', 'created_at', 'updated_at']);
         $results['missionAfterActionReports'] = $this->migrateTable('perscom_after_action_report', 'milhq_after_action_report', ['id', 'unit_id', 'mission_id', 'report', 'attendance', 'created_by', 'updated_by', 'created_at', 'updated_at']);
 

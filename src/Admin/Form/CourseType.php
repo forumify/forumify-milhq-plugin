@@ -53,7 +53,7 @@ class CourseType extends AbstractType
             ->add('newImage', FileType::class, [
                 'attr' => [
                     'preview' => $imagePreview
-                        ? $this->packages->getUrl($imagePreview, 'forumify.asset')
+                        ? $this->packages->getUrl($imagePreview, 'milhq.asset')
                         : null,
                 ],
                 'constraints' => [
