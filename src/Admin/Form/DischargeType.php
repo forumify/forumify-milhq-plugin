@@ -31,8 +31,8 @@ class DischargeType extends AbstractType
                 'choices' => [
                     'General Discharge' => 'General Discharge',
                     'Honorable Discharge' => 'Honorable Discharge',
-                    'Other Than Honorable Discharge' => 'Other Than Honorable Discharge',
                     'Retirement' => 'Retirement',
+                    'Dishonorable Discharge' => 'Dishonorable Discharge',
                 ],
             ])
             ->add('reason', TextType::class, [

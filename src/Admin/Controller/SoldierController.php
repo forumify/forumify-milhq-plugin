@@ -51,6 +51,7 @@ class SoldierController extends AbstractCrudController
         return 'Milhq\\UserTable';
     }
 
+    #[Route('/create', '_create')]
     public function create(Request $request): Response
     {
         if (!$this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', ['basic', 'premium'])) {
