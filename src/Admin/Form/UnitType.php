@@ -39,7 +39,7 @@ class UnitType extends AbstractType
             ])
         ;
 
-        if ($this->pluginVersionChecker->isVersionInstalled('forumify-milhq-plugin', 'premium')) {
+        if ($this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', 'premium')) {
             $builder->add('role', UserRoleType::class, [
                 'placeholder' => 'Do not assign any role',
                 'required' => false,
