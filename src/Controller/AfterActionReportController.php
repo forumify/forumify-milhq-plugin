@@ -168,13 +168,13 @@ class AfterActionReportController extends AbstractController
     #[Route('/unit/{id}', 'unit')]
     public function getUnit(Unit $unit, Request $request, MissionRSVPRepository $missionRSVPRepository): JsonResponse
     {
-        $users = $unit->getSoldiers()->toArray();
+        $soldiers = $unit->getSoldiers()->toArray();
         $missionId = $request->query->get('mission');
         $rsvps = $missionId === null
             ? []
             : $missionRSVPRepository->findBy([
                 'mission' => $missionId,
-                'user' => $users,
+                'soldier' => $soldiers,
             ]);
 
         $usersToRsvp = [];
@@ -184,7 +184,7 @@ class AfterActionReportController extends AbstractController
         }
 
         $response = [];
-        foreach ($users as $user) {
+        foreach ($soldiers as $user) {
             $row = [
                 'id' => $user->getId(),
                 'name' => $user->getName(),
