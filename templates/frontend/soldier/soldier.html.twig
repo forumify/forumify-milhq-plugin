@@ -39,25 +39,25 @@
                         {% if soldier.specialty %}
                             <div>
                                 <p class="text-bold">{{ 'milhq.soldier.specialty'|trans }}</p>
-                                <p>{{ soldier.specialty.name }}</p>
+                                <p id="specialty">{{ soldier.specialty.name }}</p>
                             </div>
                         {% endif %}
                         {% if soldier.unit %}
                             <div>
                                 <p class="text-bold">{{ 'milhq.soldier.unit'|trans }}</p>
-                                <p>{{ soldier.unit.name }}</p>
+                                <p id="unit">{{ soldier.unit.name }}</p>
                             </div>
                         {% endif %}
                         {% if soldier.position %}
                             <div>
                                 <p class="text-bold">{{ 'milhq.soldier.position'|trans }}</p>
-                                <p>{{ soldier.position.name }}</p>
+                                <p id="position">{{ soldier.position.name }}</p>
                             </div>
                         {% endif %}
                         {% if supervisors is not empty %}
                             <div>
                                 <p class="text-bold">{{ 'milhq.soldier.supervisors'|trans }}</p>
-                                <ul>
+                                <ul id="supervisors">
                                     {% for supervisor in supervisors %}
                                         <li>{{ supervisor.rank.abbreviation|default('') }} {{ supervisor.name }}</li>
                                     {% endfor %}

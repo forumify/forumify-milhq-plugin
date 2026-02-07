@@ -134,12 +134,14 @@ class SoldierController extends AbstractController
             return [];
         }
 
-        $supervisorPositions = $unit->supervisors->toArray();
-        if (empty($supervisorPositions)) {
+        if ($unit->supervisors->isEmpty()) {
             return [];
         }
 
-        $supervisors = $this->userRepository->findBy(['position' => $supervisorPositions]);
+        $supervisors = $this->userRepository->findBy([
+            'position' => $unit->supervisors->toArray(),
+            'unit' => $unit,
+        ]);
         if ($user->getPosition() === null) {
             return $supervisors;
         }
