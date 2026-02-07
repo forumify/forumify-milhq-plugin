@@ -36,6 +36,8 @@ use Zenstruck\Foundry\Story;
  * @method static Entity\Unit unitSecondSquad()
  * @method static Entity\Unit unitCivilian()
  * @method static Entity\Roster rosterAlphaCompany()
+ * @method static Entity\Position positionSquadLeader()
+ * @method static Entity\Position positionTeamLeader()
  * @method static Entity\Position positionRiflemanAT()
  * @method static Entity\Position positionCivilian()
  * @method static Entity\Specialty specialtyInfantry()
@@ -96,10 +98,26 @@ class MilsimStory extends Story
         $enlistmentForum = ForumFactory::createOne(['title' => 'Enlistments']);
         $this->settingRepository->set('milhq.enlistment.forum', $enlistmentForum->getId());
 
+        // Positions
+        $squadLeader = PositionFactory::createOne(['name' => 'Squad Leader']);
+        $this->addState('positionSquadLeader', $squadLeader);
+        $teamLeader = PositionFactory::createOne(['name' => 'Team Leader']);
+        $this->addState('positionTeamLeader', $teamLeader);
+        $riflemanAT = PositionFactory::createOne(['name' => 'Rifleman AT']);
+        $this->addState('positionRiflemanAT', $riflemanAT);
+        $civilianPosition = PositionFactory::createOne(['name' => 'Civilian']);
+        $this->addState('positionCivilian', $civilianPosition);
+
         // Units
-        $firstSquad = UnitFactory::createOne(['name' => 'First Squad']);
+        $firstSquad = UnitFactory::createOne([
+            'name' => 'First Squad',
+            'supervisors' => new ArrayCollection([$squadLeader, $teamLeader]),
+        ]);
         $this->addState('unitFirstSquad', $firstSquad);
-        $secondSquad = UnitFactory::createOne(['name' => 'Second Squad']);
+        $secondSquad = UnitFactory::createOne([
+            'name' => 'Second Squad',
+            'supervisors' => new ArrayCollection([$squadLeader, $teamLeader]),
+        ]);
         $this->addState('unitSecondSquad', $secondSquad);
         $civilianUnit = UnitFactory::createOne(['name' => 'Civilian']);
         $this->addState('unitCivilian', $civilianUnit);
@@ -109,14 +127,6 @@ class MilsimStory extends Story
             'units' => new ArrayCollection([$firstSquad, $secondSquad]),
         ]);
         $this->addState('rosterAlphaCompany', $alphaCompany);
-
-        // Positions
-        $squadLeader = PositionFactory::createOne(['name' => 'Squad Leader']);
-        $teamLeader = PositionFactory::createOne(['name' => 'Team Leader']);
-        $riflemanAT = PositionFactory::createOne(['name' => 'Rifleman AT']);
-        $this->addState('positionRiflemanAT', $riflemanAT);
-        $civilianPosition = PositionFactory::createOne(['name' => 'Civilian']);
-        $this->addState('positionCivilian', $civilianPosition);
 
         // Specialties
         $infantry = SpecialtyFactory::createOne(['name' => 'Infantryman', 'abbreviation' => '11B']);
