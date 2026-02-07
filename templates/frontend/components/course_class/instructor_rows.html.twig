@@ -22,7 +22,7 @@
             {% if canManage %}
                 <button
                     class="btn-link btn-icon btn-small"
-                    {{ live_action('removeInstructor', { userId: instructor.soldier.id }) }}
+                    {{ live_action('removeInstructor', { soldierId: instructor.soldier.id }) }}
                 >
                     <i class="ph ph-x"></i>
                 </button>
