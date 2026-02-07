@@ -42,7 +42,7 @@ class MigratePerscomController extends AbstractController
     {
         if (!$this->pluginVersionChecker->isVersionInstalled('forumify/forumify-perscom-plugin')) {
             $this->addFlash('error', 'The PERSCOM.io integration plugin is not installed.');
-            return $this->redirectToRoute('milhq_admin_configuration');
+            //return $this->redirectToRoute('milhq_admin_configuration');
         }
 
         return $this->render('@ForumifyMilhqPlugin/admin/migrate/migrate.html.twig');
@@ -177,6 +177,12 @@ class MigratePerscomController extends AbstractController
             }
         }
 
+        $acls = $conn->executeQuery('SELECT id, entity FROM acl WHERE entity LIKE ?', ['%PerscomPlugin%'])->fetchAllKeyValue();
+        foreach ($acls as $id => $entity) {
+            $entity = str_replace('PerscomPlugin\\Perscom', 'Milhq', $entity);
+            $cnt += $conn->executeStatement('UPDATE acl SET entity = ? WHERE id = ?', [$entity, $id]);
+        }
+
         return ['count' => $cnt, 'messages' => []];
     }
 
@@ -189,6 +195,19 @@ class MigratePerscomController extends AbstractController
         $cnt = $conn->executeStatement('UPDATE menu_item SET name = ?, type = ? WHERE type = ?', ['MILHQ', 'milhq', 'perscom']);
 
         $this->cache->invalidateTags([MenuRuntime::MENU_CACHE_TAG]);
+
+        $routeItems = $conn->executeQuery('SELECT id, payload FROM menu_item WHERE type = ?', ['route'])->fetchAllKeyValue();
+        foreach ($routeItems as $id => $payload) {
+            $payload = json_decode($payload, true);
+            if (empty($payload['route']) || !str_starts_with($payload['route'], 'perscom_')) {
+                continue;
+            }
+            $payload['route'] = str_replace('perscom', 'milhq', $payload['route']);
+            $cnt += $conn->executeStatement('UPDATE menu_item SET payload = ? WHERE id = ?', [
+                json_encode($payload),
+                $id,
+            ]);
+        }
 
         return ['count' => $cnt, 'messages' => []];
     }
