@@ -11,8 +11,26 @@
     </div>
     {% block opcenter_announcements %}
         {% if announcement %}
-            <div class="mb-4">
-                {{ announcement|rich }}
+            <div class="mb-6 border rounded p-4">
+                {% set announcementPreview = announcement|striptags(['br', 'p', 'a', 'strong']) %}
+                {% if announcementPreview|length > 1000 %}
+                    {{ announcementPreview|u.truncate(750, '...', false)|rich }}
+                    {% embed '@Forumify/components/modal.html.twig' %}
+                        {% block modalOpenButton %}
+                            <button class="btn-primary">Read more</button>
+                        {% endblock %}
+                        {% block modalContent %}
+                            <div class="card">
+                                <div class="card-title">Announcement</div>
+                                <div class="card-body">
+                                    {{ announcement|rich }}
+                                </div>
+                            </div>
+                        {% endblock %}
+                    {% endembed %}
+                {% else %}
+                    {{ announcement|rich }}
+                {% endif %}
             </div>
         {% endif %}
     {% endblock %}
