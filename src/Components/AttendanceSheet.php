@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Components;
 
 use DateTime;
+use Forumify\Milhq\Entity\AfterActionReport;
 use Forumify\Milhq\Entity\Operation;
+use Forumify\Milhq\Entity\Position;
+use Forumify\Milhq\Entity\Mission;
+use Forumify\Milhq\Entity\Soldier;
+use Forumify\Milhq\Entity\Specialty;
 use Forumify\Milhq\Entity\Unit;
 use Forumify\Milhq\Repository\AfterActionReportRepository;
 use Forumify\Milhq\Service\SoldierService;
@@ -54,16 +59,32 @@ class AttendanceSheet extends AbstractController
             ->add('unit', EntityType::class, [
                 'autocomplete' => true,
                 'choice_label' => 'name',
+                'placeholder' => 'All units',
                 'class' => Unit::class,
-                'help' => 'Leave empty to calculate attendance for all units that have at least 1 after action report in the selected time period.',
+                'multiple' => true,
+                'required' => false,
+            ])
+            ->add('position', EntityType::class, [
+                'autocomplete' => true,
+                'choice_label' => 'name',
+                'placeholder' => 'All positions',
+                'class' => Position::class,
+                'multiple' => true,
+                'required' => false,
+            ])
+            ->add('specialty', EntityType::class, [
+                'autocomplete' => true,
+                'choice_label' => 'name',
+                'placeholder' => 'All specialties',
+                'class' => Specialty::class,
                 'multiple' => true,
                 'required' => false,
             ])
             ->add('operation', EntityType::class, [
                 'autocomplete' => true,
                 'choice_label' => 'title',
+                'placeholder' => 'All operations',
                 'class' => Operation::class,
-                'help' => 'Leave empty to calculate attendance for all operations.',
                 'multiple' => true,
                 'required' => false,
             ])
@@ -98,6 +119,9 @@ class AttendanceSheet extends AbstractController
             return;
         }
 
+        $specialties = $data['specialty']->map(fn (Specialty $s) => $s->getId())->toArray();
+        $positions = $data['position']->map(fn (Position $p) => $p->getId())->toArray();
+
         $aars = $this->aarRepository->findByMissionStartAndUnit(
             $data['from'],
             $data['to'],
@@ -117,17 +141,44 @@ class AttendanceSheet extends AbstractController
         uasort($units, fn(Unit $a, Unit $b): int => $a->getPosition() <=> $b->getPosition());
 
         $users = [];
-        foreach ($units as $unit) {
-            $unitUsers = $unit->getSoldiers()->toArray();
+        foreach ($units as $i => $unit) {
+            $unitUsers = $unit->getSoldiers()->filter(function (Soldier $soldier) use ($specialties, $positions) {
+                if (!empty($specialties) && !in_array($soldier->getSpecialty()->getId(), $specialties, true)) {
+                    return false;
+                }
+                if (!empty($positions) && !in_array($soldier->getPosition()->getId(), $positions, true)) {
+                    return false;
+                }
+                return true;
+            })->toArray();
+
+            if (empty($unitUsers)) {
+                unset($units[$i]);
+                continue;
+            }
+
             $this->userService->sortSoldiers($unitUsers);
             $users[$unit->getId()] = $unitUsers;
         }
 
+        $this->sheet = $this->buildSheetData($aars, $missions, $units, $users);
+        $this->missions = $missions;
+        $this->units = $units;
+        $this->users = $users;
+    }
+
+    /**
+     * @param array<AfterActionReport> $aars
+     * @param array<Mission> $missions
+     * @param array<Unit> $units
+     * @param array<array<Soldier>> $users
+     * @return array<int, array<int, array<int, string>>>
+     */
+    private function buildSheetData(array $aars, array $missions, array $units, array $users): array
+    {
         $sheetData = [];
         foreach (array_keys($missions) as $missionId) {
-            $sheetData[$missionId] = [];
             foreach (array_keys($units) as $unitId) {
-                $sheetData[$missionId][$unitId] = [];
                 foreach (($users[$unitId] ?? []) as $user) {
                     $sheetData[$missionId][$unitId][$user->getId()] = '';
                 }
@@ -155,10 +206,7 @@ class AttendanceSheet extends AbstractController
             }
         }
 
-        $this->missions = $missions;
-        $this->units = $units;
-        $this->users = $users;
-        $this->sheet = $sheetData;
+        return $sheetData;
     }
 
     #[LiveAction]
