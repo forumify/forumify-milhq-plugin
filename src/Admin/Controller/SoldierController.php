@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Admin\Controller;
 
 use Forumify\Admin\Crud\AbstractCrudController;
-use Forumify\Milhq\Admin\Form\UserType;
+use Forumify\Milhq\Admin\Form\SoldierType;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Repository\AssignmentRecordRepository;
 use Forumify\Milhq\Repository\SoldierRepository;
@@ -67,7 +67,7 @@ class SoldierController extends AbstractCrudController
 
     protected function getForm(?object $data): FormInterface
     {
-        return $this->createForm(UserType::class, $data);
+        return $this->createForm(SoldierType::class, $data);
     }
 
     protected function templateParams(array $params = []): array

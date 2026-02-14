@@ -23,7 +23,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class UserType extends AbstractType
+class SoldierType extends AbstractType
 {
     public function __construct(
         private readonly Packages $packages,
@@ -39,27 +39,17 @@ class UserType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var Soldier|null $user */
-        $user = $options['data'] ?? null;
+        /** @var Soldier|null $soldier */
+        $soldier = $options['data'] ?? null;
 
-        $builder->add('name', TextType::class);
-
-        if ($user?->getUser() === null) {
-            $builder->add('user', EntityType::class, [
+        $builder
+            ->add('name', TextType::class)
+            ->add('user', EntityType::class, [
                 'autocomplete' => true,
                 'choice_label' => 'username',
                 'class' => User::class,
                 'required' => false,
-            ]);
-        } else {
-            $builder->add('forumUser', TextType::class, [
-                'data' => $user->getUser()->getDisplayName(),
-                'disabled' => true,
-                'mapped' => false,
-            ]);
-        }
-
-        $builder
+            ])
             ->add('rank', EntityType::class, [
                 'choice_label' => 'name',
                 'class' => Rank::class,
@@ -106,8 +96,8 @@ class UserType extends AbstractType
             // uniform
             ->add('newUniform', FileType::class, [
                 'attr' => [
-                    'preview' => $user?->getUniform()
-                        ? $this->packages->getUrl($user->getUniform(), 'milhq.asset')
+                    'preview' => $soldier?->getUniform()
+                        ? $this->packages->getUrl($soldier->getUniform(), 'milhq.asset')
                         : null,
                 ],
                 'constraints' => [
@@ -121,8 +111,8 @@ class UserType extends AbstractType
             ])
             ->add('newSignature', FileType::class, [
                 'attr' => [
-                    'preview' => $user?->getSignature()
-                        ? $this->packages->getUrl($user->getSignature(), 'milhq.asset')
+                    'preview' => $soldier?->getSignature()
+                        ? $this->packages->getUrl($soldier->getSignature(), 'milhq.asset')
                         : null,
                 ],
                 'constraints' => [

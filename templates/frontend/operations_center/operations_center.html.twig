@@ -3,11 +3,21 @@
 {% block body %}
     <div class="flex justify-between mb-4">
         {% include '@ForumifyMilhqPlugin/frontend/soldier/components/header.html.twig' %}
-        {% block opcenter_actions %}
-            <a class="btn-primary" href="{{ path('milhq_soldier', { id: soldier.id }) }}">
-                {{ 'milhq.opcenter.pfile'|trans }}
-            </a>
-        {% endblock %}
+        <div class="flex items-center justify-end flex-wrap gap-2">
+            {% block opcenter_actions %}
+                <a class="btn-primary" href="{{ path('milhq_soldier', { id: soldier.id }) }}">
+                    {{ 'milhq.opcenter.pfile'|trans }}
+                </a>
+                {% if milsimUnitsId is not empty %}
+                    <iframe
+                        height="40"
+                        width="220"
+                        src="https://milsimunits.com/embed/{{ milsimUnitsId }}"
+                        frameborder="0"
+                    ></iframe>
+                {% endif %}
+            {% endblock %}
+        </div>
     </div>
     {% block opcenter_announcements %}
         {% if announcement %}
