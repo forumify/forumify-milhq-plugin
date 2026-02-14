@@ -14,6 +14,16 @@
             <div id="general">
                 <h2>{{ 'milhq.settings.op_center'|trans }}</h2>
                 {{ form_row(form.milhq__opcenter__announcement) }}
+                <div class="rounded border pl-4 pr-4 pt-4 mb-4">
+                    <h4>Milsim Units</h4>
+                    <p class="mb-2">Looking to grow your unit? List your unit on Milsim Units for free to expand your ranks!</p>
+                    <a href="https://milsimunits.com/ref/forumify" class="btn-primary mb-2" target="_blank">
+                        <i class="ph ph-arrow-square-out"></i>
+                        Learn more
+                    </a>
+                    <p class="text-small mb-4">Want to stand out from the competition? Use code <strong>FORUMIFY</strong> at checkout for <strong>15% off</strong> any paid tier for the first 6 months!</p>
+                    {{ form_row(form.milhq__opcenter__milsimunits_link) }}
+                </div>
                 <h2>{{ 'milhq.settings.roster'|trans }}</h2>
                 {{ form_row(form.milhq__roster__user_sort_order) }}
                 <h2>{{ 'milhq.settings.enlistment'|trans }}</h2>
