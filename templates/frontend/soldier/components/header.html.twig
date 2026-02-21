@@ -1,14 +1,19 @@
-<div>
-    <h1 class="mb-0 flex gap-2 items-center">
-        {{ soldier.name }}
-        {% if soldier.status %}
-            {% include '@ForumifyMilhqPlugin/frontend/roster/components/status.html.twig' with {
-                status: soldier.status
-            } only %}
-        {% endif %}
-    </h1>
-    {% set subtitle = [soldier.rank.name ?? null, soldier.position.name ?? null]|filter(v => v)|join(', ') %}
-    {% if subtitle is not empty %}
-        <p class="text-subtitle">{{ subtitle }}</p>
+<div class="inline-flex">
+    {% if soldier.rank is not null and soldier.rank.image %}
+        <img height="55px" src="{{ asset(soldier.rank.image, 'milhq.asset') }}">
     {% endif %}
+    <div>
+        <h1 class="mb-0 flex gap-2 items-center">
+            {{ soldier.name }}
+            {% if soldier.status %}
+                {% include '@ForumifyMilhqPlugin/frontend/roster/components/status.html.twig' with {
+                    status: soldier.status
+                } only %}
+            {% endif %}
+        </h1>
+        {% set subtitle = [soldier.rank.name ?? null, soldier.position.name ?? null]|filter(v => v)|join(', ') %}
+        {% if subtitle is not empty %}
+            <p class="text-subtitle">{{ subtitle }}</p>
+        {% endif %}
+    </div>
 </div>

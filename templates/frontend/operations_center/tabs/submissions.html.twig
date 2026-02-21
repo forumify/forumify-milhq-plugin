@@ -3,6 +3,16 @@
         {{ component('Milhq\\SubmissionList', { soldierId: soldier.id }) }}
     </div>
     <div class="col-xs-12 col-sm-6 col-md-5 flex flex-col gap-2">
+        {% if milsimUnitsId is not empty %}
+            <div class="mb-2 w-100">
+            <iframe
+                height="60"
+                width="100%"
+                src="https://milsimunits.com/embed/{{ milsimUnitsId }}"
+                frameborder="0"
+            ></iframe>
+            </div>
+        {% endif %}
         {% if plugin_version('forumify/forumify-milhq-plugin', 'premium') and setting('milhq.report_in.enabled') %}
             {{ component('Milhq\\ReportInButton') }}
         {% endif %}

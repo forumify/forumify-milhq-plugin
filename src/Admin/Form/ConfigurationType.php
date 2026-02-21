@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -39,6 +40,12 @@ class ConfigurationType extends AbstractType
             ->add('milhq__opcenter__announcement', RichTextEditorType::class, [
                 'help' => 'Content to show on the operations center.',
                 'label' => 'Announcement',
+                'required' => false,
+            ])
+            ->add('milhq__opcenter__milsimunits_link', UrlType::class, [
+                'label' => 'Unit Profile Link',
+                'help' => 'Enter your <a href="https://milsimunits.com/ref/forumify" target="_blank">MilSim Units</a> profile link. e.g.: https://milsimunits.com/unit/my-cool-unit.',
+                'help_html' => true,
                 'required' => false,
             ])
             // Roster

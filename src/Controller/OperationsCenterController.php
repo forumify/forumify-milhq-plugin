@@ -11,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+use function Symfony\Component\String\u;
+
 class OperationsCenterController extends AbstractController
 {
     public function __construct(
@@ -38,6 +40,22 @@ class OperationsCenterController extends AbstractController
             'announcement' => $announcement,
             'forms' => $this->formRepository->findAllSubmissionsAllowed(),
             'soldier' => $soldier,
+            'milsimUnitsId' => $this->getMilsimUnitsId(),
         ]);
+    }
+
+    private function getMilsimUnitsId(): ?string
+    {
+        $url = $this->settingRepository->get('milhq.opcenter.milsimunits_link');
+        if (empty($url)) {
+            return null;
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if (!is_string($path) || empty($path)) {
+            return null;
+        }
+
+        return u($path)->afterLast('/')->trimEnd('/')->toString();
     }
 }
