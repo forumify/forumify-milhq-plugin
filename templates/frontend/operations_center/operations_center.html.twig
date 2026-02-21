@@ -8,14 +8,6 @@
                 <a class="btn-primary" href="{{ path('milhq_soldier', { id: soldier.id }) }}">
                     {{ 'milhq.opcenter.pfile'|trans }}
                 </a>
-                {% if milsimUnitsId is not empty %}
-                    <iframe
-                        height="40"
-                        width="220"
-                        src="https://milsimunits.com/embed/{{ milsimUnitsId }}"
-                        frameborder="0"
-                    ></iframe>
-                {% endif %}
             {% endblock %}
         </div>
     </div>
