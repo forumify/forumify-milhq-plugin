@@ -18,9 +18,9 @@ milhq:
                 You have access to the user, their rank, position, specialty and status.<br/>
                 The following examples assume your soldiers all have roleplay friendly names ("Firstname Lastname"):<br/>
                 <ul class="pl-4 pt-1">
-                    <li><strong>Colonel John Doe:</strong> <code>&lbrace;&lbrace;user.rank.name&rbrace;&rbrace; &lbrace;&lbrace;user.name&rbrace;&rbrace;</code></li>
-                    <li><strong>COL J.Doe:</strong> <code>&lbrace;&lbrace;user.rank.abbreviation&rbrace;&rbrace; &lbrace;&lbrace;user.name|slice(0,1)&rbrace;&rbrace;.&lbrace;&lbrace;user.name|split(&#039; &#039;)|last&rbrace;&rbrace;</code></li>
-                    <li><strong>Commander Doe:</strong> <code>&lbrace;&lbrace;user.position.name&rbrace;&rbrace; &lbrace;&lbrace;user.name|split(&#039; &#039;)|last&rbrace;&rbrace;</code>
+                    <li><strong>Colonel John Doe:</strong> <code>&lbrace;&lbrace;soldier.rank.name&rbrace;&rbrace; &lbrace;&lbrace;soldier.name&rbrace;&rbrace;</code></li>
+                    <li><strong>COL J.Doe:</strong> <code>&lbrace;&lbrace;soldier.rank.abbreviation&rbrace;&rbrace; &lbrace;&lbrace;soldier.name|slice(0,1)&rbrace;&rbrace;.&lbrace;&lbrace;soldier.name|split(&#039; &#039;)|last&rbrace;&rbrace;</code></li>
+                    <li><strong>Commander Doe:</strong> <code>&lbrace;&lbrace;soldier.position.name&rbrace;&rbrace; &lbrace;&lbrace;soldier.name|split(&#039; &#039;)|last&rbrace;&rbrace;</code>
                 </ul>
     admin:
         requires_milhq_account: 'This action requires you to have a soldier linked to your forum user.'
