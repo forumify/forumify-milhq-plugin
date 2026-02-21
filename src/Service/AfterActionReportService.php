@@ -124,13 +124,14 @@ class AfterActionReportService
             : $notificationMessage;
 
         foreach ($absentSoldiers as $soldier) {
-            if ($soldier->getUser() === null) {
+            $user = $soldier->getUser();
+            if ($user === null) {
                 continue;
             }
 
             $this->notificationService->sendNotification(new Notification(
                 GenericNotificationType::TYPE,
-                $soldier->getUser(),
+                $user,
                 [
                     'description' => $notificationMessage,
                     'image' => $this->packages->getUrl('bundles/forumifymilhqplugin/images/milhq.png'),
@@ -178,18 +179,15 @@ class AfterActionReportService
         $consecutiveMessage = $s('milhq.operations.consecutive_absent_notification_message');
         $consecutiveMessage = empty(strip_tags($consecutiveMessage)) ? $description : $consecutiveMessage;
 
-        foreach ($absentUsers as $user) {
-            if (!$this->isAbsentInAllAars($user, $pastAars)) {
-                continue;
-            }
-
-            if ($user->getUser() === null) {
+        foreach ($absentUsers as $soldier) {
+            $user = $soldier->getUser();
+            if ($user === null || !$this->isAbsentInAllAars($soldier, $pastAars)) {
                 continue;
             }
 
             $this->notificationService->sendNotification(new Notification(
                 GenericEmailNotificationType::TYPE,
-                $user->getUser(),
+                $user,
                 [
                     'description' => $description,
                     'emailActionLabel' => 'View After Action Report',
@@ -222,11 +220,11 @@ class AfterActionReportService
         ]);
     }
 
-    private function isAbsentInAllAars(Soldier $user, array $pastAars): bool
+    private function isAbsentInAllAars(Soldier $soldier, array $pastAars): bool
     {
         foreach ($pastAars as $pastAar) {
             $absences = $pastAar->getAttendance()['absent'] ?? [];
-            if (!in_array($user->getId(), $absences)) {
+            if (!in_array($soldier->getId(), $absences)) {
                 return false;
             }
         }
