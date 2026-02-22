@@ -49,6 +49,7 @@ class MissionService
         $event->setCalendar($mission->getCalendar());
         $event->setTitle($mission->getTitle());
         $event->setStart($mission->getStart());
+        $event->setEnd($mission->getEnd());
 
         $missionLink = $this->urlGenerator->generate('milhq_missions_view', ['id' => $mission->getId()]);
         $content = "<p><a href='$missionLink' target='_blank'><i class='ph ph-arrow-square-out'></i> View mission</a></p>";

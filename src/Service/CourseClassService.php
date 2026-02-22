@@ -44,6 +44,7 @@ class CourseClassService
         $event->setCalendar($calendar);
         $event->setTitle($class->getTitle());
         $event->setStart($class->getStart());
+        $event->setEnd($class->getEnd());
 
         $classLink = $this->urlGenerator->generate('milhq_course_class_view', ['id' => $class->getId()]);
         $content = "<p><a href='$classLink' target='_blank'><i class='ph ph-arrow-square-out'></i> View class</a></p>";
