@@ -14,16 +14,13 @@ export default class extends Controller {
   addInstructor() {
     const prototype = this.instructorsTarget.dataset.prototype;
     const row = document.createElement('div');
-    row.classList.add('form-row', 'mt-8');
     row.innerHTML = prototype.replace(/__name__/g, this.instructorIdx);
 
-    const deleteBtn = this._createDeleteBtn(row);
-    row.prepend(deleteBtn);
-
+    this._formatRow(row);
     this.instructorsTarget.firstElementChild.append(row);
 
     document
-      .getElementById(`class_result_instructors_${this.instructorIdx}_user`)
+      .getElementById(`class_result_instructors_${this.instructorIdx}_soldier`)
       .classList
       .remove('d-none')
     ;
@@ -34,16 +31,13 @@ export default class extends Controller {
   addStudent() {
     const prototype = this.studentsTarget.dataset.prototype;
     const row = document.createElement('div');
-    row.classList.add('form-row', 'mt-8');
     row.innerHTML = prototype.replace(/__name__/g, this.studentIdx);
 
-    const deleteBtn = this._createDeleteBtn(row);
-    row.prepend(deleteBtn);
-
+    this._formatRow(row);
     this.studentsTarget.firstElementChild.append(row);
 
     document
-      .getElementById(`class_result_students_${this.studentIdx}_user`)
+      .getElementById(`class_result_students_${this.studentIdx}_soldier`)
       .classList
       .remove('d-none')
     ;
@@ -54,6 +48,17 @@ export default class extends Controller {
   _addDeleteToExistingRow(formRow) {
     const btn = this._createDeleteBtn(formRow);
     formRow.querySelector('label.text-bold > span').append(btn);
+    formRow.classList.add('mt-8');
+  }
+
+  _formatRow(row) {
+    row.classList.add('form-row', 'mt-8');
+
+    const deleteBtn = this._createDeleteBtn(row);
+    const soldierSelect = row.firstElementChild.firstElementChild;
+
+    soldierSelect.classList.add('flex', 'items-center', 'gap-2');
+    soldierSelect.append(deleteBtn);
   }
 
   _createDeleteBtn(formRow) {
