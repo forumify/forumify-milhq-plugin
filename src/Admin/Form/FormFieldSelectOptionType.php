@@ -17,7 +17,7 @@ class FormFieldSelectOptionType extends AbstractType
         $resolver->setDefault('label', false);
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('key', TextType::class, [
