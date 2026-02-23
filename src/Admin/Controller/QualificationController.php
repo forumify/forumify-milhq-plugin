@@ -40,8 +40,6 @@ class QualificationController extends AbstractCrudController
 
     protected function getForm(?object $data): FormInterface
     {
-        return $this->createForm(QualificationType::class, $data, [
-            'image_required' => $data === null,
-        ]);
+        return $this->createForm(QualificationType::class, $data);
     }
 }
