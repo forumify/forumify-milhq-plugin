@@ -133,11 +133,15 @@ class RecordType extends AbstractType
                 'autocomplete' => true,
                 'choice_label' => 'name',
                 'class' => Unit::class,
+                'placeholder' => 'Keep current unit.',
+                'required' => false,
             ])
             ->add('position', EntityType::class, [
                 'autocomplete' => true,
                 'choice_label' => 'name',
                 'class' => Position::class,
+                'placeholder' => 'Keep current position.',
+                'required' => false,
             ]);
     }
 
