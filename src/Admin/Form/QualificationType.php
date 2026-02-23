@@ -24,7 +24,6 @@ class QualificationType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Qualification::class,
-            'image_required' => false,
         ]);
     }
 
@@ -44,9 +43,6 @@ class QualificationType extends AbstractType
                         : null,
                 ],
                 'constraints' => [
-                    ...($options['image_required'] ? [
-                        new Assert\NotBlank(allowNull: false),
-                    ]: []),
                     new Assert\Image(
                         maxSize: '1M',
                     ),
