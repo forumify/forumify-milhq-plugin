@@ -46,6 +46,9 @@
                             <div>
                                 <p class="text-bold">{{ 'milhq.soldier.unit'|trans }}</p>
                                 <p id="unit">{{ soldier.unit.name }}</p>
+                                {% if soldier.unit.designation %}
+                                    <span class="text-small" style="color:grey;">({{ soldier.unit.designation }})</span>
+                                {% endif %}
                             </div>
                         {% endif %}
                         {% if soldier.position %}

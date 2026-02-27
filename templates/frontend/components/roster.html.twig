@@ -27,7 +27,14 @@
                         {% block roster_unit %}
                             <li class="card mb-4">
                                 {% block roster_unit_name %}
-                                    <div class="card-title">{{ unit.name }}</div>
+                                    <div class="card-title">
+                                        <div>
+                                            {{ unit.name }}
+                                            {% if unit.designation %}
+                                                <span class="text-small" style="color:grey;">({{ unit.designation }})</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 {% endblock %}
                                 {% block roster_unit_users %}
                                     <ul class="card-body">

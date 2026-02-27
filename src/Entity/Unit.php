@@ -56,6 +56,9 @@ class Unit implements SortableEntityInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     public ?Role $role = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $designation = null;
+
     public function __construct()
     {
         $this->soldiers = new ArrayCollection();
@@ -107,5 +110,15 @@ class Unit implements SortableEntityInterface
     public function setRosters(Collection $rosters): void
     {
         $this->rosters = $rosters;
+    }
+
+    public function getDesignation(): ?string
+    {
+        return $this->designation;
+    }
+
+    public function setDesignation(?string $designation): void
+    {
+        $this->designation = $designation;
     }
 }

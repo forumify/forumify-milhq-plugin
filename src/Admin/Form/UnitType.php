@@ -37,6 +37,10 @@ class UnitType extends AbstractType
             ->add('description', RichTextEditorType::class, [
                 'required' => false,
             ])
+            ->add('designation', TextType::class, [
+                'help' => 'Designation is a identifier for the unit for example: 1st Squad, 2n Platoon, Alpha Company would be 1/2/A-Co',
+                'required' => false,
+            ])
         ;
 
         if ($this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', 'premium')) {
