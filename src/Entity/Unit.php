@@ -56,7 +56,7 @@ class Unit implements SortableEntityInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     public ?Role $role = null;
 
-    #[ORM\Column(type: 'text', nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $designation = null;
 
     public function __construct()

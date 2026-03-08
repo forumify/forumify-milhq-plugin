@@ -38,7 +38,7 @@ class UnitType extends AbstractType
                 'required' => false,
             ])
             ->add('designation', TextType::class, [
-                'help' => 'Designation is a identifier for the unit for example: 1st Squad, 2n Platoon, Alpha Company would be 1/2/A-Co',
+                'help' => 'Designation is an identifier for the unit, for example: 1st Squad, 2nd Platoon, Alpha Company could be "1/2/A-Co"',
                 'required' => false,
             ])
         ;
