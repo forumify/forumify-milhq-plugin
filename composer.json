@@ -44,7 +44,7 @@
     "extra": {
         "forumify-plugin-class": "Forumify\\Milhq\\ForumifyMilhqPlugin",
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "1.1.x-dev"
         }
     }
 }
