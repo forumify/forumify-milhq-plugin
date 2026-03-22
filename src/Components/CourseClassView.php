@@ -55,6 +55,10 @@ class CourseClassView extends AbstractController
             return false;
         }
 
+        if ($this->getStudentSlots() === 0) {
+            return false;
+        }
+
         $qualifications = $this->qualificationRecordRepository
             ->createQueryBuilder('qr')
             ->select('DISTINCT IDENTITY(qr.qualification)')
