@@ -18,8 +18,11 @@ class DateExtension extends AbstractExtension
         ];
     }
 
-    private function date(string $value): ?DateTime
+    private function date(?string $value): ?DateTime
     {
+        if ($value === null) {
+            return null;
+        }
         return DateTime::createFromFormat(SubmissionFormType::DATE_FORMAT, $value) ?: null;
     }
 }

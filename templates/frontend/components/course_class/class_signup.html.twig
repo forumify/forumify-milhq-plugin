@@ -23,7 +23,11 @@
             {% else %}
                 <button class="btn-outlined" disabled>
                     <i class="ph ph-student"></i>
-                    {{ 'milhq.course.class.prerequisites_not_met'|trans }}
+                    {% if this.studentSlots === 0 %}
+                            {{ 'milhq.course.class.full'|trans }}
+                        {% else %}
+                            {{ 'milhq.course.class.prerequisites_not_met'|trans }}
+                    {% endif %}
                 </button>
             {% endif %}
             {% if can('signup_as_instructor', class.course) %}
