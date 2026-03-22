@@ -295,6 +295,7 @@ milhq:
             students: 'Students'
             open: 'Open'
             prerequisites_not_met: 'Prerequisites not met'
+            full: 'Class is full'
             new_report: 'Submit Class Report'
             create_report: 'New Class Report'
             report: '{class} - Report'
