@@ -21,7 +21,8 @@
         "symfony/debug-bundle": "7.4.*",
         "symfony/stopwatch": "7.4.*",
         "symfony/web-profiler-bundle": "7.4.*",
-        "zenstruck/foundry": "2.8.7"
+        "zenstruck/foundry": "2.8.7",
+        "symfony/lock": "^8.0"
     },
     "autoload": {
         "psr-4": {
