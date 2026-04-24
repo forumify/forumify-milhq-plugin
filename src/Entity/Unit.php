@@ -59,11 +59,16 @@ class Unit implements SortableEntityInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $designation = null;
 
+    #[ORM\ManyToMany(targetEntity: Equipment::class)]
+    #[ORM\JoinTable('milhq_unit_vehicles')]
+    private Collection $vehicles;
+
     public function __construct()
     {
         $this->soldiers = new ArrayCollection();
         $this->rosters = new ArrayCollection();
         $this->supervisors = new ArrayCollection();
+        $this->vehicles = new ArrayCollection();
     }
 
     public function getName(): string
@@ -120,5 +125,15 @@ class Unit implements SortableEntityInterface
     public function setDesignation(?string $designation): void
     {
         $this->designation = $designation;
+    }
+
+    public function getVehicles(): Collection
+    {
+        return $this->vehicles;
+    }
+
+    public function setVehicles(Collection $vehicles): void
+    {
+        $this->vehicles = $vehicles;
     }
 }

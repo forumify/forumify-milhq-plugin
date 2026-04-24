@@ -38,7 +38,12 @@ class AdminMenuBuilder implements AdminMenuBuilderInterface
                 ->addItem(new MenuItem('Courses', $u('milhq_admin_courses_list'), [
                     'icon' => 'ph ph-graduation-cap',
                     'permission' => 'milhq.admin.courses.view',
-                ]));
+                ]))
+                ->addItem(new MenuItem('Equipment', $u('milhq_admin_equipment_list'), [
+                    'icon' => 'ph ph-backpack',
+                    'permission' => 'milhq.admin.equipment.view'
+                ]))
+            ;
         }
 
         $submissionMenu = new Menu('Submissions', ['icon' => 'ph ph-table', 'permission' => 'milhq.admin.submissions.view']);

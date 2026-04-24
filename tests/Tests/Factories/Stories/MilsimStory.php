@@ -9,7 +9,9 @@ use Forumify\Core\Entity\MenuItem;
 use Forumify\Core\Repository\MenuItemRepository;
 use Forumify\Core\Repository\SettingRepository;
 use Forumify\Milhq\Entity;
+use Forumify\Milhq\Entity\Enum\EquipmentType;
 use PluginTests\Tests\Factories\Forumify\ForumFactory;
+use PluginTests\Tests\Factories\Milhq\EquipmentFactory;
 use PluginTests\Tests\Factories\Milhq\FormFactory;
 use PluginTests\Tests\Factories\Milhq\FormFieldFactory;
 use PluginTests\Tests\Factories\Milhq\PositionFactory;
@@ -46,6 +48,9 @@ use Zenstruck\Foundry\Story;
  * @method static Entity\Rank rankSGT()
  * @method static Entity\Qualification qualificationLandNav()
  * @method static Entity\Qualification qualificationCLS()
+ * @method static Entity\Equipment equipmentM4()
+ * @method static Entity\Equipment equipmentM17()
+ * @method static Entity\Equipment equipmentHMMWV()
  * @method static array<Entity\Soldier> firstSquad()
  * @method static array<Entity\Soldier> secondSquad()
  */
@@ -98,12 +103,24 @@ class MilsimStory extends Story
         $enlistmentForum = ForumFactory::createOne(['title' => 'Enlistments']);
         $this->settingRepository->set('milhq.enlistment.forum', $enlistmentForum->getId());
 
+        // Equipment
+        $m4 = EquipmentFactory::createOne(['name' => 'M4', 'type' => EquipmentType::PrimaryWeapon]);
+        $this->addState('equipmentM4', $m4);
+        $m17 = EquipmentFactory::createOne(['name' => 'M17', 'type' => EquipmentType::SecondaryWeapon]);
+        $this->addState('equipmentM17', $m17);
+        $hmmwv = EquipmentFactory::createOne(['name' => 'HMMWV', 'type' => EquipmentType::Vehicle]);
+        $this->addState('equipmentHMMWV', $hmmwv);
+
         // Positions
         $squadLeader = PositionFactory::createOne(['name' => 'Squad Leader']);
         $this->addState('positionSquadLeader', $squadLeader);
-        $teamLeader = PositionFactory::createOne(['name' => 'Team Leader']);
+        $teamLeader = PositionFactory::createOne(['name' => 'Team Leader',]);
         $this->addState('positionTeamLeader', $teamLeader);
-        $riflemanAT = PositionFactory::createOne(['name' => 'Rifleman AT']);
+        $riflemanAT = PositionFactory::createOne([
+            'name' => 'Rifleman AT',
+            'primaryWeapons' => new ArrayCollection([$m4]),
+            'secondaryWeapons' => new ArrayCollection([$m17]),
+            ]);
         $this->addState('positionRiflemanAT', $riflemanAT);
         $civilianPosition = PositionFactory::createOne(['name' => 'Civilian']);
         $this->addState('positionCivilian', $civilianPosition);
@@ -112,6 +129,7 @@ class MilsimStory extends Story
         $firstSquad = UnitFactory::createOne([
             'name' => 'First Squad',
             'supervisors' => new ArrayCollection([$squadLeader, $teamLeader]),
+            'vehicles' => new ArrayCollection([$hmmwv]),
         ]);
         $this->addState('unitFirstSquad', $firstSquad);
         $secondSquad = UnitFactory::createOne([

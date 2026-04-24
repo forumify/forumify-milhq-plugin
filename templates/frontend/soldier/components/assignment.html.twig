@@ -48,4 +48,35 @@
             </ul>
         </div>
     </div>
+    {% if plugin_version('forumify/forumify-milhq-plugin', 'premium') %}
+        <div class="card">
+            <div class="card-title">{{ 'milhq.soldier.equipment'|trans }}</div>
+            <div class="card-body">
+                <ul class="text-small flex flex-col gap-2">
+                    <p class="text-bold">{{ 'milhq.soldier.primary_weapons'|trans }}</p>
+                    {% for weapon in equipment.primaryWeapons %}
+                        <li id="primary-weapons" class="ml-2">{{ weapon.name }}</li>
+                    {% else %}
+                        <li>{{ 'milhq.soldier.no_primary_weapons'|trans }}</li>
+                    {% endfor %}
+                </ul>
+                <ul class="text-small flex flex-col gap-2 mt-2">
+                    <p class="text-bold">{{ 'milhq.soldier.secondary_weapons'|trans }}</p>
+                    {% for weapon in equipment.secondaryWeapons %}
+                        <li id="secondary-weapons" class="ml-2">{{ weapon.name }}</li>
+                    {% else %}
+                        <li>{{ 'milhq.soldier.no_secondary_weapons'|trans }}</li>
+                    {% endfor %}
+                </ul>
+                <ul class="text-small flex flex-col gap-2 mt-2">
+                    <p class="text-bold">{{ 'milhq.soldier.vehicles'|trans }}</p>
+                    {% for vehicle in equipment.vehicles %}
+                        <li id="vehicles" class="ml-2">{{ vehicle.name }}</li>
+                    {% else %}
+                        <li>{{ 'milhq.soldier.no_vehicles'|trans }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
 </div>

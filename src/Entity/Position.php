@@ -12,6 +12,8 @@ use Forumify\Core\Entity\SortableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Repository\PositionRepository;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: PositionRepository::class)]
 #[ORM\Table('milhq_position')]
@@ -32,6 +34,20 @@ class Position implements SortableEntityInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     public ?Role $role = null;
 
+    #[ORM\ManyToMany(targetEntity: Equipment::class)]
+    #[ORM\JoinTable('milhq_position_primary_weapons')]
+    private Collection $primaryWeapons;
+
+    #[ORM\ManyToMany(targetEntity: Equipment::class)]
+    #[ORM\JoinTable('milhq_position_secondary_weapons')]
+    private Collection $secondaryWeapons;
+
+    public function __construct()
+    {
+        $this->primaryWeapons = new ArrayCollection();
+        $this->secondaryWeapons = new ArrayCollection();
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -50,5 +66,25 @@ class Position implements SortableEntityInterface
     public function setDescription(string $description): void
     {
         $this->description = $description;
+    }
+
+    public function getSecondaryWeapons(): Collection
+    {
+        return $this->secondaryWeapons;
+    }
+
+    public function setSecondaryWeapons(Collection $secondaryWeapons): void
+    {
+        $this->secondaryWeapons = $secondaryWeapons;
+    }
+
+    public function getPrimaryWeapons(): Collection
+    {
+        return $this->primaryWeapons;
+    }
+
+    public function setPrimaryWeapons(Collection $primaryWeapons): void
+    {
+        $this->primaryWeapons = $primaryWeapons;
     }
 }

@@ -153,6 +153,10 @@ milhq:
                 plural: 'Operations'
             description_help: 'Brief description that is shown on the operation list page.'
             rsvp_help: 'When enabled, users will get the option to mark their own attendance before the mission, which will prefil attendance on the after action report.'
+        equipment:
+            crud:
+                plural: 'Equipment'
+                single: 'Equipment'
     roster:
         title: 'Roster'
         no_users: 'No users in unit.'
@@ -193,6 +197,13 @@ milhq:
         last_report_in: 'Last report in'
         no_report_in: 'This user has not reported in yet.'
         search_records: 'Search Records'
+        equipment: 'Equipment'
+        primary_weapons: 'Primary Weapons'
+        no_primary_weapons: 'This user has no primary weapons.'
+        secondary_weapons: 'Secondary Weapons'
+        no_secondary_weapons: 'This user has no secondary weapons.'
+        vehicles: 'Vehicles'
+        no_vehicles: 'This user has no vehicles.'
     rank:
         title: 'Ranks'
         no_ranks: 'No ranks.'

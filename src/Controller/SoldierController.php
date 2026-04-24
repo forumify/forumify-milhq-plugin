@@ -40,6 +40,7 @@ class SoldierController extends AbstractController
             'tis' => $this->getTimeInService($soldier),
             'soldier' => $soldier,
             'supervisors' => $this->getSupervisors($soldier),
+            'equipment' => $this->getAllEquipment($soldier),
         ]);
     }
 
@@ -123,6 +124,57 @@ class SoldierController extends AbstractController
 
         return $grouped;
     }
+
+     private function getAllEquipment(Soldier $soldier): array
+     {
+         $primaryWeapons = [];
+         $secondaryWeapons = [];
+         $vehicles = [];
+
+         if ($soldier->getPosition() !== null) {
+             foreach ($soldier->getPosition()->getPrimaryWeapons() as $weapon) {
+                 $primaryWeapons[$weapon->getId()] = $weapon;
+             }
+             foreach ($soldier->getPosition()->getSecondaryWeapons() as $weapon) {
+                 $secondaryWeapons[$weapon->getId()] = $weapon;
+             }
+         }
+
+         if ($soldier->getUnit() !== null) {
+             foreach ($soldier->getUnit()->getVehicles() as $vehicle) {
+                 $vehicles[$vehicle->getId()] = $vehicle;
+             }
+         }
+
+         $records = $this->assignmentRecordRepository->findBy([
+             'type' => 'secondary',
+             'soldier' => $soldier,
+         ]);
+         foreach ($records as $record) {
+             $position = $record->getPosition();
+             if ($position !== null) {
+                 foreach ($position->getPrimaryWeapons() as $weapon) {
+                     $primaryWeapons[$weapon->getId()] = $weapon;
+                 }
+                 foreach ($position->getSecondaryWeapons() as $weapon) {
+                     $secondaryWeapons[$weapon->getId()] = $weapon;
+                 }
+             }
+
+             $unit = $record->getUnit();
+             if ($unit !== null) {
+                 foreach ($unit->getVehicles() as $vehicle) {
+                     $vehicles[$vehicle->getId()] = $vehicle;
+                 }
+             }
+         }
+
+         return [
+             'primaryWeapons' => $primaryWeapons,
+             'secondaryWeapons' => $secondaryWeapons,
+             'vehicles' => $vehicles,
+         ];
+     }
 
     /**
      * @return array<Soldier>
