@@ -10,7 +10,6 @@ use Forumify\Milhq\Entity\Enum\EquipmentType;
 use Forumify\Milhq\Repository\EquipmentRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 #[ORM\Entity(repositoryClass: EquipmentRepository::class)]
 #[ORM\Table('milhq_equipment')]
 class Equipment

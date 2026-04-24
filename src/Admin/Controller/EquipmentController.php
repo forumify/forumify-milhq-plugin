@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Forumify\Milhq\Admin\Controller;
 
 use Forumify\Admin\Crud\AbstractCrudController;

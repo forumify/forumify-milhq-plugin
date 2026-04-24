@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Forumify\Milhq\Admin\Form;
 
 use Forumify\Milhq\Entity\Equipment;

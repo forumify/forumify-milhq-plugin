@@ -41,7 +41,7 @@ class AdminMenuBuilder implements AdminMenuBuilderInterface
                 ]))
                 ->addItem(new MenuItem('Equipment', $u('milhq_admin_equipment_list'), [
                     'icon' => 'ph ph-backpack',
-                    'permission' => 'milhq.admin.equipment.view'
+                    'permission' => 'milhq.admin.equipment.view',
                 ]))
             ;
         }

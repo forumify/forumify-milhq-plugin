@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Forumify\Milhq\Entity\Enum;
 
 enum EquipmentType: string
@@ -10,7 +12,7 @@ enum EquipmentType: string
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PrimaryWeapon => 'Primary Weapon',
             self::SecondaryWeapon => 'Secondary Weapon',
             self::Vehicle => 'Vehicle',
