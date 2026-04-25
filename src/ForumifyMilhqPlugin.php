@@ -147,6 +147,12 @@ class ForumifyMilhqPlugin extends AbstractForumifyPlugin
                     'manage',
                     'delete',
                 ],
+                'equipment'=> [
+                    'view',
+                    'manage',
+                    'delete',
+                    'create',
+                ],
             ],
             'frontend' => [
                 'attendance_sheet' => [

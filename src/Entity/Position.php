@@ -12,6 +12,8 @@ use Forumify\Core\Entity\SortableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Repository\PositionRepository;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: PositionRepository::class)]
 #[ORM\Table('milhq_position')]
@@ -32,6 +34,22 @@ class Position implements SortableEntityInterface
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     public ?Role $role = null;
 
+    /** @var Collection<int, Equipment> */
+    #[ORM\ManyToMany(targetEntity: Equipment::class)]
+    #[ORM\JoinTable('milhq_position_primary_weapons')]
+    private Collection $primaryWeapons;
+
+    /** @var Collection<int, Equipment> */
+    #[ORM\ManyToMany(targetEntity: Equipment::class)]
+    #[ORM\JoinTable('milhq_position_secondary_weapons')]
+    private Collection $secondaryWeapons;
+
+    public function __construct()
+    {
+        $this->primaryWeapons = new ArrayCollection();
+        $this->secondaryWeapons = new ArrayCollection();
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -50,5 +68,37 @@ class Position implements SortableEntityInterface
     public function setDescription(string $description): void
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return Collection<int, Equipment>
+     */
+    public function getPrimaryWeapons(): Collection
+    {
+        return $this->primaryWeapons;
+    }
+
+    /**
+     * @param Collection<int, Equipment> $primaryWeapons
+     */
+    public function setPrimaryWeapons(Collection $primaryWeapons): void
+    {
+        $this->primaryWeapons = $primaryWeapons;
+    }
+
+    /**
+     * @return Collection<int, Equipment>
+     */
+    public function getSecondaryWeapons(): Collection
+    {
+        return $this->secondaryWeapons;
+    }
+
+    /**
+     * @param Collection<int, Equipment> $secondaryWeapons
+     */
+    public function setSecondaryWeapons(Collection $secondaryWeapons): void
+    {
+        $this->secondaryWeapons = $secondaryWeapons;
     }
 }
