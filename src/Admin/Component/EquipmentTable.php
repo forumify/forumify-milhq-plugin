@@ -8,6 +8,7 @@ use Forumify\Core\Component\Table\AbstractDoctrineTable;
 use Forumify\Milhq\Entity\Enum\EquipmentType;
 use Forumify\Milhq\Entity\Equipment;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
 #[AsLiveComponent('Milhq\\EquipmentTable', '@Forumify/components/table/table.html.twig')]
@@ -15,6 +16,10 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 class EquipmentTable extends AbstractDoctrineTable
 {
     protected ?string $permissionReorder = 'milhq.admin.organization.equipment.manage';
+
+    public function __construct(private readonly TranslatorInterface $translator)
+    {
+    }
 
     protected function getEntityClass(): string
     {
@@ -31,7 +36,7 @@ class EquipmentTable extends AbstractDoctrineTable
             ->addColumn('type', [
                 'field' => 'type',
                 'sortable' => true,
-                'renderer' => fn(EquipmentType $type) => $type->getLabel(),
+                'renderer' => fn(EquipmentType $type) => $this->translator->trans('milhq.equipment.type.' . $type->value),
             ])
             ->addColumn('actions', [
                 'field' => 'id',

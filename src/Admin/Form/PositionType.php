@@ -44,8 +44,8 @@ class PositionType extends AbstractType
         if ($this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', 'premium')) {
             $builder
                 ->add('role', UserRoleType::class, [
-                'placeholder' => 'Do not assign any role',
-                'required' => false,
+                    'placeholder' => 'Do not assign any role',
+                    'required' => false,
                 ])
                 ->add('primaryWeapons', EntityType::class, [
                     'required' => false,

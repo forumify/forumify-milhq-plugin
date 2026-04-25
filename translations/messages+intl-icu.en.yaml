@@ -359,3 +359,8 @@ milhq:
         total_absent: '# Absent'
         perc_attended: '% Attended'
         perc_accountable: '% Accountable'
+    equipment:
+        type:
+            primary_weapon: 'Primary Weapon'
+            secondary_weapon: 'Secondary Weapon'
+            vehicle: 'Vehicle'

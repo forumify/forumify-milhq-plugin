@@ -18,12 +18,11 @@ class EquipmentRepository extends AbstractRepository
         return Equipment::class;
     }
 
+    /**
+     * @return array<Equipment>
+     */
     public function findByType(EquipmentType $type): array
     {
-        return $this->createQueryBuilder('e')
-            ->where('e.type = :type')
-            ->setParameter('type', $type)
-            ->getQuery()
-            ->getResult();
+        return $this->findBy(['type' => $type->value]);
     }
 }

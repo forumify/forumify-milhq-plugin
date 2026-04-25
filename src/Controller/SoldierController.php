@@ -32,15 +32,21 @@ class SoldierController extends AbstractController
     #[Route('soldier/{id}', 'soldier')]
     public function __invoke(Soldier $soldier): Response
     {
+        /** @var array<AssignmentRecord> */
+        $secondaryRecords = $this->assignmentRecordRepository->findBy([
+            'type' => 'secondary',
+            'soldier' => $soldier,
+        ]);
+
         return $this->render('@ForumifyMilhqPlugin/frontend/soldier/soldier.html.twig', [
             'awards' => $this->getAwardCounts($soldier),
             'reportInDate' => $this->getLastReportInDate($soldier),
-            'secondaryAssignments' => $this->getSecondaryUnits($soldier),
+            'secondaryAssignments' => $this->getSecondaryUnits($secondaryRecords),
             'tig' => $this->getTimeInGrade($soldier),
             'tis' => $this->getTimeInService($soldier),
             'soldier' => $soldier,
             'supervisors' => $this->getSupervisors($soldier),
-            'equipment' => $this->getAllEquipment($soldier),
+            'equipment' => $this->getAllEquipment($soldier, $secondaryRecords),
         ]);
     }
 
@@ -93,14 +99,8 @@ class SoldierController extends AbstractController
         ;
     }
 
-    private function getSecondaryUnits(Soldier $soldier): array
+    private function getSecondaryUnits(array $records): array
     {
-        /** @var array<AssignmentRecord> */
-        $records = $this->assignmentRecordRepository->findBy([
-            'type' => 'secondary',
-            'soldier' => $soldier,
-        ]);
-
         $grouped = [];
         foreach ($records as $record) {
             $unit = $record->getUnit();
@@ -125,47 +125,26 @@ class SoldierController extends AbstractController
         return $grouped;
     }
 
-    private function getAllEquipment(Soldier $soldier): array
+    private function getAllEquipment(Soldier $soldier, array $records): array
     {
         $primaryWeapons = [];
         $secondaryWeapons = [];
         $vehicles = [];
 
-        if ($soldier->getPosition() !== null) {
-            foreach ($soldier->getPosition()->getPrimaryWeapons() as $weapon) {
+        $positions = array_map(fn(AssignmentRecord $record) => $record->getPosition(), $records);
+        $positions[] = $soldier->getPosition();
+        foreach (array_filter($positions) as $position) {
+            foreach ($position->getPrimaryWeapons() as $weapon) {
                 $primaryWeapons[$weapon->getId()] = $weapon;
             }
-            foreach ($soldier->getPosition()->getSecondaryWeapons() as $weapon) {
+            foreach ($position->getSecondaryWeapons() as $weapon) {
                 $secondaryWeapons[$weapon->getId()] = $weapon;
             }
         }
 
-        if ($soldier->getUnit() !== null) {
-            foreach ($soldier->getUnit()->getVehicles() as $vehicle) {
-                $vehicles[$vehicle->getId()] = $vehicle;
-            }
-        }
-
-        $records = $this->assignmentRecordRepository->findBy([
-            'type' => 'secondary',
-            'soldier' => $soldier,
-        ]);
-        foreach ($records as $record) {
-            $position = $record->getPosition();
-            if ($position !== null) {
-                foreach ($position->getPrimaryWeapons() as $weapon) {
-                    $primaryWeapons[$weapon->getId()] = $weapon;
-                }
-                foreach ($position->getSecondaryWeapons() as $weapon) {
-                    $secondaryWeapons[$weapon->getId()] = $weapon;
-                }
-            }
-
-            $unit = $record->getUnit();
-            if ($unit === null) {
-                continue;
-            }
-
+        $units = array_map(fn(AssignmentRecord $record) => $record->getUnit(), $records);
+        $units[] = $soldier->getUnit();
+        foreach (array_filter($units) as $unit) {
             foreach ($unit->getVehicles() as $vehicle) {
                 $vehicles[$vehicle->getId()] = $vehicle;
             }

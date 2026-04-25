@@ -59,6 +59,7 @@ class Unit implements SortableEntityInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $designation = null;
 
+    /** @var Collection<int, Equipment> */
     #[ORM\ManyToMany(targetEntity: Equipment::class)]
     #[ORM\JoinTable('milhq_unit_vehicles')]
     private Collection $vehicles;
@@ -127,11 +128,17 @@ class Unit implements SortableEntityInterface
         $this->designation = $designation;
     }
 
+    /**
+     * @return Collection<int, Equipment>
+     */
     public function getVehicles(): Collection
     {
         return $this->vehicles;
     }
 
+    /**
+     * @param Collection<int, Equipment> $vehicles
+     */
     public function setVehicles(Collection $vehicles): void
     {
         $this->vehicles = $vehicles;

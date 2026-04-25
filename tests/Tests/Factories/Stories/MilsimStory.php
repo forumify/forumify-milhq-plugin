@@ -120,7 +120,7 @@ class MilsimStory extends Story
             'name' => 'Rifleman AT',
             'primaryWeapons' => new ArrayCollection([$m4]),
             'secondaryWeapons' => new ArrayCollection([$m17]),
-            ]);
+        ]);
         $this->addState('positionRiflemanAT', $riflemanAT);
         $civilianPosition = PositionFactory::createOne(['name' => 'Civilian']);
         $this->addState('positionCivilian', $civilianPosition);
