@@ -19,6 +19,9 @@ class SoldierTest extends MilhqWebTestCase
         self::assertSelectorTextContains('#specialty', $soldier->getSpecialty()->getName());
         self::assertSelectorTextContains('#unit', $soldier->getUnit()->getName());
         self::assertSelectorTextContains('#position', $soldier->getPosition()->getName());
+        self::assertSelectorTextContains('#primary-weapons', 'M4');
+        self::assertSelectorTextContains('#secondary-weapons', 'M17');
+        self::assertSelectorTextContains('#vehicles', 'HMMWV');
         self::assertSelectorCount(3, '#supervisors > li');
     }
 }
