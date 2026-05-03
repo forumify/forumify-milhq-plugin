@@ -43,7 +43,7 @@ class AdminMenuBuilder implements AdminMenuBuilderInterface
 
         $submissionMenu = new Menu('Submissions', ['icon' => 'ph ph-table', 'permission' => 'milhq.admin.submissions.view']);
         $submissionMenu->addItem(new MenuItem('View All', $u('milhq_admin_submission_list')));
-        foreach ($this->formRepository->findAll() as $form) {
+        foreach ($this->formRepository->findAllWithViewableSubmissions() as $form) {
             $submissionMenu->addItem(new MenuItem($form->getName(), $u('milhq_admin_submission_list', ['form' => $form->getId()])));
         }
         $milhq->addItem($submissionMenu);
