@@ -41,4 +41,15 @@ class FormRepository extends AbstractRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * @return array<Form>
+     */
+    public function findAllWithViewableSubmissions(): array
+    {
+        $qb = $this->createQueryBuilder('e');
+        $this->addACLToQuery($qb, 'view_submissions');
+
+        return $qb->getQuery()->getResult();
+    }
 }

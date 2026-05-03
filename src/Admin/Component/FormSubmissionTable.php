@@ -7,6 +7,8 @@ namespace Forumify\Milhq\Admin\Component;
 use DateTimeInterface;
 use Doctrine\ORM\QueryBuilder;
 use Forumify\Core\Component\Table\AbstractDoctrineTable;
+use Forumify\Core\Security\VoterAttribute;
+use Forumify\Milhq\Entity\Form;
 use Forumify\Milhq\Entity\FormSubmission;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -65,10 +67,16 @@ class FormSubmissionTable extends AbstractDoctrineTable
             ]);
     }
 
-    private function renderActions(int $id): string
+    private function renderActions(int $id, FormSubmission $submission): string
     {
+        $canDelete = $this->security->isGranted('milhq.admin.submissions.delete')
+            && $this->security->isGranted(VoterAttribute::ACL->value, [
+                'permission' => 'manage_submissions',
+                'entity' => $submission->getForm(),
+            ]);
+
         $actions = $this->renderAction('milhq_admin_submission_view', ['id' => $id], 'eye');
-        if ($this->security->isGranted('milhq.admin.submissions.delete')) {
+        if ($canDelete) {
             $actions .= $this->renderAction('milhq_admin_submission_delete', ['id' => $id], 'x');
         }
 
@@ -78,6 +86,10 @@ class FormSubmissionTable extends AbstractDoctrineTable
     protected function getQuery(array $search): QueryBuilder
     {
         $qb = parent::getQuery($search);
+
+        $qb->innerJoin('e.form', 'sf');
+        $this->repository->addACLToQuery($qb, 'view_submissions', Form::class, 'sf', 'id');
+
         if ($this->form !== null) {
             $qb->andWhere('e.form = :form')
                 ->setParameter('form', $this->form)
