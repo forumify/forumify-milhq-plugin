@@ -48,24 +48,27 @@ class SubmissionController extends AbstractController
             'entity' => $submission->getForm(),
         ]);
 
-        $form = $this->createForm(SubmissionStatusType::class);
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
+        $canManage = $this->isGranted('milhq.admin.submissions.assign_statuses')
+            && $this->isGranted(VoterAttribute::ACL->value, [
                 'permission' => 'manage_submissions',
                 'entity' => $submission->getForm(),
             ]);
 
-            $statusRecord = $form->getData();
-            $submissionStatusUpdateService->createStatusRecord($submission, $statusRecord);
+        $form = null;
+        if ($canManage) {
+            $form = $this->createForm(SubmissionStatusType::class);
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $statusRecord = $form->getData();
+                $submissionStatusUpdateService->createStatusRecord($submission, $statusRecord);
 
-            $this->addFlash('success', 'milhq.admin.submissions.view.status_created');
-            return $this->redirectToRoute('milhq_admin_submission_view', ['id' => $submission->getId()]);
+                $this->addFlash('success', 'milhq.admin.submissions.view.status_created');
+                return $this->redirectToRoute('milhq_admin_submission_view', ['id' => $submission->getId()]);
+            }
         }
 
         return $this->render('@ForumifyMilhqPlugin/admin/submissions/view/form.html.twig', [
-            'form' => $form->createView(),
+            'form' => $form?->createView(),
             'submission' => $submission,
         ]);
     }
@@ -73,6 +76,11 @@ class SubmissionController extends AbstractController
     #[Route('/{id}/delete', 'delete')]
     public function delete(Request $request, FormSubmission $formSubmission): Response
     {
+        if (!$this->isGranted('milhq.admin.submissions.delete')) {
+            $this->addFlash('error', 'You are not allowed to delete submissions.');
+            return $this->redirectToRoute('milhq_admin_submission_list');
+        }
+
         $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
             'permission' => 'manage_submissions',
             'entity' => $formSubmission->getForm(),

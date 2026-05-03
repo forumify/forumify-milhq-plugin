@@ -69,13 +69,14 @@ class FormSubmissionTable extends AbstractDoctrineTable
 
     private function renderActions(int $id, FormSubmission $submission): string
     {
-        $canManage = $this->security->isGranted(VoterAttribute::ACL->value, [
-            'permission' => 'manage_submissions',
-            'entity' => $submission->getForm(),
-        ]);
+        $canDelete = $this->security->isGranted('milhq.admin.submissions.delete')
+            && $this->security->isGranted(VoterAttribute::ACL->value, [
+                'permission' => 'manage_submissions',
+                'entity' => $submission->getForm(),
+            ]);
 
         $actions = $this->renderAction('milhq_admin_submission_view', ['id' => $id], 'eye');
-        if ($canManage) {
+        if ($canDelete) {
             $actions .= $this->renderAction('milhq_admin_submission_delete', ['id' => $id], 'x');
         }
 
