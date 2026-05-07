@@ -13,7 +13,7 @@
     </div>
     {% if soldier.uniform %}
         <div class="text-center mb-4">
-            <img style="max-height: 530px; max-width: 100%" src="{{ asset(soldier.uniform, 'milhq.asset') }}">
+            <img style="max-height: 530px; max-width: 100%" src="{{ asset(soldier.uniform, 'milhq.asset')|imagine_filter('milhq_uniform') }}">
         </div>
     {% endif %}
     <div class="grid gap-4">
@@ -23,7 +23,7 @@
                     <div class="card-title">{{ 'milhq.soldier.rank'|trans }}</div>
                     <div class="card-body flex flex-col items-center">
                         {% if soldier.rank.image %}
-                            <img width="125px" height="auto" src="{{ asset(soldier.rank.image, 'milhq.asset') }}" alt="">
+                            <img width="125px" height="auto" src="{{ asset(soldier.rank.image, 'milhq.asset')|imagine_filter('milhq_large') }}" alt="">
                         {% endif %}
                         <div class="text-small text-center">
                             <p>{{ soldier.rank.name }}</p>

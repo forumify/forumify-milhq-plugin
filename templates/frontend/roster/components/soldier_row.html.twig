@@ -1,7 +1,7 @@
 <div class="flex justify-between items-center w-100">
     <div class="w-5 text-left">
         {% if soldier.rank is not null and soldier.rank.image is not null %}
-            <img width="24px" height="24px" src="{{ asset(soldier.rank.image, 'milhq.asset') }}" alt="">
+            <img width="24px" height="24px" src="{{ asset(soldier.rank.image, 'milhq.asset')|imagine_filter('avatar_xs') }}" alt="">
         {% endif %}
     </div>
     <div class="w-40 text-center">
