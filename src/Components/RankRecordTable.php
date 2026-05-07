@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Components;
 
+use Doctrine\ORM\QueryBuilder;
 use Forumify\Milhq\Entity\Record\RankRecord;
 use Symfony\Component\Asset\Packages;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -51,5 +52,10 @@ class RankRecordTable extends AbstractRecordTable
         $image = $image ? "<img src='$image' width='100%' height='auto' style='max-width: 24px; max-height: 24px;'>" : '';
 
         return "<div class='mr-1 flex justify-center items-center' style='width: 24px; height: 24px'>$image</div>" . $rankName;
+    }
+
+    protected function getQuery(array $search): QueryBuilder
+    {
+        return parent::getQuery($search)->addSelect('rank');
     }
 }
