@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Components;
 
+use Doctrine\ORM\QueryBuilder;
 use Forumify\Milhq\Entity\Record\AwardRecord;
 use Symfony\Component\Asset\Packages;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -47,5 +48,10 @@ class AwardRecordTable extends AbstractRecordTable
         $awardName = $awardName ?? 'Unknown';
 
         return "<div class='w-100 flex items-center gap-2'>$image $awardName</div>";
+    }
+
+    protected function getQuery(array $search): QueryBuilder
+    {
+        return parent::getQuery($search)->addSelect('award');
     }
 }
