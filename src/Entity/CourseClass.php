@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Column;
 use Forumify\Calendar\Entity\Calendar;
 use Forumify\Calendar\Entity\CalendarEvent;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\BlameableEntityTrait;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
@@ -19,7 +20,7 @@ use Forumify\Milhq\Repository\CourseClassRepository;
 if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
     #[ORM\Entity(repositoryClass: CourseClassRepository::class)]
     #[ORM\Table('milhq_course_class')]
-    class CourseClass
+    class CourseClass implements AuditableEntityInterface
     {
         use IdentifiableEntityTrait;
         use BlameableEntityTrait;
@@ -250,12 +251,22 @@ if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
         {
             $this->calendarEvent = $event;
         }
+
+        public function getIdentifierForAudit(): string
+        {
+            return (string)$this->getId();
+        }
+
+        public function getNameForAudit(): string
+        {
+            return $this->getTitle();
+        }
     }
 } else {
     #[ORM\Entity(repositoryClass: CourseClassRepository::class)]
     #[ORM\Table('milhq_course_class')]
     // phpcs:ignore
-    class CourseClass
+    class CourseClass implements AuditableEntityInterface
     {
         use IdentifiableEntityTrait;
         use BlameableEntityTrait;
@@ -457,6 +468,16 @@ if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
         public function setResult(bool $result): void
         {
             $this->result = $result;
+        }
+
+        public function getIdentifierForAudit(): string
+        {
+            return (string)$this->getId();
+        }
+
+        public function getNameForAudit(): string
+        {
+            return $this->getTitle();
         }
     }
 }

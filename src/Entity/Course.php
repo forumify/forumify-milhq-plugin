@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AccessControlledEntityInterface;
 use Forumify\Core\Entity\ACLParameters;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SluggableEntityTrait;
 use Forumify\Core\Entity\SortableEntityInterface;
@@ -16,7 +17,7 @@ use Forumify\Milhq\Repository\CourseRepository;
 
 #[ORM\Entity(repositoryClass: CourseRepository::class)]
 #[ORM\Table(name: 'milhq_course')]
-class Course implements AccessControlledEntityInterface, SortableEntityInterface
+class Course implements AccessControlledEntityInterface, SortableEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use SluggableEntityTrait;
@@ -164,5 +165,15 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
             'milhq_admin_courses_list',
             ['id' => $this->getId()],
         );
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getTitle();
     }
 }

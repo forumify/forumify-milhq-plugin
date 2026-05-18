@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\Role;
 use Forumify\Core\Entity\SortableEntityInterface;
@@ -17,7 +18,7 @@ use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: PositionRepository::class)]
 #[ORM\Table('milhq_position')]
-class Position implements SortableEntityInterface
+class Position implements SortableEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use SortableEntityTrait;
@@ -100,5 +101,15 @@ class Position implements SortableEntityInterface
     public function setSecondaryWeapons(Collection $secondaryWeapons): void
     {
         $this->secondaryWeapons = $secondaryWeapons;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getName();
     }
 }

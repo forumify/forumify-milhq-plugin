@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AccessControlledEntityInterface;
 use Forumify\Core\Entity\ACLParameters;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SluggableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
@@ -17,7 +18,7 @@ use Forumify\Milhq\Repository\OperationRepository;
 
 #[ORM\Entity(repositoryClass: OperationRepository::class)]
 #[ORM\Table('milhq_operation')]
-class Operation implements AccessControlledEntityInterface
+class Operation implements AccessControlledEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use SluggableEntityTrait;
@@ -180,5 +181,15 @@ class Operation implements AccessControlledEntityInterface
             'milhq_admin_operations_list',
             ['id' => $this->getId()],
         );
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getTitle();
     }
 }
