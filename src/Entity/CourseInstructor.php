@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\SortableEntityTrait;
@@ -12,7 +13,7 @@ use Forumify\Milhq\Repository\CourseInstructorRepository;
 
 #[ORM\Entity(repositoryClass: CourseInstructorRepository::class)]
 #[ORM\Table(name: 'milhq_course_instructor')]
-class CourseInstructor implements SortableEntityInterface
+class CourseInstructor implements SortableEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use SortableEntityTrait;
@@ -55,5 +56,15 @@ class CourseInstructor implements SortableEntityInterface
     public function setCourse(Course $course): void
     {
         $this->course = $course;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getCourse()->getTitle();
     }
 }

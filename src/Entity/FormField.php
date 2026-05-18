@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\SortableEntityTrait;
@@ -17,7 +18,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Table('milhq_form_field')]
 #[ORM\UniqueConstraint(fields: ['form', 'key'])]
 #[UniqueEntity(fields: ['form', 'key'], message: 'This key is already used in this form.', errorPath: 'label')]
-class FormField implements SortableEntityInterface
+class FormField implements SortableEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use SortableEntityTrait;
@@ -103,5 +104,15 @@ class FormField implements SortableEntityInterface
     public function setRequired(bool $required): void
     {
         $this->required = $required;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getForm()->getName();
     }
 }

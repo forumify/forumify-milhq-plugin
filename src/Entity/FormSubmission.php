@@ -6,13 +6,14 @@ namespace Forumify\Milhq\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Repository\FormSubmissionRepository;
 
 #[ORM\Entity(repositoryClass: FormSubmissionRepository::class)]
 #[ORM\Table('milhq_form_submission')]
-class FormSubmission
+class FormSubmission implements AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use TimestampableEntityTrait;
@@ -83,5 +84,15 @@ class FormSubmission
     public function setStatusReason(?string $statusReason): void
     {
         $this->statusReason = $statusReason;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getForm()->getName();
     }
 }
