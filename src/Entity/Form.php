@@ -148,7 +148,7 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
 
     public function getACLPermissions(): array
     {
-        return ['create_submissions'];
+        return ['create_submissions', 'view_submissions', 'manage_submissions'];
     }
 
     public function getACLParameters(): ACLParameters
