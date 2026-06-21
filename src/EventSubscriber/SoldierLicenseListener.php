@@ -6,6 +6,7 @@ namespace Forumify\Milhq\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
+use Forumify\Milhq\Admin\Controller\SoldierController;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Repository\SoldierRepository;
 use Forumify\Plugin\Service\PluginVersionChecker;
@@ -27,7 +28,7 @@ class SoldierLicenseListener
         }
 
         $count = $this->soldierRepository->count([]);
-        if ($count >= 5) {
+        if ($count >= SoldierController::FREE_SOLDIER_LIMIT) {
             throw new AccessDeniedException('You can only have up to 5 soldiers in the free version of MILHQ.');
         }
     }
