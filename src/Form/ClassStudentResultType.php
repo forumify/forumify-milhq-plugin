@@ -23,7 +23,7 @@ class ClassStudentResultType extends AbstractType
     public function __construct(
         private readonly QualificationRepository $qualificationRepository,
         private readonly AwardRepository $awardRepository,
-    ){
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver)
