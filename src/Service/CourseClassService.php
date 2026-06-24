@@ -10,10 +10,12 @@ use Forumify\Calendar\Repository\CalendarEventRepository;
 use Forumify\Milhq\Admin\Service\RecordService;
 use Forumify\Milhq\Entity\CourseClass;
 use Forumify\Milhq\Entity\CourseClassStudent;
+use Forumify\Milhq\Entity\Record\AwardRecord;
 use Forumify\Milhq\Entity\Record\QualificationRecord;
 use Forumify\Milhq\Entity\Record\RecordInterface;
 use Forumify\Milhq\Entity\Record\ServiceRecord;
 use Forumify\Milhq\Exception\MilhqException;
+use Forumify\Milhq\Repository\AwardRepository;
 use Forumify\Milhq\Repository\QualificationRepository;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -24,6 +26,7 @@ class CourseClassService
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly QualificationRepository $qualificationRepository,
         private readonly ?CalendarEventRepository $calendarEventRepository = null,
+        private readonly AwardRepository $awardRepository,
     ) {
     }
 
@@ -78,6 +81,7 @@ class CourseClassService
 
         $this->addServiceRecords($records, $class);
         $this->addQualificationRecords($records, $class->getStudents());
+        $this->addAwardRecords($records, $class->getStudents());
 
         $this->recordService->createRecords($records, true);
     }
@@ -146,6 +150,37 @@ class CourseClassService
 
                 $record = new QualificationRecord();
                 $record->setQualification($qualifications[$qualificationId]);
+                $record->setSoldier($recipient);
+                $records[] = $record;
+            }
+        }
+    }
+
+    /**
+     * @param array<RecordInterface> $records
+     * @param Collection<int, CourseClassStudent> $students
+     */
+    private function addAwardRecords(array &$records, Collection $students): void
+    {
+        $awards = [];
+
+        foreach ($students as $student) {
+            $recipient = $student->getSoldier();
+            if ($recipient === null) {
+                continue;
+            }
+
+            foreach ($student->getAwards() as $awardId) {
+                $awards[$awardId] = isset($awards[$awardId])
+                    ? $awards[$awardId]
+                    : $this->awardRepository->find($awardId);
+
+                if ($awards[$awardId] === null) {
+                    continue;
+                }
+
+                $record = new AwardRecord();
+                $record->setAward($awards[$awardId]);
                 $record->setSoldier($recipient);
                 $records[] = $record;
             }
