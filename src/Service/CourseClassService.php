@@ -25,8 +25,8 @@ class CourseClassService
         private readonly RecordService $recordService,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly QualificationRepository $qualificationRepository,
-        private readonly ?CalendarEventRepository $calendarEventRepository = null,
         private readonly AwardRepository $awardRepository,
+        private readonly ?CalendarEventRepository $calendarEventRepository = null,
     ) {
     }
 
