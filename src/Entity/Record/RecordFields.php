@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Entity\Record;
 
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Entity\Document;
 use Forumify\Milhq\Entity\Soldier;
 
+/**
+ * @phpstan-require-implements AuditableEntityInterface
+ */
 trait RecordFields
 {
     use IdentifiableEntityTrait;
@@ -64,5 +68,15 @@ trait RecordFields
     public function setDocument(?Document $document): void
     {
         $this->document = $document;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getText();
     }
 }
