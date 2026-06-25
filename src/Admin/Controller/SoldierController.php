@@ -21,6 +21,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/soldiers', 'soldier')]
 class SoldierController extends AbstractCrudController
 {
+    public const FREE_SOLDIER_LIMIT = 5;
+
     protected string $listTemplate = '@ForumifyMilhqPlugin/admin/soldiers/list/list.html.twig';
     protected string $formTemplate = '@ForumifyMilhqPlugin/admin/soldiers/edit/form.html.twig';
 
@@ -56,7 +58,7 @@ class SoldierController extends AbstractCrudController
     {
         if (!$this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', ['basic', 'premium'])) {
             $soldierCount = $this->soldierRepository->count([]);
-            if ($soldierCount >= 5) {
+            if ($soldierCount >= self::FREE_SOLDIER_LIMIT) {
                 $this->addFlash('error', 'You have exceeded the maximum allowed soldiers for the free version of MILHQ.');
                 return $this->redirectToRoute($this->getRoute('list'));
             }
@@ -83,6 +85,11 @@ class SoldierController extends AbstractCrudController
             'type' => 'secondary',
             'soldier' => $soldier,
         ]);
+
+        if (!$this->pluginVersionChecker->isVersionInstalled('forumify/forumify-milhq-plugin', ['basic', 'premium'])) {
+            $params['freeSoldierCount'] = $this->soldierRepository->count([]);
+            $params['freeSoldierLimit'] = self::FREE_SOLDIER_LIMIT;
+        }
 
         return $params;
     }
