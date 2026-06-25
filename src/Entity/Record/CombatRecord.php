@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Entity\Record;
 
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Repository\CombatRecordRepository;
 
 #[ORM\Entity(repositoryClass: CombatRecordRepository::class)]
 #[ORM\Table('milhq_record_combat')]
-class CombatRecord implements RecordInterface
+class CombatRecord implements RecordInterface, AuditableEntityInterface
 {
     use RecordFields;
 
