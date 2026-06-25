@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Form;
 
+use Forumify\Milhq\Entity\Award;
 use Forumify\Milhq\Entity\CourseClass;
 use Forumify\Milhq\Entity\CourseClassStudent;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Qualification;
+use Forumify\Milhq\Repository\AwardRepository;
 use Forumify\Milhq\Repository\QualificationRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -18,8 +20,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ClassStudentResultType extends AbstractType
 {
-    public function __construct(private readonly QualificationRepository $qualificationRepository)
-    {
+    public function __construct(
+        private readonly QualificationRepository $qualificationRepository,
+        private readonly AwardRepository $awardRepository,
+    ) {
     }
 
     public function configureOptions(OptionsResolver $resolver)
@@ -38,6 +42,12 @@ class ClassStudentResultType extends AbstractType
         $qualificationChoices = array_combine(
             array_map(fn (Qualification $qualification) => $qualification->getName(), $qualifications),
             array_map(fn (Qualification $qualification) => $qualification->getId(), $qualifications),
+        );
+
+        $awards = $this->awardRepository->findAll();
+        $awardChoices = array_combine(
+            array_map(fn (Award $award) => $award->getName(), $awards),
+            array_map(fn (Award $award) => $award->getId(), $awards)
         );
 
         $builder
@@ -60,6 +70,12 @@ class ClassStudentResultType extends AbstractType
             ->add('qualifications', ChoiceType::class, [
                 'autocomplete' => true,
                 'choices' => $qualificationChoices,
+                'multiple' => true,
+                'required' => false,
+            ])
+            ->add('awards', ChoiceType::class, [
+                'autocomplete' => true,
+                'choices' => $awardChoices,
                 'multiple' => true,
                 'required' => false,
             ])
