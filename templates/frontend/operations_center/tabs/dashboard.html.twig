@@ -1,0 +1,46 @@
+<div id="dashboard" class="grid-12 gap-4">
+    <div class="col-xs-12 col-md-7">
+        {% if supervisedUnits is not empty %}
+            {% embed '@Forumify/components/tabs.html.twig' %}
+                {% block tabs %}
+                    <button class="btn-link" data-tab-id="submissions">{{ 'milhq.opcenter.submissions'|trans }}</button>
+                    <button class="btn-link" data-tab-id="unit-submissions">{{ 'milhq.opcenter.unit_submissions'|trans }}</button>
+                {% endblock %}
+                {% block tabpanels %}
+                    <div id="submissions">
+                        {{ component('Milhq\\SubmissionList', { soldierId: soldier.id }) }}
+                    </div>
+                    <div id="unit-submissions">
+                        {{ component('Milhq\\SupervisorSubmissionList', {
+                            soldierId: soldier.id,
+                            supervisedUnits: supervisedUnits|map(u => u.id),
+                        }) }}
+                    </div>
+                {% endblock %}
+            {% endembed %}
+        {% else %}
+            {{ component('Milhq\\SubmissionList', { soldierId: soldier.id }) }}
+        {% endif %}
+    </div>
+    <div class="col-xs-12 col-md-5 flex flex-col gap-2">
+        {% if milsimUnitsId is not empty %}
+            <div class="mb-2 w-100">
+            <iframe
+                height="60"
+                width="100%"
+                src="https://milsimunits.com/embed/{{ milsimUnitsId }}"
+                frameborder="0"
+            ></iframe>
+            </div>
+        {% endif %}
+        {% if plugin_version('forumify/forumify-milhq-plugin', 'premium') and setting('milhq.report_in.enabled') %}
+            {{ component('Milhq\\ReportInButton') }}
+        {% endif %}
+        {% for form in forms %}
+            <a href="{{ path('milhq_form_submission_create', { id: form.id }) }}" class="btn-outlined w-100 justify-start">
+                <i class="ph ph-arrow-elbow-down-right"></i>
+                {{ form.name }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
