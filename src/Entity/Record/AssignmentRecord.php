@@ -15,6 +15,7 @@ use Forumify\Milhq\Repository\AssignmentRecordRepository;
 
 #[ORM\Entity(repositoryClass: AssignmentRecordRepository::class)]
 #[ORM\Index(fields: ['type'])]
+#[ORM\Index(fields: ['soldier', 'type'])]
 #[ORM\Table('milhq_record_assignment')]
 class AssignmentRecord implements RecordInterface
 {

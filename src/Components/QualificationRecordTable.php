@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Components;
 
+use Doctrine\ORM\QueryBuilder;
 use Forumify\Milhq\Entity\Record\QualificationRecord;
 use Symfony\Component\Asset\Packages;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -45,5 +46,10 @@ class QualificationRecordTable extends AbstractRecordTable
         $image = $image ? "<img src='$image' width='100%' height='auto' style='max-width: 24px; max-height: 24px;'>" : '';
 
         return "<div class='w-100 flex items-center gap-2'>$image $qualificationName</div>";
+    }
+
+    protected function getQuery(array $search): QueryBuilder
+    {
+        return parent::getQuery($search)->addSelect('qualification');
     }
 }

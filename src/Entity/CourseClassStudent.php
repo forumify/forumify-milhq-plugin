@@ -27,6 +27,9 @@ class CourseClassStudent
     #[ORM\Column(type: 'simple_array', nullable: true)]
     private ?array $qualifications = [];
 
+    #[ORM\Column(type: 'simple_array', nullable: true)]
+    private ?array $awards = [];
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $serviceRecordTextOverride = null;
 
@@ -71,6 +74,19 @@ class CourseClassStudent
     public function setQualifications(?array $qualifications): void
     {
         $this->qualifications = $qualifications;
+    }
+
+    /**
+     * @return array<int>
+     */
+    public function getAwards(): array
+    {
+        return array_map(fn (mixed $id) => (int)$id, $this->awards ?? []);
+    }
+
+    public function setAwards(?array $awards): void
+    {
+        $this->awards = $awards;
     }
 
     public function getServiceRecordTextOverride(): ?string

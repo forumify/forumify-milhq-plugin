@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Milhq\Entity\Enum\EquipmentType;
 use Forumify\Milhq\Repository\EquipmentRepository;
@@ -12,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EquipmentRepository::class)]
 #[ORM\Table('milhq_equipment')]
-class Equipment
+class Equipment implements AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
 
@@ -44,5 +45,15 @@ class Equipment
     public function setType(EquipmentType $type): void
     {
         $this->type = $type;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getName();
     }
 }

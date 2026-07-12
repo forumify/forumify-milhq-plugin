@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\BlameableEntityTrait;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
@@ -15,7 +16,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Table('milhq_after_action_report')]
 #[ORM\UniqueConstraint(fields: ['mission', 'unit'])]
 #[UniqueEntity(['mission', 'unit'], message: 'An AAR already exists for this unit.', errorPath: 'unit')]
-class AfterActionReport
+class AfterActionReport implements AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use BlameableEntityTrait;
@@ -73,5 +74,15 @@ class AfterActionReport
     public function setMission(Mission $mission): void
     {
         $this->mission = $mission;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getMission()->getTitle();
     }
 }
