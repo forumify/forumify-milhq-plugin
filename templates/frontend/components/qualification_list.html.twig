@@ -14,7 +14,7 @@
                     <div class="card-body grid gap-4">
                         <div class="col-xs-12 col-sm-3 col-lg-2 flex items-center justify-center">
                             {% if item.image %}
-                                <img src="{{ asset(item.image, 'milhq.asset') }}" width="100%" height="auto">
+                                <img src="{{ asset(item.image, 'milhq.asset')|imagine_filter('milhq_large') }}" width="100%" height="auto">
                             {% endif %}
                         </div>
                         <div class="col-xs-12 col-sm-9 col-lg-10">

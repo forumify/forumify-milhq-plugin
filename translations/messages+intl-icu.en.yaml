@@ -32,6 +32,9 @@ milhq:
             not_found: 'Soldier can not be found.'
             list:
                 title: 'Soldiers'
+                free_limit_info: 'You are using the free version of MILHQ, which allows up to {limit} soldiers. You are currently using {count}/{limit} soldiers.'
+                free_limit_reached: 'You have reached the free soldier limit of {limit}/{limit}. New enlistments will fail until you upgrade.'
+                upgrade: 'Upgrade MILHQ to unlock unlimited soldiers.'
                 actions:
                     service: 'New Service Record'
                     award: 'New Award'
@@ -219,7 +222,7 @@ milhq:
     opcenter:
         operations_center: 'Operations Center'
         pfile: 'Personnel File'
-        submissions: 'Dashboard'
+        dashboard: 'Dashboard'
         newsfeed: 'Newsfeed'
         submission_created: 'Form submission created.'
         status_history: 'Status history'
@@ -234,6 +237,8 @@ milhq:
         class_last: 'Last ran:'
         class_never: 'Never'
         attendance: 'Attendance Sheet'
+        submissions: 'Submissions'
+        unit_submissions: 'Unit Submissions'
     operation:
         missions: 'Missions'
         operation: 'Operation'
