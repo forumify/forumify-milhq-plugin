@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Service;
 
 use Doctrine\Common\Collections\Collection;
-use Forumify\Calendar\Entity\CalendarEvent;
-use Forumify\Calendar\Repository\CalendarEventRepository;
 use Forumify\Milhq\Admin\Service\RecordService;
 use Forumify\Milhq\Entity\CourseClass;
 use Forumify\Milhq\Entity\CourseClassStudent;
@@ -17,59 +15,14 @@ use Forumify\Milhq\Entity\Record\ServiceRecord;
 use Forumify\Milhq\Exception\MilhqException;
 use Forumify\Milhq\Repository\AwardRepository;
 use Forumify\Milhq\Repository\QualificationRepository;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CourseClassService
 {
     public function __construct(
         private readonly RecordService $recordService,
-        private readonly UrlGeneratorInterface $urlGenerator,
         private readonly QualificationRepository $qualificationRepository,
         private readonly AwardRepository $awardRepository,
-        private readonly ?CalendarEventRepository $calendarEventRepository = null,
     ) {
-    }
-
-    public function createOrUpdateCalendarEvent(CourseClass $class): void
-    {
-        if ($this->calendarEventRepository === null) {
-            // Calendar plugin not installed
-            return;
-        }
-
-        $calendar = $class->getCalendar();
-        if ($calendar === null) {
-            // No events should be created
-            return;
-        }
-
-        $event = $class->getEvent() ?? new CalendarEvent();
-        $event->setCalendar($calendar);
-        $event->setTitle($class->getTitle());
-        $event->setStart($class->getStart());
-        $event->setEnd($class->getEnd());
-
-        $classLink = $this->urlGenerator->generate('milhq_course_class_view', ['id' => $class->getId()]);
-        $content = "<p><a href='$classLink' target='_blank'><i class='ph ph-arrow-square-out'></i> View class</a></p>";
-        $event->setContent($content);
-
-        $class->setEvent($event);
-        $this->calendarEventRepository->save($event);
-    }
-
-    public function removeCalendarEvent(CourseClass $class): void
-    {
-        if ($this->calendarEventRepository === null) {
-            // Calendar plugin not installed
-            return;
-        }
-
-        $event = $class->getEvent();
-        if ($event === null) {
-            return;
-        }
-
-        $this->calendarEventRepository->remove($event);
     }
 
     /**
