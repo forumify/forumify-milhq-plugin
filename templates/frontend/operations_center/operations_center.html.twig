@@ -38,7 +38,7 @@
     {% endblock %}
     {% embed '@Forumify/components/tabs.html.twig' %}
         {% block tabs %}
-            <button class="btn-link" data-tab-id="submissions">{{ 'milhq.opcenter.submissions'|trans }}</button>
+            <button class="btn-link" data-tab-id="dashboard">{{ 'milhq.opcenter.dashboard'|trans }}</button>
             {% if plugin_version('forumify/forumify-milhq-plugin', 'premium') %}
                 <button class="btn-link" data-tab-id="operations">{{ 'milhq.opcenter.operations'|trans }}</button>
                 {% if is_granted('milhq.frontend.attendance_sheet.view') %}
@@ -48,7 +48,7 @@
             {% endif %}
         {% endblock %}
         {% block tabpanels %}
-            {% include '@ForumifyMilhqPlugin/frontend/operations_center/tabs/submissions.html.twig' %}
+            {% include '@ForumifyMilhqPlugin/frontend/operations_center/tabs/dashboard.html.twig' %}
             {% if plugin_version('forumify/forumify-milhq-plugin', 'premium') %}
                 {% include '@ForumifyMilhqPlugin/frontend/operations_center/tabs/operations.html.twig' %}
                 {% if is_granted('milhq.frontend.attendance_sheet.view') %}

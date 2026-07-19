@@ -222,7 +222,7 @@ milhq:
     opcenter:
         operations_center: 'Operations Center'
         pfile: 'Personnel File'
-        submissions: 'Dashboard'
+        dashboard: 'Dashboard'
         newsfeed: 'Newsfeed'
         submission_created: 'Form submission created.'
         status_history: 'Status history'
@@ -237,6 +237,8 @@ milhq:
         class_last: 'Last ran:'
         class_never: 'Never'
         attendance: 'Attendance Sheet'
+        submissions: 'Submissions'
+        unit_submissions: 'Unit Submissions'
     operation:
         missions: 'Missions'
         operation: 'Operation'

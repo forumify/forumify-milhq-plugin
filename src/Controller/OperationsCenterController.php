@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Controller;
 
 use Forumify\Core\Repository\SettingRepository;
 use Forumify\Milhq\Repository\FormRepository;
+use Forumify\Milhq\Repository\UnitRepository;
 use Forumify\Milhq\Service\SoldierService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,7 @@ class OperationsCenterController extends AbstractController
         private readonly SoldierService $soldierService,
         private readonly SettingRepository $settingRepository,
         private readonly FormRepository $formRepository,
+        private readonly UnitRepository $unitRepository,
     ) {
     }
 
@@ -41,6 +43,7 @@ class OperationsCenterController extends AbstractController
             'forms' => $this->formRepository->findAllSubmissionsAllowed(),
             'soldier' => $soldier,
             'milsimUnitsId' => $this->getMilsimUnitsId(),
+            'supervisedUnits' => $this->unitRepository->findBySoldierIsSupervisor($soldier),
         ]);
     }
 
