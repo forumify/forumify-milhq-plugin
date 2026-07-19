@@ -31,7 +31,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "PluginTests\\": "tests/"
+            "PluginTests\\": "tests/",
+            "Tests\\Tests\\Factories\\": "vendor/forumify/forumify-platform/tests/Tests/Factories/"
         }
     },
     "config": {

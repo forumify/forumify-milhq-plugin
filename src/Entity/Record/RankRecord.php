@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Entity\Record;
 
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Rank;
 use Forumify\Milhq\Repository\RankRecordRepository;
 
 #[ORM\Entity(repositoryClass: RankRecordRepository::class)]
 #[ORM\Table('milhq_record_rank')]
-class RankRecord implements RecordInterface
+class RankRecord implements RecordInterface, AuditableEntityInterface
 {
     use RecordFields;
 
