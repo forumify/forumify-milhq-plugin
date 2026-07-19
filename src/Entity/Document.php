@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\BlameableEntityTrait;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
@@ -13,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
 #[ORM\Table('milhq_document')]
-class Document
+class Document implements AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use TimestampableEntityTrait;
@@ -57,5 +58,15 @@ class Document
     public function setContent(string $content): void
     {
         $this->content = $content;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getName();
     }
 }

@@ -40,6 +40,8 @@ class AssignmentRecordTable extends AbstractRecordTable
     protected function getQuery(array $search): QueryBuilder
     {
         $qb = parent::getQuery($search);
-        return $qb->andWhere($qb->expr()->orX('e.position IS NOT NULL', 'e.unit IS NOT NULL'));
+        return $qb
+            ->addSelect('position', 'unit')
+            ->andWhere($qb->expr()->orX('e.position IS NOT NULL', 'e.unit IS NOT NULL'));
     }
 }

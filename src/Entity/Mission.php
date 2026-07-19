@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Calendar\Entity\Calendar;
 use Forumify\Calendar\Entity\CalendarEvent;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\BlameableEntityTrait;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SluggableEntityTrait;
@@ -19,7 +20,7 @@ use Forumify\Milhq\Repository\MissionRepository;
 if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
     #[ORM\Entity(repositoryClass: MissionRepository::class)]
     #[ORM\Table('milhq_mission')]
-    class Mission
+    class Mission implements AuditableEntityInterface
     {
         use IdentifiableEntityTrait;
         use SluggableEntityTrait;
@@ -201,12 +202,22 @@ if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
         {
             $this->rsvps = $rsvps;
         }
+
+        public function getIdentifierForAudit(): string
+        {
+            return (string)$this->getId();
+        }
+
+        public function getNameForAudit(): string
+        {
+            return $this->getTitle();
+        }
     }
 } else {
     #[ORM\Entity(repositoryClass: MissionRepository::class)]
     #[ORM\Table('milhq_mission')]
     // phpcs:ignore
-    class Mission
+    class Mission implements AuditableEntityInterface
     {
         use IdentifiableEntityTrait;
         use SluggableEntityTrait;
@@ -359,6 +370,16 @@ if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
         public function setRsvps(Collection $rsvps): void
         {
             $this->rsvps = $rsvps;
+        }
+
+        public function getIdentifierForAudit(): string
+        {
+            return (string)$this->getId();
+        }
+
+        public function getNameForAudit(): string
+        {
+            return $this->getTitle();
         }
     }
 }

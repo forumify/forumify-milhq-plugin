@@ -5,7 +5,7 @@
     "license": "OSL-3.0",
     "require": {
         "php": ">=8.4",
-        "forumify/forumify-platform": "^1.2.0",
+        "forumify/forumify-platform": "^1.2.x-dev",
         "league/commonmark": "^2.5"
     },
     "require-dev": {
@@ -31,7 +31,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "PluginTests\\": "tests/"
+            "PluginTests\\": "tests/",
+            "Tests\\Tests\\Factories\\": "vendor/forumify/forumify-platform/tests/Tests/Factories/"
         }
     },
     "config": {

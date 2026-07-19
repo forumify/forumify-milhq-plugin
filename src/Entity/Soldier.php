@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Core\Entity\User;
@@ -24,7 +25,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ORM\Entity(repositoryClass: SoldierRepository::class)]
 #[ORM\Table(name: 'milhq_soldier')]
 #[UniqueEntity('user', errorPath: 'user')]
-class Soldier
+class Soldier implements AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use TimestampableEntityTrait;
@@ -268,5 +269,15 @@ class Soldier
     public function setSteamId(?int $steamId): void
     {
         $this->steamId = $steamId;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getName();
     }
 }

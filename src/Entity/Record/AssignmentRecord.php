@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Entity\Record;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Column;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Position;
 use Forumify\Milhq\Entity\Specialty;
@@ -15,8 +16,9 @@ use Forumify\Milhq\Repository\AssignmentRecordRepository;
 
 #[ORM\Entity(repositoryClass: AssignmentRecordRepository::class)]
 #[ORM\Index(fields: ['type'])]
+#[ORM\Index(fields: ['soldier', 'type'])]
 #[ORM\Table('milhq_record_assignment')]
-class AssignmentRecord implements RecordInterface
+class AssignmentRecord implements RecordInterface, AuditableEntityInterface
 {
     use RecordFields;
 

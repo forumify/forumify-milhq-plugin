@@ -9,4 +9,5 @@ services:
             - '../src/**/DataFixture/'
             - '../src/**/DependencyInjection/'
             - '../src/**/Entity/'
+            - '../src/Calendar/'
             - '../src/Discord/'

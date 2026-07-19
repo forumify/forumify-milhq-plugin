@@ -3,6 +3,19 @@
     {{ 'milhq.admin.soldiers.list.title'|trans }}
 {% endblock %}
 {% block body %}
+    {% if freeSoldierLimit is defined %}
+        {% if freeSoldierCount >= freeSoldierLimit %}
+            <div class="alert-error mb-4">
+                <p class="mb-2">{{ 'milhq.admin.soldiers.list.free_limit_reached'|trans({ 'count': freeSoldierCount, 'limit': freeSoldierLimit }) }}</p>
+                <a href="https://forumify.net/marketplace/product/forumify/forumify-milhq-plugin/9" target="_blank">{{ 'milhq.admin.soldiers.list.upgrade'|trans }}</a>
+            </div>
+        {% else %}
+            <div class="alert-info mb-4">
+                <p class="mb-2">{{ 'milhq.admin.soldiers.list.free_limit_info'|trans({ 'count': freeSoldierCount, 'limit': freeSoldierLimit }) }}</p>
+                <a href="https://forumify.net/marketplace/product/forumify/forumify-milhq-plugin/9" target="_blank">{{ 'milhq.admin.soldiers.list.upgrade'|trans }}</a>
+            </div>
+        {% endif %}
+    {% endif %}
     <div class="flex justify-between items-center mb-4">
         <span class="flex items-center gap-2">
             <h2 class="mb-0">{{ 'milhq.admin.soldiers.list.title'|trans }}</h2>

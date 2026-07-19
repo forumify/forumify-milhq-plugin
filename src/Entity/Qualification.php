@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\SortableEntityTrait;
@@ -14,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: QualificationRepository::class)]
 #[ORM\Table('milhq_qualification')]
-class Qualification implements SortableEntityInterface
+class Qualification implements SortableEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use SortableEntityTrait;
@@ -58,5 +59,15 @@ class Qualification implements SortableEntityInterface
     public function setImage(?string $image): void
     {
         $this->image = $image;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getName();
     }
 }

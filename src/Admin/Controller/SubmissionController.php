@@ -9,6 +9,7 @@ use Forumify\Milhq\Admin\Service\SubmissionStatusUpdateService;
 use Forumify\Milhq\Entity\FormSubmission;
 use Forumify\Milhq\Repository\FormRepository;
 use Forumify\Milhq\Repository\FormSubmissionRepository;
+use Forumify\Core\Security\VoterAttribute;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,21 +43,32 @@ class SubmissionController extends AbstractController
         FormSubmission $submission,
         Request $request
     ): Response {
-        $form = $this->createForm(SubmissionStatusType::class);
+        $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
+            'permission' => 'view_submissions',
+            'entity' => $submission->getForm(),
+        ]);
 
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->denyAccessUnlessGranted('milhq.admin.submissions.assign_statuses');
+        $canManage = $this->isGranted('milhq.admin.submissions.assign_statuses')
+            && $this->isGranted(VoterAttribute::ACL->value, [
+                'permission' => 'manage_submissions',
+                'entity' => $submission->getForm(),
+            ]);
 
-            $statusRecord = $form->getData();
-            $submissionStatusUpdateService->createStatusRecord($submission, $statusRecord);
+        $form = null;
+        if ($canManage) {
+            $form = $this->createForm(SubmissionStatusType::class);
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $statusRecord = $form->getData();
+                $submissionStatusUpdateService->createStatusRecord($submission, $statusRecord);
 
-            $this->addFlash('success', 'milhq.admin.submissions.view.status_created');
-            return $this->redirectToRoute('milhq_admin_submission_view', ['id' => $submission->getId()]);
+                $this->addFlash('success', 'milhq.admin.submissions.view.status_created');
+                return $this->redirectToRoute('milhq_admin_submission_view', ['id' => $submission->getId()]);
+            }
         }
 
         return $this->render('@ForumifyMilhqPlugin/admin/submissions/view/form.html.twig', [
-            'form' => $form->createView(),
+            'form' => $form?->createView(),
             'submission' => $submission,
         ]);
     }
@@ -68,6 +80,11 @@ class SubmissionController extends AbstractController
             $this->addFlash('error', 'You are not allowed to delete submissions.');
             return $this->redirectToRoute('milhq_admin_submission_list');
         }
+
+        $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
+            'permission' => 'manage_submissions',
+            'entity' => $formSubmission->getForm(),
+        ]);
 
         if (!$request->query->get('confirmed')) {
             return $this->render('@ForumifyMilhqPlugin/admin/submissions/delete/delete.html.twig', [
