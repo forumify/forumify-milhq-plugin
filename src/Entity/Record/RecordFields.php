@@ -77,6 +77,6 @@ trait RecordFields
 
     public function getNameForAudit(): string
     {
-        return $this->getText();
+        return $this->getSoldier()->getName() ?? 'Unknown';
     }
 }
