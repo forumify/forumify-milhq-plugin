@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq;
 
 use Forumify\Calendar\ForumifyCalendarPlugin;
+use Forumify\Discord\ForumifyDiscordPlugin;
 use Forumify\Plugin\AbstractForumifyPlugin;
 use Forumify\Plugin\PluginMetadata;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -173,6 +174,10 @@ class ForumifyMilhqPlugin extends AbstractForumifyPlugin
 
         if (class_exists(ForumifyCalendarPlugin::class)) {
             $container->import($configDir . '/calendar.php');
+        }
+
+        if (class_exists(ForumifyDiscordPlugin::class)) {
+            $container->import($configDir . '/discord.php');
         }
     }
 }
