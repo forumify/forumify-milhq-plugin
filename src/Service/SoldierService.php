@@ -14,6 +14,7 @@ use Forumify\Milhq\Entity\Equipment;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
 use Forumify\Milhq\Form\Enlistment;
 use Forumify\Milhq\Entity\Soldier;
+use Forumify\Milhq\Entity\Unit;
 use Forumify\Milhq\Repository\AssignmentRecordRepository;
 use Forumify\Milhq\Repository\RankRecordRepository;
 use Forumify\Milhq\Repository\ReportInRepository;
@@ -163,14 +164,7 @@ class SoldierService
             return [];
         }
 
-        if ($unit->supervisors->isEmpty()) {
-            return [];
-        }
-
-        $supervisors = $this->soldierRepository->findBy([
-            'position' => $unit->supervisors->toArray(),
-            'unit' => $unit,
-        ]);
+        $supervisors = $this->getUnitSupervisors($unit);
         if ($soldier->getPosition() === null) {
             return $supervisors;
         }
@@ -181,6 +175,57 @@ class SoldierService
         );
         usort($supervisors, fn (Soldier $a, Soldier $b) => $a->getPosition()->getPosition() <=> $b->getPosition()->getPosition());
         return $supervisors;
+    }
+
+    /**
+     * @return array<Soldier>
+     */
+    public function getUnitSupervisors(Unit $unit): array
+    {
+        if ($unit->supervisors->isEmpty()) {
+            return [];
+        }
+
+        return $this->soldierRepository->findBy([
+            'position' => $unit->supervisors->toArray(),
+            'unit' => $unit,
+        ]);
+    }
+
+    /**
+     * @return array<Soldier>
+     */
+    public function getSoldiersInUnit(Unit $unit): array
+    {
+        $allSoldiers = [];
+
+        $primaryAssigned = $unit->getSoldiers()->toArray();
+        foreach ($primaryAssigned as $soldier) {
+            $allSoldiers[$soldier->getId()] = $soldier;
+        }
+
+        $secondaryAssigned = $this->assignmentRecordRepository
+            ->createQueryBuilder('ar')
+            ->select('ar')
+            ->join('ar.soldier', 's')
+            ->where('ar.type = :type')
+            ->andWhere('ar.unit = :unit')
+            ->setParameter('type', 'secondary')
+            ->setParameter('unit', $unit)
+            ->getQuery()
+            ->getResult()
+        ;
+
+        /** @var AssignmentRecord $secondary */
+        foreach ($secondaryAssigned as $secondary) {
+            $soldier = $secondary->getSoldier();
+            $allSoldiers[$soldier->getId()] = $soldier;
+            $soldier->setPosition($secondary->getPosition());
+            $soldier->setSpecialty($secondary->getSpecialty());
+        }
+
+        $this->sortSoldiers($allSoldiers);
+        return $allSoldiers;
     }
 
     /**

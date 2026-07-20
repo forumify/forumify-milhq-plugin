@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Components;
 
-use Forumify\Milhq\Entity\Record\AssignmentRecord;
 use Forumify\Milhq\Entity\Roster;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Unit;
-use Forumify\Milhq\Repository\AssignmentRecordRepository;
 use Forumify\Milhq\Repository\RosterRepository;
 use Forumify\Milhq\Service\SoldierService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,7 +28,6 @@ class RosterView extends AbstractController
 
     public function __construct(
         private readonly RosterRepository $rosterRepository,
-        private readonly AssignmentRecordRepository $assignmentRecordRepository,
         private readonly SoldierService $soldierService,
     ) {
     }
@@ -68,34 +65,6 @@ class RosterView extends AbstractController
      */
     public function getSoldiersInUnit(Unit $unit): array
     {
-        $allSoldiers = [];
-
-        $primaryAssigned = $unit->getSoldiers()->toArray();
-        foreach ($primaryAssigned as $soldier) {
-            $allSoldiers[$soldier->getId()] = $soldier;
-        }
-
-        $secondaryAssigned = $this->assignmentRecordRepository
-            ->createQueryBuilder('ar')
-            ->select('ar')
-            ->join('ar.soldier', 's')
-            ->where('ar.type = :type')
-            ->andWhere('ar.unit = :unit')
-            ->setParameter('type', 'secondary')
-            ->setParameter('unit', $unit)
-            ->getQuery()
-            ->getResult()
-        ;
-
-        /** @var AssignmentRecord $secondary */
-        foreach ($secondaryAssigned as $secondary) {
-            $soldier = $secondary->getSoldier();
-            $allSoldiers[$soldier->getId()] = $soldier;
-            $soldier->setPosition($secondary->getPosition());
-            $soldier->setSpecialty($secondary->getSpecialty());
-        }
-
-        $this->soldierService->sortSoldiers($allSoldiers);
-        return $allSoldiers;
+        return $this->soldierService->getSoldiersInUnit($unit);
     }
 }
