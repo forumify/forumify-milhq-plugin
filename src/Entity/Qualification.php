@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
@@ -30,6 +32,15 @@ class Qualification implements SortableEntityInterface, AuditableEntityInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
+
+    /** @var Collection<int, QualificationTier> */
+    #[ORM\OneToMany(targetEntity: QualificationTier::class, mappedBy: 'parent')]
+    public Collection $tiers;
+
+    public function __construct()
+    {
+        $this->tiers = new ArrayCollection();
+    }
 
     public function getName(): string
     {

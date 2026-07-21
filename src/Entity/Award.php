@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
@@ -25,11 +28,30 @@ class Award implements SortableEntityInterface, AuditableEntityInterface
     #[Assert\NotBlank(allowNull: false)]
     private string $name;
 
-    #[ORM\Column(type: 'text')]
+    #[ORM\Column(type: Types::TEXT)]
     private string $description = '';
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $image = null;
+    public ?string $image = null;
+
+    /** @var Collection<int, AwardTier> */
+    #[ORM\OneToMany(
+        targetEntity: AwardTier::class,
+        mappedBy: 'parent',
+        cascade: ['persist', 'remove'],
+        fetch: 'EAGER',
+        orphanRemoval: true,
+    )]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    public Collection $tiers;
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    public bool $autoAdvanceTiers = false;
+
+    public function __construct()
+    {
+        $this->tiers = new ArrayCollection();
+    }
 
     public function getName(): string
     {
@@ -69,5 +91,16 @@ class Award implements SortableEntityInterface, AuditableEntityInterface
     public function getNameForAudit(): string
     {
         return $this->getName();
+    }
+
+    public function addTier(AwardTier $tier): void
+    {
+        $tier->parent = $this;
+        $this->tiers->add($tier);
+    }
+
+    public function removeTier(AwardTier $tier): void
+    {
+        $this->tiers->removeElement($tier);
     }
 }

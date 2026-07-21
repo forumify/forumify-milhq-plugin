@@ -1,0 +1,42 @@
+{% extends '@Forumify/admin/crud/form.html.twig' %}
+{% block body %}
+    <div class="mb-4 flex flex-wrap items-center justify-between">
+        <h1 class="mb-0">{{ title }}</h1>
+        <div>
+            {% block form_actions %}{{ parent() }}{% endblock %}
+        </div>
+    </div>
+    {% embed '@Forumify/admin/components/simple_form.html.twig' with {
+        cancelPath: path(route ~ '_list'),
+        title: null,
+    } %}
+        {% set controller = 'forumify/forumify-milhq-plugin/award_form' %}
+        {% block form %}
+            <div {{ data ? stimulus_controller(controller) : '' }}>
+                {{ parent() }}
+            </div>
+        {% endblock %}
+        {% block form_widget %}
+            {{ form_row(form.name) }}
+            {{ form_row(form.description) }}
+            {{ form_row(form.newAwardImage) }}
+            {% if data %}
+                {{ form_row(form.useTiers) }}
+                <div id="award-tiers" class="d-none mb-4">
+                    {{ form_row(form.autoAdvanceTiers) }}
+                    <h2 class="mb-2">
+                        Tiers
+                        <a
+                            class="btn-primary btn-small btn-icon"
+                            href="{{ path('milhq_admin_award_tier_create', { id: data.id }) }}"
+                        >
+                            <i class="ph ph-plus"></i>
+                        </a>
+                    </h2>
+                    <p class="help-text mb-2">The lowest tier should be at the top of the list, and the highest achievable tier at the bottom.</p>
+                    {{ component('Milhq\\AwardTierTable', { awardId: data.id }) }}
+                </div>
+            {% endif %}
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

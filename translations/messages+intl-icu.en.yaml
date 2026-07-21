@@ -73,6 +73,11 @@ milhq:
             crud:
                 single: 'award'
                 plural: 'awards'
+            tier:
+                create: 'New Award Tier ({award})'
+                edit: 'Editing {tier}'
+                removed: 'Award tier removed.'
+                saved: 'Award tier saved.'
         document:
             crud:
                 single: 'document'
