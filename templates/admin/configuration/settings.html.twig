@@ -9,9 +9,6 @@
                 <button type="button" class="btn-link" data-tab-id="operations">{{ 'milhq.settings.tab_operations'|trans }}</button>
                 <button type="button" class="btn-link" data-tab-id="squadxml">{{ 'milhq.settings.tab_squadxml'|trans }}</button>
             {% endif %}
-            {% if plugin_version('forumify/forumify-discord-plugin') %}
-                <button type="button" class="btn-link" data-tab-id="discord">{{ 'milhq.settings.tab_discord'|trans }}</button>
-            {% endif %}
         {% endblock %}
         {% block tabpanels %}
             <div id="general">
@@ -72,11 +69,6 @@
                     {{ form_row(form.milhq__squadxml__email) }}
                     {{ form_row(form.milhq__squadxml__web) }}
                     {{ form_row(form.milhq__squadxml__new_picture) }}
-                </div>
-            {% endif %}
-            {% if plugin_version('forumify/forumify-discord-plugin') %}
-                <div id="discord">
-                    hi
                 </div>
             {% endif %}
         {% endblock %}
