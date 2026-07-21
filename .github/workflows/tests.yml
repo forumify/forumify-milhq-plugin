@@ -18,25 +18,59 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          tools: composer
-          extensions: mbstring, xml, ctype, iconv, intl, mysql
-
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Setup forumify
-        run: |
-          composer install --no-progress
-          cd tests
-          php bin/console doctrine:database:create --env=test
-          php bin/console doctrine:migrations:migrate --no-interaction --env=test
-          php bin/console forumify:platform:setting -k forumify.platform_installed --value true
-          php bin/console forumify:plugins:refresh --env=test
-          php bin/console forumify:plugins:activate forumify/forumify-milhq-plugin --env=test
+      - name: Start test env
+        uses: ./.github/workflows/setup-env
+
+      - name: Run tests
+        run: vendor/bin/phpunit
+
+  tests-calendar:
+    name: Run Tests (With Calendar)
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Start test env
+        uses: ./.github/workflows/setup-env
+        with:
+          plugin: forumify/forumify-calendar-plugin
+          plugin-version: 1.0.x-dev
+
+      - name: Run tests
+        run: vendor/bin/phpunit
+
+  tests-discord:
+    name: Run Tests (With Discord)
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Start test env
+        uses: ./.github/workflows/setup-env
+        with:
+          plugin: forumify/forumify-discord-plugin
+          plugin-version: 1.1.x-dev
 
       - name: Run tests
         run: vendor/bin/phpunit

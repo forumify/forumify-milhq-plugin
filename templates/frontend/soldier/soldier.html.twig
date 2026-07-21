@@ -77,21 +77,13 @@
                         {% if tis %}
                             <p class="text-bold">{{ 'milhq.soldier.time_in_service'|trans }}</p>
                             <p class="mb-2">
-                                {{ [
-                                    'date_relative.years'|trans({ count: tis.format('%y') }),
-                                    'date_relative.months'|trans({ count: tis.format('%m') }),
-                                    'date_relative.days'|trans({ count: tis.format('%d') })
-                                ]|filter(v => v is not empty)|join(', ') }}
+                                {{ tis }}
                             </p>
                         {% endif %}
                         {% if tig %}
                             <p class="text-bold">{{ 'milhq.soldier.time_in_grade'|trans }}</p>
                             <p class="mb-2">
-                                {{ [
-                                    'date_relative.years'|trans({ count: tig.format('%y') }),
-                                    'date_relative.months'|trans({ count: tig.format('%m') }),
-                                    'date_relative.days'|trans({ count: tig.format('%d') })
-                                ]|filter(v => v is not empty)|join(', ') }}
+                                {{ tig }}
                             </p>
                         {% endif %}
                     </div>

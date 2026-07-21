@@ -30,4 +30,20 @@ class UnitRepository extends AbstractRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return array<Unit>
+     */
+    public function findByNameLike(string $name): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.name LIKE :nameLike')
+            ->orWhere('e.designation = :designation')
+            ->setParameter('nameLike', '%' . $name . '%')
+            ->setParameter('designation', $name)
+            ->orderBy('e.name', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+    }
 }

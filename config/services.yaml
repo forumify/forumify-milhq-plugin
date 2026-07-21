@@ -10,3 +10,4 @@ services:
             - '../src/**/DependencyInjection/'
             - '../src/**/Entity/'
             - '../src/Calendar/'
+            - '../src/Discord/'
