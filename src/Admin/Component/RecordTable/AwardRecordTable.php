@@ -19,9 +19,13 @@ class AwardRecordTable extends AbstractAdminRecordTable
 
     protected function addRecordColumns(): static
     {
-        $this->addColumn('award', [
-            'field' => 'award.name',
-        ]);
+        $this
+            ->addColumn('award', [
+                'field' => 'award.name',
+            ])
+            ->addColumn('tier', [
+                'field' => 'tier?.name',
+            ]);
 
         return $this;
     }

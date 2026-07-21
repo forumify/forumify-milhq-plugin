@@ -8,11 +8,11 @@
         {% if awards is not empty %}
             <div class="card-body grid-xs-4 grid-sm-6 grid-md-12 gap-1">
                 {% for award in awards %}
-                    <div style="position: relative;" title="{{ award.name }}">
+                    <div style="position: relative;" title="{{ award.tierName ? award.name ~ ': ' ~ award.tierName : award.name }}">
                         <div class="text-center">
                             <img src="{{ asset(award.image, 'milhq.asset')|imagine_filter('milhq_small') }}" style="width: 100%; height: 42px; object-fit: contain;">
                         </div>
-                        {% if award.count > 1 %}
+                        {% if not award.tierName and award.count > 1 %}
                             <span style="
                                 position: absolute;
                                 bottom: 8px;

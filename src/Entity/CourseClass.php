@@ -35,12 +35,12 @@ if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
             $this->calendar = $calendar;
         }
 
-        public function getCalendarEvent(): ?CalendarEvent
+        public function getEvent(): ?CalendarEvent
         {
             return $this->calendarEvent;
         }
 
-        public function setCalendarEvent(?CalendarEvent $calendarEvent): void
+        public function setEvent(?CalendarEvent $calendarEvent): void
         {
             $this->calendarEvent = $calendarEvent;
         }
