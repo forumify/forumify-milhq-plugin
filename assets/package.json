@@ -10,12 +10,6 @@
                 "enabled": true,
                 "autoimport": {}
             },
-            "award_form": {
-                "main": "dist/award_form_controller.js",
-                "fetch": "lazy",
-                "enabled": true,
-                "autoimport": {}
-            },
             "course_class_report": {
                 "main": "dist/course_class_report_controller.js",
                 "fetch": "lazy",

@@ -113,7 +113,7 @@ class AwardController extends AbstractCrudController
 
         /** @var AwardTier $tier */
         $tier = $form->getData();
-        $newImage = $form->get('newAwardTierImage')->getData();
+        $newImage = $form->get('newImage')->getData();
         if ($newImage instanceof UploadedFile) {
             $tier->image = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newImage);
         }

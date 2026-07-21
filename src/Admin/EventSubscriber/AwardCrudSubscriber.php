@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Admin\EventSubscriber;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Forumify\Admin\Crud\Event\PreSaveCrudEvent;
 use Forumify\Core\Service\MediaService;
 use Forumify\Milhq\Entity\Award;
@@ -37,12 +36,5 @@ class AwardCrudSubscriber implements EventSubscriberInterface
         if ($newImage instanceof UploadedFile) {
             $award->image = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newImage);
         }
-
-        if (!$form->has('useTiers') || $form->get('useTiers')->getData()) {
-            return;
-        }
-
-        $award->autoAdvanceTiers = false;
-        $award->tiers = new ArrayCollection();
     }
 }

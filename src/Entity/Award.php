@@ -42,7 +42,7 @@ class Award implements SortableEntityInterface, AuditableEntityInterface
         fetch: 'EAGER',
         orphanRemoval: true,
     )]
-    #[ORM\OrderBy(['position' => 'ASC'])]
+    #[ORM\OrderBy(['position' => 'DESC'])]
     public Collection $tiers;
 
     #[ORM\Column(type: Types::BOOLEAN)]

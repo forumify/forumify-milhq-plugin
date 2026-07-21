@@ -34,7 +34,14 @@ class Qualification implements SortableEntityInterface, AuditableEntityInterface
     private ?string $image = null;
 
     /** @var Collection<int, QualificationTier> */
-    #[ORM\OneToMany(targetEntity: QualificationTier::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(
+        targetEntity: QualificationTier::class,
+        mappedBy: 'parent',
+        cascade: ['persist', 'remove'],
+        fetch: 'EAGER',
+        orphanRemoval: true,
+    )]
+    #[ORM\OrderBy(['position' => 'DESC'])]
     public Collection $tiers;
 
     public function __construct()

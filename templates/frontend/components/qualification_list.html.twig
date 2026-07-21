@@ -19,6 +19,19 @@
                         </div>
                         <div class="col-xs-12 col-sm-9 col-lg-10">
                             {{ item.description|milhq_text }}
+                            {% if item.tiers|length %}
+                                <h3>Tiers</h3>
+                                <div class="grid-xs-4 grid-sm-6 grid-md-12 gap-2">
+                                    {% for tier in item.tiers %}
+                                        <div class="flex flex-col justify-center items-center gap-2">
+                                            {% if tier.image %}
+                                                <img src="{{ asset(tier.image, 'milhq.asset')|imagine_filter('milhq_small') }}">
+                                            {% endif %}
+                                            <span class="text-small text-center">{{ tier.name }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </li>

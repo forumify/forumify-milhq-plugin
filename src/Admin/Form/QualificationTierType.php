@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Admin\Form;
 
-use Forumify\Milhq\Entity\AwardTier;
+use Forumify\Milhq\Entity\QualificationTier;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class AwardTierType extends AbstractType
+class QualificationTierType extends AbstractType
 {
     public function __construct(private readonly Packages $packages)
     {
@@ -22,7 +22,7 @@ class AwardTierType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => AwardTier::class,
+            'data_class' => QualificationTier::class,
         ]);
     }
 

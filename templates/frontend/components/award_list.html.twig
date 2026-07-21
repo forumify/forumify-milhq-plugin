@@ -22,9 +22,11 @@
                             {% if item.tiers|length %}
                                 <h3>Tiers</h3>
                                 <div class="grid-xs-4 grid-sm-6 grid-md-12 gap-2">
-                                    {% for tier in item.tiers|filter(t => t.image) %}
+                                    {% for tier in item.tiers %}
                                         <div class="flex flex-col justify-center items-center gap-2">
-                                            <img src="{{ asset(tier.image, 'milhq.asset')|imagine_filter('milhq_small') }}">
+                                            {% if tier.image %}
+                                                <img src="{{ asset(tier.image, 'milhq.asset')|imagine_filter('milhq_small') }}">
+                                            {% endif %}
                                             <span class="text-small text-center">{{ tier.name }}</span>
                                         </div>
                                     {% endfor %}

@@ -98,6 +98,11 @@ milhq:
             crud:
                 single: 'qualification'
                 plural: 'qualifications'
+            tier:
+                create: 'New Qualification Tier ({qualification})'
+                edit: 'Editing {tier}'
+                removed: 'Qualification tier removed.'
+                saved: 'Qualification tier saved.'
         rank:
             crud:
                 single: 'rank'

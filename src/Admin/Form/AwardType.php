@@ -31,9 +31,7 @@ class AwardType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var Award|null $data */
-        $data = $options['data'] ?? null;
-        $imagePreview = $data?->getImage();
+        $imagePreview = ($options['data'] ?? null)?->getImage();
 
         $builder
             ->add('name', TextType::class)
@@ -58,20 +56,10 @@ class AwardType extends AbstractType
                 'label' => 'Image',
                 'mapped' => false,
             ])
+            ->add('autoAdvanceTiers', CheckboxType::class, [
+                'required' => false,
+                'help' => 'When enabled, the soldier\'s profile will only show the highest tier achieved. Granting this award multiple times advances the soldier to the next tier.  When disabled, the admin must select a tier when creating the award record, and the soldier can have multiple tiers of the same award.',
+            ])
         ;
-        if ($data !== null) {
-            $builder
-                ->add('useTiers', CheckboxType::class, [
-                    'required' => false,
-                    'mapped' => false,
-                    'help' => 'Enable tiers if this award has multiple versions that the soldier can achieve.',
-                    'data' => !$data->tiers->isEmpty(),
-                ])
-                ->add('autoAdvanceTiers', CheckboxType::class, [
-                    'required' => false,
-                    'help' => 'When enabled, the soldier\'s profile will only show the highest tier achieved. Granting this award multiple times advances the soldier to the next tier.  When disabled, the admin must select a tier when creating the award record, and the soldier can have multiple tiers of the same award.',
-                ])
-            ;
-        }
     }
 }

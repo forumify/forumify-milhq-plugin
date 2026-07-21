@@ -29,15 +29,15 @@
                         Tiers
                         <a
                             class="btn-primary btn-small btn-icon"
-                            href="{{ path('milhq_admin_award_tier_create', { id: data.id }) }}"
+                            href="{{ path('milhq_admin_qualification_tier_create', { id: data.id }) }}"
                         >
                             <i class="ph ph-plus"></i>
                         </a>
                     </h2>
                     <p class="help-text mb-2">
-                        Optional. When an award has tiers, depending on the "Auto advance tiers" setting, the soldier will either automatically advance to the next tier when this award is given, or, if disabled, a tier must be selected when creating an award record.
+                        Optional. When a qualification has tiers, you can select the tier during the course class report or when creating the qualification record. Only the highest tier achieved by the soldier is shown on their profile.
                     </p>
-                    {{ component('Milhq\\AwardTierTable', { awardId: data.id }) }}
+                    {{ component('Milhq\\QualificationTierTable', { qualificationId: data.id }) }}
                 </div>
             {% endblock %}
         {% endembed %}
