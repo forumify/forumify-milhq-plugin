@@ -9,10 +9,12 @@ use Forumify\Core\Security\VoterAttribute;
 use Forumify\Milhq\Entity\CourseClass;
 use Forumify\Milhq\Entity\CourseClassInstructor;
 use Forumify\Milhq\Entity\CourseClassStudent;
+use Forumify\Milhq\Repository\AwardRepository;
 use Forumify\Milhq\Repository\CourseClassInstructorRepository;
 use Forumify\Milhq\Repository\CourseClassStudentRepository;
 use Forumify\Milhq\Repository\CourseInstructorRepository;
 use Forumify\Milhq\Repository\QualificationRecordRepository;
+use Forumify\Milhq\Repository\QualificationRepository;
 use Forumify\Milhq\Service\SoldierService;
 use Forumify\Plugin\Attribute\PluginVersion;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,7 +39,99 @@ class CourseClassView extends AbstractController
         private readonly CourseClassStudentRepository $classStudentRepository,
         private readonly CourseClassInstructorRepository $classInstructorRepository,
         private readonly QualificationRecordRepository $qualificationRecordRepository,
+        private readonly QualificationRepository $qualificationRepository,
+        private readonly AwardRepository $awardRepository,
     ) {
+    }
+
+    /**
+     * @return array<int, array{
+     *     soldier: \Forumify\Milhq\Entity\Soldier,
+     *     student: CourseClassStudent,
+     *     qualifications: array<array{name: string, tier: string|null}>,
+     *     awards: array<array{name: string, tier: string|null}>,
+     * }>
+     */
+    public function getStudentResults(): array
+    {
+        if ($this->class->getResult() === false) {
+            return [];
+        }
+
+        $qualIds = [];
+        $awardIds = [];
+        foreach ($this->class->getStudents() as $student) {
+            $qualIds += $student->getQualifications();
+            $awardIds += $student->getAwards();
+        }
+
+        $qualifications = empty($qualIds)
+            ? []
+            : $this->indexById($this->qualificationRepository->findBy(['id' => array_keys($qualIds)]));
+        $awards = empty($awardIds)
+            ? []
+            : $this->indexById($this->awardRepository->findBy(['id' => array_keys($awardIds)]));
+
+        $results = [];
+        foreach ($this->class->getStudents() as $student) {
+            $soldier = $student->getSoldier();
+            if ($soldier === null) {
+                continue;
+            }
+
+            $results[$soldier->getId()] = [
+                'soldier' => $soldier,
+                'student' => $student,
+                'qualifications' => $this->resolveAchievements($student->getQualifications(), $qualifications),
+                'awards' => $this->resolveAchievements($student->getAwards(), $awards),
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param array<int, int|null> $map
+     * @param array<int, object> $entities
+     * @return array<array{name: string, tier: string|null}>
+     */
+    private function resolveAchievements(array $map, array $entities): array
+    {
+        $resolved = [];
+        foreach ($map as $id => $tierId) {
+            $entity = $entities[$id] ?? null;
+            if ($entity === null) {
+                continue;
+            }
+
+            $tierName = null;
+            if ($tierId !== null) {
+                foreach ($entity->tiers as $tier) {
+                    if ($tier->getId() === $tierId) {
+                        $tierName = $tier->name;
+                        break;
+                    }
+                }
+            }
+
+            $resolved[] = ['name' => $entity->getName(), 'tier' => $tierName];
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * @param array<object> $entities
+     * @return array<int, object>
+     */
+    private function indexById(array $entities): array
+    {
+        $indexed = [];
+        foreach ($entities as $entity) {
+            $indexed[$entity->getId()] = $entity;
+        }
+
+        return $indexed;
     }
 
     public function isSignupOpen(): bool

@@ -56,11 +56,8 @@ class RecordService
             $record->setDocument($data['document'] ?? null);
 
             if ($record instanceof AwardRecord) {
-                $award = $data['award'];
-                $record->setAward($award);
-                $record->setTier($award->autoAdvanceTiers
-                    ? $this->resolveAutoAdvanceTier($award, $record->getSoldier())
-                    : ($data['tier'] ?? null));
+                $record->setAward($data['award']);
+                $record->setTier($data['tier'] ?? null);
             } elseif ($record instanceof AssignmentRecord) {
                 $record->setType($data['type'] ?? 'primary');
                 $record->setStatus($data['status'] ?? null);
@@ -117,6 +114,11 @@ class RecordService
             if ($record->getAuthor() === null) {
                 $record->setAuthor($author);
             }
+
+            if ($record instanceof AwardRecord && $record->getAward()->autoAdvanceTiers) {
+                $record->setTier($this->resolveAutoAdvanceTier($record->getAward(), $record->getSoldier()));
+            }
+
             $this->entityManager->persist($record);
         }
         $this->entityManager->flush();

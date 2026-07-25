@@ -31,7 +31,6 @@ class ClassInstructorResultType extends AbstractType
 
         $builder
             ->add('soldier', EntityType::class, [
-                'attr' => ['class' => 'd-none'],
                 'autocomplete' => true,
                 'choice_label' => 'name',
                 'class' => Soldier::class,
@@ -39,6 +38,9 @@ class ClassInstructorResultType extends AbstractType
                 'placeholder' => 'Please select a soldier',
             ])
             ->add('present', CheckboxType::class, [
+                'attr' => [
+                    'data-role' => 'present',
+                ],
                 'required' => false,
             ])
             ->add('instructor', EntityType::class, [

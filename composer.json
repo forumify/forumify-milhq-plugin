@@ -22,7 +22,9 @@
         "symfony/stopwatch": "7.4.*",
         "symfony/web-profiler-bundle": "7.4.*",
         "zenstruck/foundry": "2.8.7",
-        "symfony/lock": "^8.0"
+        "symfony/lock": "^8.0",
+        "forumify/forumify-calendar-plugin": "1.0.x-dev",
+        "forumify/forumify-discord-plugin": "1.1.x-dev"
     },
     "autoload": {
         "psr-4": {

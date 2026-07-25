@@ -1,75 +1,93 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-  static targets = ['instructors', 'students'];
+  static targets = ['students', 'instructors'];
 
   connect() {
-    this.instructorIdx = this.instructorsTarget.dataset.index;
-    this.studentIdx = this.studentsTarget.dataset.index;
+    this.studentIndex = parseInt(this.studentsTarget.dataset.index, 10) || 0;
+    this.instructorIndex = parseInt(this.instructorsTarget.dataset.index, 10) || 0;
 
-    [...this.instructorsTarget.firstElementChild.children].forEach(this._addDeleteToExistingRow.bind(this));
-    [...this.studentsTarget.firstElementChild.children].forEach(this._addDeleteToExistingRow.bind(this));
-  }
-
-  addInstructor() {
-    const prototype = this.instructorsTarget.dataset.prototype;
-    const row = document.createElement('div');
-    row.innerHTML = prototype.replace(/__name__/g, this.instructorIdx);
-
-    this._formatRow(row);
-    this.instructorsTarget.firstElementChild.append(row);
-
-    document
-      .getElementById(`class_result_instructors_${this.instructorIdx}_soldier`)
-      .classList
-      .remove('d-none')
-    ;
-
-    this.instructorIdx++;
+    this.studentsTarget.addEventListener('change', this._onStudentChange.bind(this));
+    this.instructorsTarget.addEventListener('change', this._onInstructorChange.bind(this));
+    this._syncAllStudentAchievements();
+    this._syncAllInstructorRoles();
   }
 
   addStudent() {
-    const prototype = this.studentsTarget.dataset.prototype;
-    const row = document.createElement('div');
-    row.innerHTML = prototype.replace(/__name__/g, this.studentIdx);
-
-    this._formatRow(row);
-    this.studentsTarget.firstElementChild.append(row);
-
-    document
-      .getElementById(`class_result_students_${this.studentIdx}_soldier`)
-      .classList
-      .remove('d-none')
-    ;
-
-    this.studentIdx++;
+    this._appendRows(this.studentsTarget, this.studentIndex++);
+    this._syncAllStudentAchievements();
   }
 
-  _addDeleteToExistingRow(formRow) {
-    const btn = this._createDeleteBtn(formRow);
-    formRow.querySelector('label.text-bold > span').append(btn);
-    formRow.classList.add('mt-8');
+  addInstructor() {
+    this._appendRows(this.instructorsTarget, this.instructorIndex++);
+    this._syncAllInstructorRoles();
   }
 
-  _formatRow(row) {
-    row.classList.add('form-row', 'mt-8');
-
-    const deleteBtn = this._createDeleteBtn(row);
-    const soldierSelect = row.firstElementChild.firstElementChild;
-
-    soldierSelect.classList.add('flex', 'items-center', 'gap-2');
-    soldierSelect.append(deleteBtn);
+  _appendRows(tbody, index) {
+    const html = tbody.dataset.prototype.replace(/__name__/g, index);
+    const temp = document.createElement('tbody');
+    temp.innerHTML = html;
+    while (temp.firstElementChild) {
+      tbody.appendChild(temp.firstElementChild);
+    }
   }
 
-  _createDeleteBtn(formRow) {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.classList.add('btn-link', 'btn-small', 'btn-icon');
-    btn.innerHTML = '<i class="ph ph-x"></i>';
+  _onInstructorChange(event) {
+    if (event.target.matches('[data-role="present"]')) {
+      this._syncInstructorRole(event.target);
+    }
+  }
 
-    btn.addEventListener('click', () => {
-      formRow.parentElement.removeChild(formRow);
+  _syncAllInstructorRoles() {
+    this.instructorsTarget
+      .querySelectorAll('[data-role="present"]')
+      .forEach((checkbox) => this._syncInstructorRole(checkbox));
+  }
+
+  _syncInstructorRole(checkbox) {
+    const roleCell = checkbox.closest('tr')?.querySelector('[data-role-cell]');
+    if (roleCell) {
+      roleCell.classList.toggle('d-none', !checkbox.checked);
+    }
+  }
+
+  _onStudentChange(event) {
+    if (event.target.matches('[data-role="result"]')) {
+      this._syncStudentAchievements(event.target);
+    }
+  }
+
+  _syncAllStudentAchievements() {
+    this.studentsTarget
+      .querySelectorAll('[data-role="result"]')
+      .forEach((select) => this._syncStudentAchievements(select));
+  }
+
+  _syncStudentAchievements(select) {
+    const row = select.closest('tr');
+    const passed = select.value === 'passed';
+    row?.querySelectorAll('[data-achievement-cell]').forEach((cell) => {
+      cell.classList.toggle('d-none', !passed);
     });
-    return btn;
+  }
+
+  toggleDetail(event) {
+    const detail = event.currentTarget.closest('tr').nextElementSibling;
+    if (detail && detail.classList.contains('milhq-report-detail')) {
+      detail.classList.toggle('d-none');
+    }
+  }
+
+  removeStudent(event) {
+    const row = event.currentTarget.closest('tr');
+    const detail = row.nextElementSibling;
+    if (detail && detail.classList.contains('milhq-report-detail')) {
+      detail.remove();
+    }
+    row.remove();
+  }
+
+  removeInstructor(event) {
+    event.currentTarget.closest('tr').remove();
   }
 }

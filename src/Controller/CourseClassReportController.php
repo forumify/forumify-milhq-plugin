@@ -8,7 +8,9 @@ use Forumify\Core\Security\VoterAttribute;
 use Forumify\Milhq\Form\ClassResultType;
 use Forumify\Milhq\Entity\CourseClass;
 use Forumify\Milhq\Exception\SoldierNotFoundException;
+use Forumify\Milhq\Repository\AwardRepository;
 use Forumify\Milhq\Repository\CourseClassRepository;
+use Forumify\Milhq\Repository\QualificationRepository;
 use Forumify\Milhq\Service\CourseClassService;
 use Forumify\Plugin\Attribute\PluginVersion;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,6 +25,8 @@ class CourseClassReportController extends AbstractController
     public function __construct(
         private readonly CourseClassService $classService,
         private readonly CourseClassRepository $classRepository,
+        private readonly QualificationRepository $qualificationRepository,
+        private readonly AwardRepository $awardRepository,
     ) {
     }
 
@@ -37,9 +41,12 @@ class CourseClassReportController extends AbstractController
         $form = $this->createForm(ClassResultType::class, $class);
         $form->handleRequest($request);
         if (!$form->isSubmitted() || !$form->isValid()) {
+            $course = $class->getCourse();
             return $this->render('@ForumifyMilhqPlugin/frontend/course/class_report.html.twig', [
                 'class' => $class,
                 'form' => $form->createView(),
+                'qualifications' => $this->qualificationRepository->findBy(['id' => $course->getQualifications()]),
+                'awards' => $this->awardRepository->findBy(['id' => $course->getAwards()]),
             ]);
         }
 

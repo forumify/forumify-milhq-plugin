@@ -7,6 +7,7 @@ namespace Forumify\Milhq\Admin\Form;
 use Forumify\Core\Form\RichTextEditorType;
 use Forumify\Milhq\Entity\Course;
 use Forumify\Milhq\Entity\Rank;
+use Forumify\Milhq\Repository\AwardRepository;
 use Forumify\Milhq\Repository\QualificationRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Asset\Packages;
@@ -21,6 +22,7 @@ class CourseType extends AbstractType
 {
     public function __construct(
         private readonly QualificationRepository $qualificationRepository,
+        private readonly AwardRepository $awardRepository,
         private readonly Packages $packages,
     ) {
     }
@@ -45,6 +47,17 @@ class CourseType extends AbstractType
         $qualificationChoices = array_combine(
             array_column($qualifications, 'name'),
             array_column($qualifications, 'id'),
+        );
+
+        $awards = $this->awardRepository
+            ->createQueryBuilder('a')
+            ->select('a.id', 'a.name')
+            ->getQuery()
+            ->getArrayResult()
+        ;
+        $awardChoices = array_combine(
+            array_column($awards, 'name'),
+            array_column($awards, 'id'),
         );
 
         $builder
@@ -83,6 +96,13 @@ class CourseType extends AbstractType
                 'autocomplete' => true,
                 'choices' => $qualificationChoices,
                 'help' => 'Which qualifications can be achieved by completing this course?',
+                'multiple' => true,
+                'required' => false,
+            ])
+            ->add('awards', ChoiceType::class, [
+                'autocomplete' => true,
+                'choices' => $awardChoices,
+                'help' => 'Which awards can be granted by completing this course?',
                 'multiple' => true,
                 'required' => false,
             ])
