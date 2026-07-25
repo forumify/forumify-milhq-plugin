@@ -16,6 +16,7 @@ use PluginTests\Tests\Factories\Milhq\FormFactory;
 use PluginTests\Tests\Factories\Milhq\FormFieldFactory;
 use PluginTests\Tests\Factories\Milhq\PositionFactory;
 use PluginTests\Tests\Factories\Milhq\QualificationFactory;
+use PluginTests\Tests\Factories\Milhq\QualificationTierFactory;
 use PluginTests\Tests\Factories\Milhq\RankFactory;
 use PluginTests\Tests\Factories\Milhq\RosterFactory;
 use PluginTests\Tests\Factories\Milhq\SpecialtyFactory;
@@ -47,6 +48,8 @@ use Zenstruck\Foundry\Story;
  * @method static Entity\Rank rankPFC()
  * @method static Entity\Rank rankSGT()
  * @method static Entity\Qualification qualificationLandNav()
+ * @method static Entity\QualificationTier qualificationLandNavBasic()
+ * @method static Entity\QualificationTier qualificationLandNavExpert()
  * @method static Entity\Qualification qualificationCLS()
  * @method static Entity\Equipment equipmentM4()
  * @method static Entity\Equipment equipmentM17()
@@ -189,6 +192,17 @@ class MilsimStory extends Story
         // Qualifications
         $landNav = QualificationFactory::createOne(['name' => 'Land Navigation']);
         $this->addState('qualificationLandNav', $landNav);
+        $this->addState('qualificationLandNavBasic', QualificationTierFactory::createOne([
+            'name' => 'Basic',
+            'parent' => $landNav,
+            'position' => 0,
+        ]));
+        $this->addState('qualificationLandNavExpert', QualificationTierFactory::createOne([
+            'name' => 'Expert',
+            'parent' => $landNav,
+            'position' => 1,
+        ]));
+
         $cls = QualificationFactory::createOne(['name' => 'Combat Life Saver']);
         $this->addState('qualificationCLS', $cls);
     }

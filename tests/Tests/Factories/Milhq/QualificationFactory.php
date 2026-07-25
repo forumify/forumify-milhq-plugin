@@ -7,6 +7,9 @@ namespace PluginTests\Tests\Factories\Milhq;
 use Forumify\Milhq\Entity\Qualification;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
+/**
+ * @extends PersistentObjectFactory<Qualification>
+ */
 class QualificationFactory extends PersistentObjectFactory
 {
     public static function class(): string

@@ -73,6 +73,11 @@ milhq:
             crud:
                 single: 'award'
                 plural: 'awards'
+            tier:
+                create: 'New Award Tier ({award})'
+                edit: 'Editing {tier}'
+                removed: 'Award tier removed.'
+                saved: 'Award tier saved.'
         document:
             crud:
                 single: 'document'
@@ -93,6 +98,11 @@ milhq:
             crud:
                 single: 'qualification'
                 plural: 'qualifications'
+            tier:
+                create: 'New Qualification Tier ({qualification})'
+                edit: 'Editing {tier}'
+                removed: 'Qualification tier removed.'
+                saved: 'Qualification tier saved.'
         rank:
             crud:
                 single: 'rank'
@@ -216,9 +226,11 @@ milhq:
     award:
         title: 'Awards'
         no_awards: 'No awards.'
+        tiers: 'Tiers'
     qualification:
         title: 'Qualifications'
         no_qualifications: 'No qualifications.'
+        tiers: 'Tiers'
     opcenter:
         operations_center: 'Operations Center'
         pfile: 'Personnel File'
@@ -285,6 +297,7 @@ milhq:
         reported_in: 'You have successfully reported in.'
     course:
         qualifications: 'Qualifications upon completion'
+        awards: 'Awards upon completion'
         no_qualifications: 'N/A'
         prerequisites: 'Prerequisites'
         classes: 'Classes'
@@ -316,6 +329,21 @@ milhq:
             create_report: 'New Class Report'
             report: '{class} - Report'
             signups_closed: 'Signups are closed.'
+            soldier: 'Soldier'
+            role: 'Role'
+            result: 'Result'
+            result_option:
+                excused: 'Excused'
+                failed: 'Failed'
+                no-show: 'No Show'
+                passed: 'Passed'
+            present: 'Present'
+            notes: 'Notes'
+            service_record_override: 'Service record text'
+            report_details: 'Details'
+            add_student: 'Add Student'
+            add_instructor: 'Add Instructor'
+            edit_report_warning: 'This class report has already been submitted. Editing it here only updates what is shown on the class page, it will not create, update, or remove any service, qualification, or award records.'
     notification:
         submission_status_updated:
             title: 'Submission status updated'

@@ -19,9 +19,13 @@ class QualificationRecordTable extends AbstractAdminRecordTable
 
     protected function addRecordColumns(): static
     {
-        $this->addColumn('qualification', [
-            'field' => 'qualification.name',
-        ]);
+        $this
+            ->addColumn('qualification', [
+                'field' => 'qualification.name',
+            ])
+            ->addColumn('tier', [
+                'field' => 'tier?.name',
+            ]);
 
         return $this;
     }

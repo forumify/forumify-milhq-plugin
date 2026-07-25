@@ -1,0 +1,15 @@
+{% extends '@Forumify/admin/crud/form.html.twig' %}
+{% block body %}
+    <div class="mb-4 flex flex-wrap items-center justify-between">
+        <h1 class="mb-0">{{ title }}</h1>
+        <div>
+            {% block form_actions %}{{ parent() }}{% endblock %}
+        </div>
+    </div>
+    <div {{ stimulus_controller('forumify/forumify-milhq-plugin/tier_select') }}>
+        {% include '@Forumify/admin/components/simple_form.html.twig' with {
+            cancelPath: path(route ~ '_list'),
+            title: null,
+        } %}
+    </div>
+{% endblock %}

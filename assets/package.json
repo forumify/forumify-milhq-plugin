@@ -22,6 +22,12 @@
                 "enabled": true,
                 "autoimport": {}
             },
+            "tier_select": {
+                "main": "dist/tier_select_controller.js",
+                "fetch": "lazy",
+                "enabled": true,
+                "autoimport": {}
+            },
             "user_edit": {
                 "main": "dist/user_edit_controller.js",
                 "fetch": "lazy",

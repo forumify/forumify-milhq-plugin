@@ -1,0 +1,45 @@
+{% extends '@Forumify/admin/crud/form.html.twig' %}
+{% block body %}
+    <div class="mb-4 flex flex-wrap items-center justify-between">
+        <h1 class="mb-0">{{ title }}</h1>
+        <div>
+            {% block form_actions %}{{ parent() }}{% endblock %}
+        </div>
+    </div>
+    {% if data is null %}
+        {% include '@Forumify/admin/components/simple_form.html.twig' with {
+            cancelPath: path(route ~ '_list'),
+            title: null,
+        } %}
+    {% else %}
+        {% embed '@Forumify/components/tabs.html.twig' %}
+            {% block tabs %}
+                <button type="button" class="btn-link" data-tab-id="form">Qualification</button>
+                <button type="button" class="btn-link" data-tab-id="tiers">Tiers</button>
+            {% endblock %}
+            {% block tabpanels %}
+                <div id="form">
+                    {% include '@Forumify/admin/components/simple_form.html.twig' with {
+                        cancelPath: path(route ~ '_list'),
+                        title: null,
+                    } %}
+                </div>
+                <div id="tiers">
+                    <h2 class="mb-2">
+                        Tiers
+                        <a
+                            class="btn-primary btn-small btn-icon"
+                            href="{{ path('milhq_admin_qualification_tier_create', { id: data.id }) }}"
+                        >
+                            <i class="ph ph-plus"></i>
+                        </a>
+                    </h2>
+                    <p class="help-text mb-2">
+                        Optional. When a qualification has tiers, you can select the tier during the course class report or when creating the qualification record. Only the highest tier achieved by the soldier is shown on their profile.
+                    </p>
+                    {{ component('Milhq\\QualificationTierTable', { qualificationId: data.id }) }}
+                </div>
+            {% endblock %}
+        {% endembed %}
+    {% endif %}
+{% endblock %}

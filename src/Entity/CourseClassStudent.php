@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
+use Forumify\Milhq\Entity\Enum\CourseResult;
 
 #[ORM\Entity]
 #[ORM\Table('milhq_course_class_student')]
@@ -21,24 +22,29 @@ class CourseClassStudent
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private CourseClass $class;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $result = null;
+    #[ORM\Column(enumType: CourseResult::class, nullable: true)]
+    private ?CourseResult $result = null;
 
-    #[ORM\Column(type: 'simple_array', nullable: true)]
+    /** @var array<int, int|null>|null */
+    #[ORM\Column(type: 'json', nullable: true)]
     private ?array $qualifications = [];
 
-    #[ORM\Column(type: 'simple_array', nullable: true)]
+    /** @var array<int, int|null>|null */
+    #[ORM\Column(type: 'json', nullable: true)]
     private ?array $awards = [];
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $serviceRecordTextOverride = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $notes = null;
 
     public function getSoldier(): ?Soldier
     {
         return $this->soldier;
     }
 
-    public function setSoldier(Soldier $user): void
+    public function setSoldier(?Soldier $user): void
     {
         $this->soldier = $user;
     }
@@ -53,40 +59,48 @@ class CourseClassStudent
         $this->class = $class;
     }
 
-    public function getResult(): ?string
+    public function getResult(): ?CourseResult
     {
         return $this->result;
     }
 
-    public function setResult(?string $result): void
+    public function setResult(?CourseResult $result): void
     {
         $this->result = $result;
     }
 
     /**
-     * @return array<int>
+     * @return array<int, int|null>
      */
     public function getQualifications(): array
     {
-        return array_map(fn (mixed $id) => (int)$id, $this->qualifications ?? []);
-    }
-
-    public function setQualifications(?array $qualifications): void
-    {
-        $this->qualifications = $qualifications;
+        return $this->normalizeTierMap($this->qualifications);
     }
 
     /**
-     * @return array<int>
+     * @param array<int|string, int|string|null>|null $qualifications
+     */
+    public function setQualifications(?array $qualifications): void
+    {
+        $normalized = $this->normalizeTierMap($qualifications);
+        $this->qualifications = $normalized === [] ? null : $normalized;
+    }
+
+    /**
+     * @return array<int, int|null>
      */
     public function getAwards(): array
     {
-        return array_map(fn (mixed $id) => (int)$id, $this->awards ?? []);
+        return $this->normalizeTierMap($this->awards);
     }
 
+    /**
+     * @param array<int|string, int|string|null>|null $awards
+     */
     public function setAwards(?array $awards): void
     {
-        $this->awards = $awards;
+        $normalized = $this->normalizeTierMap($awards);
+        $this->awards = $normalized === [] ? null : $normalized;
     }
 
     public function getServiceRecordTextOverride(): ?string
@@ -97,5 +111,29 @@ class CourseClassStudent
     public function setServiceRecordTextOverride(?string $serviceRecordTextOverride): void
     {
         $this->serviceRecordTextOverride = $serviceRecordTextOverride;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): void
+    {
+        $this->notes = $notes;
+    }
+
+    /**
+     * @param array<int|string, int|string|null>|null $map
+     * @return array<int, int|null>
+     */
+    private function normalizeTierMap(?array $map): array
+    {
+        $normalized = [];
+        foreach ($map ?? [] as $id => $tierId) {
+            $normalized[(int)$id] = $tierId === null || $tierId === '' ? null : (int)$tierId;
+        }
+
+        return $normalized;
     }
 }

@@ -48,6 +48,12 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
     #[ORM\Column(type: 'simple_array', nullable: true)]
     private ?array $qualifications = [];
 
+    /**
+     * @var array<string|int>
+     */
+    #[ORM\Column(type: 'simple_array', nullable: true)]
+    private ?array $awards = [];
+
     #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseClass::class, cascade: ['persist', 'remove'])]
     private Collection $classes;
 
@@ -125,6 +131,22 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
     public function setQualifications(?array $qualifications): void
     {
         $this->qualifications = $qualifications;
+    }
+
+    /**
+     * @return array<int>
+     */
+    public function getAwards(): array
+    {
+        return array_map(fn (mixed $id) => (int)$id, $this->awards ?? []);
+    }
+
+    /**
+     * @param array<string|int>|null $awards
+     */
+    public function setAwards(?array $awards): void
+    {
+        $this->awards = $awards;
     }
 
     public function getClasses(): Collection

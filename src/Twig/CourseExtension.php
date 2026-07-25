@@ -14,6 +14,7 @@ class CourseExtension extends AbstractExtension
         return [
             new TwigFilter('milhq_course_prerequisites', [CourseExtensionRuntime::class, 'getPrerequisites']),
             new TwigFilter('milhq_course_qualifications', [CourseExtensionRuntime::class, 'getQualifications']),
+            new TwigFilter('milhq_course_awards', [CourseExtensionRuntime::class, 'getAwards']),
             new TwigFilter('milhq_course_users', [CourseExtensionRuntime::class, 'getUsers']),
         ];
     }

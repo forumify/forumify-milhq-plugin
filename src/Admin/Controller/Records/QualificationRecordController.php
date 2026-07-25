@@ -16,6 +16,8 @@ class QualificationRecordController extends AbstractRecordCrudController
     protected ?string $permissionCreate = 'milhq.admin.records.qualification_records.create';
     protected ?string $permissionDelete = 'milhq.admin.records.qualification_records.delete';
 
+    protected string $formTemplate = '@ForumifyMilhqPlugin/admin/records/qualification_form.html.twig';
+
     protected function getRecordType(): string
     {
         return 'qualification';

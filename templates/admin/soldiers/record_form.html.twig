@@ -1,7 +1,9 @@
 {% extends '@Forumify/admin/base.html.twig' %}
 {% block body %}
-    {% include '@Forumify/admin/components/simple_form.html.twig' with {
-        cancelPath: path('milhq_admin_soldier_list'),
-        title: ('milhq.admin.soldiers.list.actions.' ~ type)|trans
-    } %}
+    <div {% if type in ['qualification', 'award'] %}{{ stimulus_controller('forumify/forumify-milhq-plugin/tier_select') }}{% endif %}>
+        {% include '@Forumify/admin/components/simple_form.html.twig' with {
+            cancelPath: path('milhq_admin_soldier_list'),
+            title: ('milhq.admin.soldiers.list.actions.' ~ type)|trans
+        } %}
+    </div>
 {% endblock %}

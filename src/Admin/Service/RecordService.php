@@ -7,6 +7,8 @@ namespace Forumify\Milhq\Admin\Service;
 use DateTime;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
+use Forumify\Milhq\Entity\Award;
+use Forumify\Milhq\Entity\AwardTier;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
 use Forumify\Milhq\Entity\Record\AwardRecord;
 use Forumify\Milhq\Entity\Record\CombatRecord;
@@ -14,8 +16,10 @@ use Forumify\Milhq\Entity\Record\QualificationRecord;
 use Forumify\Milhq\Entity\Record\RankRecord;
 use Forumify\Milhq\Entity\Record\RecordInterface;
 use Forumify\Milhq\Entity\Record\ServiceRecord;
+use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Event\RecordsCreatedEvent;
 use Forumify\Milhq\Exception\MilhqException;
+use Forumify\Milhq\Repository\AwardRecordRepository;
 use Forumify\Milhq\Service\SoldierService;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -25,6 +29,7 @@ class RecordService
         private readonly SoldierService $soldierService,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly EntityManagerInterface $entityManager,
+        private readonly AwardRecordRepository $awardRecordRepository,
     ) {
     }
 
@@ -52,6 +57,7 @@ class RecordService
 
             if ($record instanceof AwardRecord) {
                 $record->setAward($data['award']);
+                $record->setTier($data['tier'] ?? null);
             } elseif ($record instanceof AssignmentRecord) {
                 $record->setType($data['type'] ?? 'primary');
                 $record->setStatus($data['status'] ?? null);
@@ -63,11 +69,31 @@ class RecordService
                 $record->setRank($data['rank']);
             } elseif ($record instanceof QualificationRecord) {
                 $record->setQualification($data['qualification']);
+                $record->setTier($data['tier'] ?? null);
             }
 
             $records[] = $record;
         }
         $this->createRecords($records, $sendNotification);
+    }
+
+    private function resolveAutoAdvanceTier(Award $award, Soldier $soldier): ?AwardTier
+    {
+        if ($award->tiers->isEmpty()) {
+            return null;
+        }
+
+        /** @var list<AwardTier> $tiers */
+        $tiers = $award->tiers->toArray();
+        $previousTier = $this->awardRecordRepository->findLastByAward($soldier, $award)?->getTier();
+        if ($previousTier === null) {
+            return $tiers[0];
+        }
+
+        $tierIds = array_map(static fn (AwardTier $tier) => $tier->getId(), $tiers);
+        $index = array_search($previousTier->getId(), $tierIds, true);
+
+        return $index !== false ? ($tiers[$index + 1] ?? $previousTier) : $tiers[0];
     }
 
     /**
@@ -88,6 +114,11 @@ class RecordService
             if ($record->getAuthor() === null) {
                 $record->setAuthor($author);
             }
+
+            if ($record instanceof AwardRecord && $record->getAward()->autoAdvanceTiers) {
+                $record->setTier($this->resolveAutoAdvanceTier($record->getAward(), $record->getSoldier()));
+            }
+
             $this->entityManager->persist($record);
         }
         $this->entityManager->flush();

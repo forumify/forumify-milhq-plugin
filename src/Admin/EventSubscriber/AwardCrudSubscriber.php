@@ -31,12 +31,10 @@ class AwardCrudSubscriber implements EventSubscriberInterface
     {
         $award = $event->getEntity();
         $form = $event->getForm();
-        $newImage = $form->get('newAwardImage')->getData();
-        if (!($newImage instanceof UploadedFile)) {
-            return;
-        }
 
-        $image = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newImage);
-        $award->setImage($image);
+        $newImage = $form->get('newAwardImage')->getData();
+        if ($newImage instanceof UploadedFile) {
+            $award->image = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newImage);
+        }
     }
 }

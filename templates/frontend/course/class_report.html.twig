@@ -1,46 +1,209 @@
 {% extends '@Forumify/frontend/base.html.twig' %}
 {% set title = 'milhq.course.class.report'|trans({ class: class.title }) %}
 {% block title_page %}{{ title }}{% endblock %}
-{% block body %}
-    <h1>{{ title }}</h1>
-    <div {{ stimulus_controller('forumify/forumify-milhq-plugin/course_class_report') }}>
-        {{ form_start(form) }}
-        <div class="box mb-4">
-            <h3>Instructors</h3>
-            <div
-                {{ stimulus_target('forumify/forumify-milhq-plugin/course_class_report', 'instructors') }}
-                data-prototype="{{ form_widget(form.instructors.vars.prototype)|e('html_attr') }}"
-                data-index="{{ form.instructors|length }}"
+
+{% macro student_row(studentForm, qualifications, awards) %}
+    {% set data = studentForm.vars.data|default(null) %}
+    {% set soldier = data ? data.soldier : null %}
+    {% set colCount = 4 + qualifications|length + awards|length %}
+    <tr class="milhq-report-row">
+        <td>
+            {% if soldier %}
+                <span class="flex items-center gap-1">
+                    {% if soldier.rank is not null and soldier.rank.image is not null %}
+                        <img width="24px" height="24px" src="{{ asset(soldier.rank.image, 'milhq.asset')|imagine_filter('avatar_xs') }}">
+                    {% endif %}
+                    {{ soldier.name }}
+                </span>
+                <div class="d-none">{{ form_widget(studentForm.soldier) }}</div>
+            {% else %}
+                {{ form_widget(studentForm.soldier) }}
+            {% endif %}
+        </td>
+        <td>{{ form_widget(studentForm.result) }}</td>
+        {% for qualification in qualifications %}
+            <td class="text-center">
+                <span data-achievement-cell>{{ form_widget(studentForm.children['qualification_' ~ qualification.id]) }}</span>
+            </td>
+        {% endfor %}
+        {% for award in awards %}
+            <td class="text-center">
+                <span data-achievement-cell>{{ form_widget(studentForm.children['award_' ~ award.id]) }}</span>
+            </td>
+        {% endfor %}
+        <td class="text-right">
+            <button
+                type="button"
+                class="btn-link btn-icon btn-small"
+                title="{{ 'milhq.course.class.report_details'|trans }}"
+                {{ stimulus_action('forumify/forumify-milhq-plugin/course_class_report', 'toggleDetail') }}
             >
-                {{ form_widget(form.instructors) }}
+                <i class="ph ph-caret-down"></i>
+            </button>
+        </td>
+        <td class="text-right">
+            <button
+                type="button"
+                class="btn-link btn-icon btn-small"
+                title="{{ 'remove'|trans }}"
+                {{ stimulus_action('forumify/forumify-milhq-plugin/course_class_report', 'removeStudent') }}
+            >
+                <i class="ph ph-x"></i>
+            </button>
+        </td>
+    </tr>
+    <tr class="milhq-report-detail d-none">
+        <td colspan="{{ colCount }}">
+            <div class="p-2">
+                {{ form_row(studentForm.serviceRecordTextOverride) }}
+                {{ form_row(studentForm.notes) }}
+            </div>
+        </td>
+    </tr>
+{% endmacro %}
+
+{% macro instructor_row(instructorForm, hasInstructorTypes) %}
+    {% set data = instructorForm.vars.data|default(null) %}
+    {% set soldier = data ? data.soldier : null %}
+    <tr class="milhq-report-row">
+        <td>
+            {% if soldier %}
+                <span class="flex items-center gap-1">
+                    {% if soldier.rank is not null and soldier.rank.image is not null %}
+                        <img width="24px" height="24px" src="{{ asset(soldier.rank.image, 'milhq.asset')|imagine_filter('avatar_xs') }}">
+                    {% endif %}
+                    {{ soldier.name }}
+                </span>
+                <div class="d-none">{{ form_widget(instructorForm.soldier) }}</div>
+            {% else %}
+                {{ form_widget(instructorForm.soldier) }}
+            {% endif %}
+        </td>
+        <td class="text-center">{{ form_widget(instructorForm.present) }}</td>
+        <td class="{{ hasInstructorTypes ? '' : 'd-none' }}">
+            <span data-role-cell>{{ form_widget(instructorForm.instructor) }}</span>
+        </td>
+        <td class="text-right">
+            <button
+                type="button"
+                class="btn-link btn-icon btn-small"
+                title="{{ 'remove'|trans }}"
+                {{ stimulus_action('forumify/forumify-milhq-plugin/course_class_report', 'removeInstructor') }}
+            >
+                <i class="ph ph-x"></i>
+            </button>
+        </td>
+    </tr>
+{% endmacro %}
+
+{% block body %}
+    {% set hasInstructorTypes = class.course.instructors is not empty %}
+    <div class="breadcrumbs text-small">
+        <a href="{{ path('milhq_operations_center') }}">{{ 'milhq.opcenter.operations_center'|trans }}</a> &gt;
+        <a href="{{ path('milhq_course_class_view', { id: class.id }) }}">{{ class.title }}</a> &gt;
+        {{ 'milhq.course.class.report'|trans({ class: class.title }) }}
+    </div>
+    <h1>{{ title }}</h1>
+
+    {% if class.result %}
+        <div class="alert-warning mb-4">
+            <p>{{ 'milhq.course.class.edit_report_warning'|trans }}</p>
+        </div>
+    {% endif %}
+
+    <div {{ stimulus_controller('forumify/forumify-milhq-plugin/course_class_report') }}>
+        {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+
+        <div class="box mb-4">
+            <h3>{{ 'milhq.course.class.instructors'|trans }}</h3>
+            <div class="table-wrapper">
+                <table style="table-layout: fixed">
+                    <colgroup>
+                        <col style="width: 260px">
+                        <col style="width: 90px">
+                        {% if hasInstructorTypes %}
+                            <col style="width: 200px">
+                        {% endif %}
+                        <col style="width: 44px">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="text-left">{{ 'milhq.course.class.soldier'|trans }}</th>
+                            <th class="text-center">{{ 'milhq.course.class.present'|trans }}</th>
+                            <th class="text-left {{ hasInstructorTypes ? '' : 'd-none' }}">{{ 'milhq.course.class.role'|trans }}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody
+                        {{ stimulus_target('forumify/forumify-milhq-plugin/course_class_report', 'instructors') }}
+                        data-index="{{ form.instructors|length }}"
+                        data-prototype="{{ _self.instructor_row(form.instructors.vars.prototype, hasInstructorTypes)|e('html_attr') }}"
+                    >
+                        {% for instructorForm in form.instructors %}
+                            {{ _self.instructor_row(instructorForm, hasInstructorTypes) }}
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
             <button
                 class="btn-link btn-small"
                 type="button"
                 {{ stimulus_action('forumify/forumify-milhq-plugin/course_class_report', 'addInstructor') }}
             >
-                <i class="ph ph-plus"></i>
-                Add Instructor
+                <i class="ph ph-plus"></i> {{ 'milhq.course.class.add_instructor'|trans }}
             </button>
         </div>
+
         <div class="box mb-4">
-            <h3>Students</h3>
-            <div
-                {{ stimulus_target('forumify/forumify-milhq-plugin/course_class_report', 'students') }}
-                data-prototype="{{ form_widget(form.students.vars.prototype)|e('html_attr') }}"
-                data-index="{{ form.students|length }}"
-            >
-                {{ form_widget(form.students) }}
+            <h3>{{ 'milhq.course.class.students'|trans }}</h3>
+            <div class="table-wrapper">
+                <table style="table-layout: fixed">
+                    <colgroup>
+                        <col style="width: 260px">
+                        <col style="width: 140px">
+                        {% for qualification in qualifications %}
+                            <col style="width: 110px">
+                        {% endfor %}
+                        {% for award in awards %}
+                            <col style="width: 110px">
+                        {% endfor %}
+                        <col style="width: 44px">
+                        <col style="width: 44px">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="text-left">{{ 'milhq.course.class.soldier'|trans }}</th>
+                            <th class="text-left">{{ 'milhq.course.class.result'|trans }}</th>
+                            {% for qualification in qualifications %}
+                                <th class="text-center">{{ qualification.name }}</th>
+                            {% endfor %}
+                            {% for award in awards %}
+                                <th class="text-center">{{ award.name }}</th>
+                            {% endfor %}
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody
+                        {{ stimulus_target('forumify/forumify-milhq-plugin/course_class_report', 'students') }}
+                        data-index="{{ form.students|length }}"
+                        data-prototype="{{ _self.student_row(form.students.vars.prototype, qualifications, awards)|e('html_attr') }}"
+                    >
+                        {% for studentForm in form.students %}
+                            {{ _self.student_row(studentForm, qualifications, awards) }}
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
             <button
                 class="btn-link btn-small"
                 type="button"
                 {{ stimulus_action('forumify/forumify-milhq-plugin/course_class_report', 'addStudent') }}
             >
-                <i class="ph ph-plus"></i>
-                Add Student
+                <i class="ph ph-plus"></i> {{ 'milhq.course.class.add_student'|trans }}
             </button>
         </div>
+
         <div class="flex justify-center items-center gap-2">
             <button type="submit" class="btn-primary">{{ 'save'|trans }}</button>
             <a href="{{ path('milhq_course_class_view', { id: class.id }) }}" class="btn-outlined">

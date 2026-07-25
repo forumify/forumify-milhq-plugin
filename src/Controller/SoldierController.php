@@ -40,10 +40,10 @@ class SoldierController extends AbstractController
 
     private function getAwardCounts(Soldier $soldier): array
     {
-        return $this->awardRecordRepository
+        $awards = $this->awardRecordRepository
             ->createQueryBuilder('ar')
             ->join('ar.award', 'a')
-            ->select('a.id, COUNT(a.id) AS count, a.name, a.image')
+            ->select('a.id, COUNT(a.id) AS count, a.name, a.image, a.autoAdvanceTiers')
             ->where('ar.soldier = :soldier')
             ->groupBy('a.id')
             ->orderBy('a.position', 'ASC')
@@ -51,6 +51,53 @@ class SoldierController extends AbstractController
             ->getQuery()
             ->getArrayResult()
         ;
+
+        $autoAdvanceAwardIds = array_column(
+            array_filter($awards, static fn (array $award) => $award['autoAdvanceTiers']),
+            'id',
+        );
+        $highestTiers = $this->getHighestTiers($soldier, $autoAdvanceAwardIds);
+
+        foreach ($awards as &$award) {
+            $tier = $highestTiers[$award['id']] ?? null;
+            $award['image'] = $tier['image'] ?? $award['image'];
+            $award['tierName'] = $tier['name'] ?? null;
+        }
+
+        return $awards;
+    }
+
+    /**
+     * @param array<int> $awardIds
+     * @return array<int, array{name: string, image: ?string}>
+     */
+    private function getHighestTiers(Soldier $soldier, array $awardIds): array
+    {
+        if (empty($awardIds)) {
+            return [];
+        }
+
+        $rows = $this->awardRecordRepository
+            ->createQueryBuilder('ar')
+            ->join('ar.tier', 't')
+            ->select('IDENTITY(ar.award) AS awardId, t.name, t.image, t.position')
+            ->where('ar.soldier = :soldier')
+            ->andWhere('ar.award IN (:awardIds)')
+            ->setParameter('soldier', $soldier)
+            ->setParameter('awardIds', $awardIds)
+            ->getQuery()
+            ->getArrayResult()
+        ;
+
+        $highest = [];
+        foreach ($rows as $row) {
+            $awardId = $row['awardId'];
+            if (!isset($highest[$awardId]) || $row['position'] < $highest[$awardId]['position']) {
+                $highest[$awardId] = $row;
+            }
+        }
+
+        return $highest;
     }
 
     private function getSecondaryUnits(Soldier $soldier): array
