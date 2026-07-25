@@ -91,7 +91,9 @@ class CourseClassService
         $qualifications = [];
         $tiers = [];
 
-        foreach ($class->getStudents() as $student) {
+        $students = $class->getStudents()->filter(fn (CourseClassStudent $s) => $s->getResult() === CourseResult::Passed);
+        /** @var CourseClassStudent $student */
+        foreach ($students as $student) {
             $recipient = $student->getSoldier();
             if ($recipient === null) {
                 continue;
@@ -131,7 +133,9 @@ class CourseClassService
         $awards = [];
         $tiers = [];
 
-        foreach ($class->getStudents() as $student) {
+        $students = $class->getStudents()->filter(fn (CourseClassStudent $s) => $s->getResult() === CourseResult::Passed);
+        /** @var CourseClassStudent $student */
+        foreach ($students as $student) {
             $recipient = $student->getSoldier();
             if ($recipient === null) {
                 continue;

@@ -11,7 +11,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * @extends AbstractType<array{ targetAward: Award, rename: string|null }>
+ * @extends AbstractType<array{
+ *     award: string,
+ *     tierName: string,
+ *     targetAward: Award,
+ *     targetAwardName: string|null,
+ *     targetTierName: string|null,
+ * }>
  */
 class AwardToTierType extends AbstractType
 {

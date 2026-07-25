@@ -49,8 +49,6 @@ class ClassStudentResultType extends AbstractType
         $class = $options['course_class'];
         $course = $class->getCourse();
 
-        $awards = $this->awardRepository->findBy(['id' => $course->getAwards()]);
-
         $builder
             ->add('soldier', EntityType::class, [
                 'autocomplete' => true,
