@@ -7,7 +7,9 @@ namespace Forumify\Milhq\Admin\Controller;
 use Forumify\Admin\Crud\AbstractCrudController;
 use Forumify\Core\Service\MediaService;
 use Forumify\Milhq\Admin\Form\QualificationTierType;
+use Forumify\Milhq\Admin\Form\QualificationToTierType;
 use Forumify\Milhq\Admin\Form\QualificationType;
+use Forumify\Milhq\Admin\Service\QualificationToTierService;
 use Forumify\Milhq\Entity\Qualification;
 use Forumify\Milhq\Entity\QualificationTier;
 use Forumify\Milhq\Repository\QualificationTierRepository;
@@ -37,6 +39,7 @@ class QualificationController extends AbstractCrudController
         private readonly QualificationTierRepository $qualificationTierRepository,
         private readonly MediaService $mediaService,
         private readonly FilesystemOperator $milhqAssetStorage,
+        private readonly QualificationToTierService $qualificationToTierService,
     ) {
     }
 
@@ -120,5 +123,33 @@ class QualificationController extends AbstractCrudController
 
         $this->addFlash('success', 'milhq.admin.qualification.tier.saved');
         return $this->redirectToRoute('milhq_admin_qualification_edit', ['identifier' => $tier->parent->getId()]);
+    }
+
+    #[Route('/{id}/make-tier', '_make_tier')]
+    public function makeTier(Request $request, Qualification $qualification): Response
+    {
+        $form = $this->createForm(QualificationToTierType::class, ['qualification' => $qualification->getName()]);
+        $form->handleRequest($request);
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return $this->render('@Forumify/form/simple_form_page.html.twig', [
+                'admin' => true,
+                'cancelPath' => $this->generateUrl('milhq_admin_qualification_list', [
+                    'identifier' => $qualification->getId(),
+                ]),
+                'form' => $form->createView(),
+                'title' => 'Migrate Qualification To Tier',
+            ]);
+        }
+
+        $data = $form->getData();
+        $this->qualificationToTierService->qualificationToTier(
+            $qualification,
+            $data['targetQualification'],
+            $data,
+        );
+
+        $this->addFlash('success', "{$qualification->getName()} was successfully turned into a tier.");
+        return $this->redirectToRoute('milhq_admin_qualification_list');
     }
 }

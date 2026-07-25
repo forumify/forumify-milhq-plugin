@@ -88,4 +88,15 @@ class Qualification implements SortableEntityInterface, AuditableEntityInterface
     {
         return $this->getName();
     }
+
+    public function addTier(QualificationTier $tier): void
+    {
+        $tier->parent = $this;
+        $this->tiers->add($tier);
+    }
+
+    public function removeTier(QualificationTier $tier): void
+    {
+        $this->tiers->removeElement($tier);
+    }
 }

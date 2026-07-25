@@ -7,7 +7,9 @@ namespace Forumify\Milhq\Admin\Controller;
 use Forumify\Admin\Crud\AbstractCrudController;
 use Forumify\Core\Service\MediaService;
 use Forumify\Milhq\Admin\Form\AwardTierType;
+use Forumify\Milhq\Admin\Form\AwardToTierType;
 use Forumify\Milhq\Admin\Form\AwardType;
+use Forumify\Milhq\Admin\Service\AwardToTierService;
 use Forumify\Milhq\Entity\Award;
 use Forumify\Milhq\Entity\AwardTier;
 use Forumify\Milhq\Repository\AwardTierRepository;
@@ -37,6 +39,7 @@ class AwardController extends AbstractCrudController
         private readonly AwardTierRepository $awardTierRepository,
         private readonly MediaService $mediaService,
         private readonly FilesystemOperator $milhqAssetStorage,
+        private readonly AwardToTierService $awardToTierService,
     ) {
     }
 
@@ -122,5 +125,33 @@ class AwardController extends AbstractCrudController
 
         $this->addFlash('success', 'milhq.admin.award.tier.saved');
         return $this->redirectToRoute('milhq_admin_award_edit', ['identifier' => $tier->parent->getId()]);
+    }
+
+    #[Route('/{id}/make-tier', '_make_tier')]
+    public function makeTier(Request $request, Award $award): Response
+    {
+        $form = $this->createForm(AwardToTierType::class, ['award' => $award->getName()]);
+        $form->handleRequest($request);
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return $this->render('@Forumify/form/simple_form_page.html.twig', [
+                'admin' => true,
+                'cancelPath' => $this->generateUrl('milhq_admin_award_list', [
+                    'identifier' => $award->getId(),
+                ]),
+                'form' => $form->createView(),
+                'title' => 'Migrate Award To Tier',
+            ]);
+        }
+
+        $data = $form->getData();
+        $this->awardToTierService->awardToTier(
+            $award,
+            $data['targetAward'],
+            $data,
+        );
+
+        $this->addFlash('success', "{$award->getName()} was successfully turned into a tier.");
+        return $this->redirectToRoute('milhq_admin_award_list');
     }
 }
