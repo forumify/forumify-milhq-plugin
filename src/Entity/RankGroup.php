@@ -15,6 +15,7 @@ class RankGroup implements GroupInterface
 {
     use GroupEntityTrait;
 
+    /** @var Collection<int, Rank> */
     #[ORM\OneToMany(targetEntity: Rank::class, mappedBy: 'group')]
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $ranks;
@@ -24,11 +25,17 @@ class RankGroup implements GroupInterface
         $this->ranks = new ArrayCollection();
     }
 
+    /**
+     * @return Collection<int, Rank>
+     */
     public function getRanks(): Collection
     {
         return $this->ranks;
     }
 
+    /**
+     * @param Collection<int, Rank> $ranks
+     */
     public function setRanks(Collection $ranks): void
     {
         $this->ranks = $ranks;

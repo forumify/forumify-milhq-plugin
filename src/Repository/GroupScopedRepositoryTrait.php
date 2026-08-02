@@ -9,16 +9,17 @@ use Forumify\Core\Repository\AbstractRepository;
 use Forumify\Milhq\Entity\GroupedEntityInterface;
 
 /**
+ * Only for repositories whose entity implements GroupedEntityInterface.
+ *
  * @phpstan-require-extends AbstractRepository
  */
 trait GroupScopedRepositoryTrait
 {
+    /**
+     * @param GroupedEntityInterface $entity
+     */
     public function getHighestPosition(object $entity): int
     {
-        if (!$entity instanceof GroupedEntityInterface) {
-            return parent::getHighestPosition($entity);
-        }
-
         $qb = $this
             ->createQueryBuilder('e')
             ->select('MAX(e.position)');

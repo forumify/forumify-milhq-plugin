@@ -7,12 +7,16 @@ namespace Forumify\Milhq\Admin\Component;
 use Doctrine\Common\Collections\Collection;
 use Forumify\Core\Repository\AbstractRepository;
 use Forumify\Milhq\Entity\GroupInterface;
+use Forumify\Milhq\Entity\Rank;
 use Forumify\Milhq\Entity\RankGroup;
 use Forumify\Milhq\Repository\RankGroupRepository;
 use Forumify\Milhq\Repository\RankRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
+/**
+ * @extends AbstractGroupEditor<RankGroup, Rank>
+ */
 #[AsLiveComponent('Milhq\\RankEditor', '@ForumifyMilhqPlugin/admin/components/group_editor/group_editor.html.twig')]
 #[IsGranted('milhq.admin.organization.ranks.view')]
 class RankEditor extends AbstractGroupEditor
@@ -35,7 +39,6 @@ class RankEditor extends AbstractGroupEditor
 
     public function getItems(GroupInterface $group): Collection
     {
-        \assert($group instanceof RankGroup);
         return $group->getRanks();
     }
 

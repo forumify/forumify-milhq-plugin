@@ -15,6 +15,10 @@ use Symfony\UX\LiveComponent\Attribute\LiveAction;
 use Symfony\UX\LiveComponent\Attribute\LiveArg;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
 
+/**
+ * @template TGroup of GroupInterface
+ * @template TItem of GroupedEntityInterface
+ */
 abstract class AbstractGroupEditor
 {
     use DefaultActionTrait;
@@ -28,17 +32,18 @@ abstract class AbstractGroupEditor
     }
 
     /**
-     * @return AbstractRepository<GroupInterface&object>
+     * @return AbstractRepository<TGroup>
      */
     abstract protected function getGroupRepository(): AbstractRepository;
 
     /**
-     * @return AbstractRepository<GroupedEntityInterface&object>
+     * @return AbstractRepository<TItem>
      */
     abstract protected function getItemRepository(): AbstractRepository;
 
     /**
-     * @return iterable<GroupedEntityInterface>
+     * @param TGroup $group
+     * @return iterable<TItem>
      */
     abstract public function getItems(GroupInterface $group): iterable;
 
@@ -53,7 +58,7 @@ abstract class AbstractGroupEditor
     abstract public function getManagePermission(): string;
 
     /**
-     * @return array<int, GroupInterface&object>
+     * @return array<int, TGroup>
      */
     public function getGroups(): array
     {
@@ -61,7 +66,7 @@ abstract class AbstractGroupEditor
     }
 
     /**
-     * @return array<int, GroupedEntityInterface&object>
+     * @return array<int, TItem>
      */
     public function getUngroupedItems(): array
     {
