@@ -31,13 +31,13 @@ class Rank implements SortableEntityInterface, AuditableEntityInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
-    #[ORM\Column(length: 8)]
+    #[ORM\Column(length: 8, nullable: true)]
     #[Assert\Length(max: 8)]
-    private string $abbreviation = '';
+    private ?string $abbreviation = null;
 
-    #[ORM\Column(length: 16)]
+    #[ORM\Column(length: 16, nullable: true)]
     #[Assert\Length(max: 16)]
-    private string $paygrade = '';
+    private ?string $paygrade = null;
 
     public function getName(): string
     {
@@ -59,22 +59,22 @@ class Rank implements SortableEntityInterface, AuditableEntityInterface
         $this->description = $description;
     }
 
-    public function getAbbreviation(): string
+    public function getAbbreviation(): ?string
     {
         return $this->abbreviation;
     }
 
-    public function setAbbreviation(string $abbreviation): void
+    public function setAbbreviation(?string $abbreviation): void
     {
         $this->abbreviation = $abbreviation;
     }
 
-    public function getPaygrade(): string
+    public function getPaygrade(): ?string
     {
         return $this->paygrade;
     }
 
-    public function setPaygrade(string $paygrade): void
+    public function setPaygrade(?string $paygrade): void
     {
         $this->paygrade = $paygrade;
     }
