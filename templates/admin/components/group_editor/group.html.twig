@@ -1,0 +1,108 @@
+{% set canManage = is_granted(this.managePermission) %}
+<div class="card">
+    <div class="card-title flex justify-between items-center">
+        <div class="flex items-center">
+            {% if group is not null and canManage and loop is defined %}
+                <div class="mr-2">
+                    <button
+                        class="btn-link btn-small btn-icon p-1"
+                        data-action="live#action"
+                        data-live-action-param="reorderGroup"
+                        data-live-group-id-param="{{ group.id }}"
+                        data-live-direction-param="down"
+                        {% if loop.last %}
+                            disabled
+                        {% endif %}
+                    >
+                        <i class="ph ph-arrow-down"></i>
+                    </button>
+                    <button
+                        class="btn-link btn-small btn-icon p-1"
+                        data-action="live#action"
+                        data-live-action-param="reorderGroup"
+                        data-live-group-id-param="{{ group.id }}"
+                        data-live-direction-param="up"
+                        {% if loop.first %}
+                            disabled
+                        {% endif %}
+                    >
+                        <i class="ph ph-arrow-up"></i>
+                    </button>
+                </div>
+            {% endif %}
+            <h4 class="mb-0">
+                {{ group is not null ? group.title : 'milhq.admin.group_editor.ungrouped'|trans({ plural: (this.itemTranslationPrefix ~ 'plural')|trans })|capitalize }}
+            </h4>
+        </div>
+        <div class="flex gap-2">
+            {% if group is not null and canManage %}
+                <a class="btn-link btn-small btn-icon" href="{{ path(this.groupRoutePrefix ~ '_edit', { identifier: group.id }) }}">
+                    <i class="ph ph-pencil-simple-line"></i>
+                </a>
+                <a class="btn-link btn-small btn-icon" href="{{ path(this.groupRoutePrefix ~ '_delete', { identifier: group.id }) }}">
+                    <i class="ph ph-x"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="flex flex-col gap-2">
+            {% for item in items %}
+                <div class="flex flex-row justify-between items-center">
+                    <div class="flex items-center">
+                        {% if canManage %}
+                            <div class="mr-2">
+                                <button
+                                    class="btn-link btn-small btn-icon p-1"
+                                    data-action="live#action"
+                                    data-live-action-param="reorderItem"
+                                    data-live-item-id-param="{{ item.id }}"
+                                    data-live-direction-param="down"
+                                    {% if loop.last %}
+                                        disabled
+                                    {% endif %}
+                                >
+                                    <i class="ph ph-arrow-down"></i>
+                                </button>
+                                <button
+                                    class="btn-link btn-small btn-icon p-1"
+                                    data-action="live#action"
+                                    data-live-action-param="reorderItem"
+                                    data-live-item-id-param="{{ item.id }}"
+                                    data-live-direction-param="up"
+                                    {% if loop.first %}
+                                        disabled
+                                    {% endif %}
+                                >
+                                    <i class="ph ph-arrow-up"></i>
+                                </button>
+                            </div>
+                        {% endif %}
+                        {% if canManage %}
+                            <a href="{{ path(this.itemRoutePrefix ~ '_edit', { identifier: item.id }) }}">
+                                {{ item.name }}
+                            </a>
+                        {% else %}
+                            {{ item.name }}
+                        {% endif %}
+                    </div>
+                    {% if canManage %}
+                        <div>
+                            <a class="btn-link btn-small btn-icon" href="{{ path(this.itemRoutePrefix ~ '_delete', { identifier: item.id }) }}">
+                                <i class="ph ph-x"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            {% if canManage %}
+                <a
+                    href="{{ path(this.itemRoutePrefix ~ '_create', { group: group is not null ? group.id : null }) }}"
+                    class="btn-link"
+                >
+                    <i class="ph ph-plus"></i>{{ 'milhq.admin.group_editor.create.item'|trans({ single: (this.itemTranslationPrefix ~ 'single')|trans }) }}
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

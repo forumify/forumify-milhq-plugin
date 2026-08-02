@@ -107,6 +107,11 @@ milhq:
             crud:
                 single: 'rank'
                 plural: 'ranks'
+            ungrouped: 'Ranks without groups'
+        rank_group:
+            crud:
+                single: 'rank group'
+                plural: 'rank groups'
         roster:
             crud:
                 single: 'roster'
@@ -170,6 +175,11 @@ milhq:
             crud:
                 plural: 'Equipment'
                 single: 'Equipment'
+        group_editor:
+            ungrouped: '{plural} without group'
+            create:
+                group: 'Create group'
+                item: 'Create {single}'
     roster:
         title: 'Roster'
         no_users: 'No users in unit.'
@@ -223,6 +233,7 @@ milhq:
         type:
             promotion: 'Promotion'
             demotion: 'Demotion'
+        ungrouped_tab: 'Ungrouped ranks'
     award:
         title: 'Awards'
         no_awards: 'No awards.'

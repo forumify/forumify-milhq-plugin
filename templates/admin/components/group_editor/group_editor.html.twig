@@ -1,0 +1,25 @@
+<div {{ attributes }}>
+    <div class="flex flex-col gap-4">
+        {% for group in this.groups %}
+            {% include '@ForumifyMilhqPlugin/admin/components/group_editor/group.html.twig' with {
+                group: group,
+                items: this.items(group),
+            } %}
+        {% endfor %}
+    </div>
+
+    <div class="mt-4">
+        {% include '@ForumifyMilhqPlugin/admin/components/group_editor/group.html.twig' with {
+            group: null,
+            items: this.ungroupedItems,
+        } %}
+    </div>
+
+    {% if is_granted(this.managePermission) %}
+        <div class="box mt-4">
+            <a href="{{ path(this.groupRoutePrefix ~ '_create') }}">
+                <i class="ph ph-plus"></i>{{ 'milhq.admin.group_editor.create.group'|trans }}
+            </a>
+        </div>
+    {% endif %}
+</div>

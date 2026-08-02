@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Admin\Form;
 
+use Forumify\Core\Form\EntityType;
 use Forumify\Core\Form\RichTextEditorType;
 use Forumify\Milhq\Entity\Rank;
+use Forumify\Milhq\Entity\RankGroup;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -25,7 +27,9 @@ class RankType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Rank::class,
             'image_required' => false,
+            'group' => null,
         ]);
+        $resolver->setAllowedTypes('group', ['null', RankGroup::class]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -34,6 +38,15 @@ class RankType extends AbstractType
 
         $builder
             ->add('name', TextType::class)
+            ->add('group', EntityType::class, [
+                'class' => RankGroup::class,
+                'choice_label' => 'title',
+                'help' => 'Optionally organize this rank into a group.',
+                'required' => false,
+                ...(empty($options['data']) && $options['group'] !== null
+                    ? ['data' => $options['group']]
+                    : []),
+            ])
             ->add('description', RichTextEditorType::class, [
                 'required' => false,
             ])
