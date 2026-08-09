@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq;
 
+use Forumify\Calendar\ForumifyCalendarPlugin;
+use Forumify\Discord\ForumifyDiscordPlugin;
 use Forumify\Plugin\AbstractForumifyPlugin;
 use Forumify\Plugin\PluginMetadata;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /** @codeCoverageIgnore */
 class ForumifyMilhqPlugin extends AbstractForumifyPlugin
@@ -160,5 +164,20 @@ class ForumifyMilhqPlugin extends AbstractForumifyPlugin
                 ],
             ],
         ];
+    }
+
+    public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
+    {
+        parent::loadExtension($config, $container, $builder);
+
+        $configDir = $this->getPath() . '/config';
+
+        if (class_exists(ForumifyCalendarPlugin::class)) {
+            $container->import($configDir . '/calendar.php');
+        }
+
+        if (class_exists(ForumifyDiscordPlugin::class)) {
+            $container->import($configDir . '/discord.php');
+        }
     }
 }

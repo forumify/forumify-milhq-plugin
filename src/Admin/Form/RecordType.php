@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Admin\Form;
 
 use Forumify\Milhq\Entity\Award;
+use Forumify\Milhq\Entity\AwardTier;
 use Forumify\Milhq\Entity\Document;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Position;
 use Forumify\Milhq\Entity\Qualification;
+use Forumify\Milhq\Entity\QualificationTier;
 use Forumify\Milhq\Entity\Rank;
 use Forumify\Milhq\Entity\Specialty;
 use Forumify\Milhq\Entity\Status;
 use Forumify\Milhq\Entity\Unit;
+use Forumify\Milhq\Repository\AwardTierRepository;
+use Forumify\Milhq\Repository\QualificationTierRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -20,6 +24,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RecordType extends AbstractType
@@ -81,18 +88,77 @@ class RecordType extends AbstractType
 
     private function addAwardFields(FormBuilderInterface $builder): void
     {
-        $builder->add('award', EntityType::class, [
-            'autocomplete' => true,
-            'choice_label' => 'name',
-            'class' => Award::class,
-        ]);
+        $builder
+            ->add('award', EntityType::class, [
+                'attr' => [
+                    'data-tier-parent-select' => '',
+                ],
+                'autocomplete' => true,
+                'choice_attr' => fn (Award $award) => [
+                    'data-auto-advance' => $award->autoAdvanceTiers ? '1' : '0',
+                ],
+                'choice_label' => 'name',
+                'class' => Award::class,
+                'placeholder' => 'Select Award',
+            ])
+            ->add('tier', EntityType::class, [
+                'attr' => [
+                    'data-tier-select' => '',
+                ],
+                'choice_attr' => fn (AwardTier $tier) => [
+                    'data-parent' => $tier->parent->getId(),
+                ],
+                'choice_label' => 'name',
+                'class' => AwardTier::class,
+                'placeholder' => 'Select Tier',
+                'query_builder' => fn (AwardTierRepository $repository) => $repository
+                    ->createQueryBuilder('tier')
+                    ->addSelect('parent')
+                    ->join('tier.parent', 'parent')
+                    ->addOrderBy('parent.name', 'ASC')
+                    ->addOrderBy('tier.position', 'ASC'),
+                'required' => false,
+                'row_attr' => [
+                    'data-tier-row' => '',
+                ],
+            ])
+        ;
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, $this->validateAwardTier(...));
+    }
+
+    private function validateAwardTier(FormEvent $event): void
+    {
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        $award = $data['award'] ?? null;
+        if (!$award instanceof Award || $award->autoAdvanceTiers) {
+            return;
+        }
+
+        $tier = $data['tier'] ?? null;
+        if ($tier === null) {
+            if (!$award->tiers->isEmpty()) {
+                $form->get('tier')->addError(new FormError('This award requires a tier to be selected.'));
+            }
+
+            return;
+        }
+
+        if (!$tier instanceof AwardTier) {
+            return;
+        }
+
+        if ($tier->parent->getId() !== $award->getId()) {
+            $form->get('tier')->addError(new FormError('This tier does not belong to the selected award.'));
+        }
     }
 
     private function addRankFields(FormBuilderInterface $builder): void
     {
         $builder
             ->add('type', ChoiceType::class, [
-                // phpcs:ignore
                 'choices' => [
                     'Promote' => 'promotion',
                     'Demote' => 'demotion',
@@ -147,10 +213,67 @@ class RecordType extends AbstractType
 
     private function addQualificationFields(FormBuilderInterface $builder): void
     {
-        $builder->add('qualification', EntityType::class, [
-            'autocomplete' => true,
-            'choice_label' => 'name',
-            'class' => Qualification::class,
-        ]);
+        $builder
+            ->add('qualification', EntityType::class, [
+                'attr' => [
+                    'data-tier-parent-select' => '',
+                ],
+                'autocomplete' => true,
+                'choice_label' => 'name',
+                'class' => Qualification::class,
+                'placeholder' => 'Select Qualification',
+            ])
+            ->add('tier', EntityType::class, [
+                'attr' => [
+                    'data-tier-select' => '',
+                ],
+                'choice_attr' => fn (QualificationTier $tier) => [
+                    'data-parent' => $tier->parent->getId(),
+                ],
+                'choice_label' => 'name',
+                'class' => QualificationTier::class,
+                'placeholder' => 'Select Tier',
+                'query_builder' => fn (QualificationTierRepository $repository) => $repository
+                    ->createQueryBuilder('tier')
+                    ->addSelect('parent')
+                    ->join('tier.parent', 'parent')
+                    ->addOrderBy('parent.name', 'ASC')
+                    ->addOrderBy('tier.position', 'ASC'),
+                'required' => false,
+                'row_attr' => [
+                    'data-tier-row' => '',
+                ],
+            ])
+        ;
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, $this->validateTier(...));
+    }
+
+    private function validateTier(FormEvent $event): void
+    {
+        $data = $event->getData();
+        $form = $event->getForm();
+
+        $qualification = $data['qualification'] ?? null;
+        if (!$qualification instanceof Qualification) {
+            return;
+        }
+
+        $tier = $data['tier'] ?? null;
+        if ($tier === null) {
+            if (!$qualification->tiers->isEmpty()) {
+                $form->get('tier')->addError(new FormError('This qualification requires a tier to be selected.'));
+            }
+
+            return;
+        }
+
+        if (!$tier instanceof QualificationTier) {
+            return;
+        }
+
+        if ($tier->parent->getId() !== $qualification->getId()) {
+            $form->get('tier')->addError(new FormError('This tier does not belong to the selected qualification.'));
+        }
     }
 }

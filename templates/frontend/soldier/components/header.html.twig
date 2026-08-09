@@ -1,9 +1,9 @@
 <div class="inline-flex">
     {% if soldier.rank is not null and soldier.rank.image %}
-        <img height="55px" src="{{ asset(soldier.rank.image, 'milhq.asset') }}">
+        <img height="55px" src="{{ asset(soldier.rank.image, 'milhq.asset')|imagine_filter('milhq_large') }}">
     {% endif %}
     <div>
-        <h1 class="mb-0 flex gap-2 items-center">
+        <h1 class="mb-0 flex gap-2 flex-wrap items-center">
             {{ soldier.name }}
             {% if soldier.status %}
                 {% include '@ForumifyMilhqPlugin/frontend/roster/components/status.html.twig' with {

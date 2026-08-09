@@ -2,79 +2,35 @@
 
 declare(strict_types=1);
 
-namespace Forumify\Milhq\Service;
+namespace Forumify\Milhq\EventSubscriber;
 
-use Forumify\Calendar\Entity\CalendarEvent;
-use Forumify\Calendar\Repository\CalendarEventRepository;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
+use Doctrine\ORM\Events;
+use Forumify\Milhq\Entity\Mission;
 use Forumify\Core\Entity\Notification;
 use Forumify\Core\Notification\NotificationService;
 use Forumify\Core\Repository\ACLRepository;
 use Forumify\Core\Repository\SettingRepository;
 use Forumify\Core\Repository\UserRepository;
-use Forumify\Milhq\Entity\Mission;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Notification\MissionCreatedNotificationType;
 use Forumify\Milhq\Repository\SoldierRepository;
 use Forumify\Milhq\Repository\StatusRepository;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class MissionService
+#[AsEntityListener(Events::postPersist, 'postPersist', entity: Mission::class)]
+class MissionNotificationListener
 {
     public function __construct(
         private readonly NotificationService $notificationService,
         private readonly ACLRepository $ACLRepository,
         private readonly SettingRepository $settingRepository,
         private readonly UserRepository $userRepository,
-        private readonly UrlGeneratorInterface $urlGenerator,
         private readonly SoldierRepository $soldierRepository,
         private readonly StatusRepository $statusRepository,
-        private readonly ?CalendarEventRepository $calendarEventRepository = null,
     ) {
     }
 
-    public function createOrUpdateCalendarEvent(Mission $mission): void
-    {
-        if ($this->calendarEventRepository === null) {
-            // Calendar plugin not installed
-            return;
-        }
-
-        $calendar = $mission->getCalendar();
-        if ($calendar === null) {
-            // No events should be created
-            return;
-        }
-
-        $event = $mission->getCalendarEvent() ?? new CalendarEvent();
-        $event->setCalendar($mission->getCalendar());
-        $event->setTitle($mission->getTitle());
-        $event->setStart($mission->getStart());
-        $event->setEnd($mission->getEnd());
-
-        $missionLink = $this->urlGenerator->generate('milhq_missions_view', ['id' => $mission->getId()]);
-        $content = "<p><a href='$missionLink' target='_blank'><i class='ph ph-arrow-square-out'></i> View mission</a></p>";
-        $event->setContent($content);
-
-        $mission->setCalendarEvent($event);
-        $this->calendarEventRepository->save($event);
-    }
-
-    public function removeCalendarEvent(Mission $mission): void
-    {
-        if ($this->calendarEventRepository === null) {
-            // Calendar plugin not installed
-            return;
-        }
-
-        $event = $mission->getCalendarEvent();
-        if ($event === null) {
-            return;
-        }
-
-        $this->calendarEventRepository->remove($event);
-    }
-
-    public function sendNotification(Mission $mission): void
+    public function postPersist(Mission $mission): void
     {
         if (!$mission->isSendNotification()) {
             return;

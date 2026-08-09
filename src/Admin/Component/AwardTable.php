@@ -46,6 +46,7 @@ class AwardTable extends AbstractDoctrineTable
         }
 
         if ($this->security->isGranted('milhq.admin.organization.awards.delete')) {
+            $actions .= $this->renderAction('milhq_admin_award_make_tier', ['id' => $id], 'caret-double-down');
             $actions .= $this->renderAction('milhq_admin_award_delete', ['identifier' => $id], 'x');
         }
 

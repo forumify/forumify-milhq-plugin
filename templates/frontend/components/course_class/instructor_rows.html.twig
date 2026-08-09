@@ -6,7 +6,7 @@
         <td>
             <span class="flex items-center gap-1 p-1">
                 {% if instructor.soldier.rank is not null and instructor.soldier.rank.image is not null %}
-                    <img width="24px" height="24px" src="{{ asset(instructor.soldier.rank.image, 'milhq.asset') }}">
+                    <img width="24px" height="24px" src="{{ asset(instructor.soldier.rank.image, 'milhq.asset')|imagine_filter('avatar_xs') }}">
                 {% endif %}
                 {{ instructor.soldier.name }}
                 {% set instructorAttended = instructor.courseUser.present %}

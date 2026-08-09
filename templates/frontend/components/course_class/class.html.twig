@@ -27,6 +27,15 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
+                {% set awards = course.awards|milhq_course_awards %}
+                {% if awards is not empty %}
+                    <p class="text-bold mt-2">{{ 'milhq.course.awards'|trans }}</p>
+                    <ul>
+                        {% for award in awards %}
+                            <li>{{ award }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
                 {% set prerequisites = course|milhq_course_prerequisites %}
                 {% if prerequisites is not empty %}
                     <p class="text-bold mt-2">{{ 'milhq.course.prerequisites'|trans }}</p>
@@ -76,7 +85,7 @@
                             <td>
                                 <span class="flex items-center gap-1 p-1">
                                     {% if student.soldier.rank is not null and student.soldier.rank.image is not null %}
-                                        <img width="24px" height="24px" src="{{ asset(student.soldier.rank.image, 'milhq.asset') }}">
+                                        <img width="24px" height="24px" src="{{ asset(student.soldier.rank.image, 'milhq.asset')|imagine_filter('avatar_xs') }}">
                                     {% endif %}
                                     {{ student.soldier.name }}
                                     {% set studentResult = student.courseUser.result %}
@@ -86,10 +95,28 @@
                                             failed: 'red',
                                             excused: 'gray',
                                             'no-show': 'gray',
-                                        }[studentResult] %}
-                                        | <span class="text-bold" style="color: {{ color }}">{{ studentResult|upper }}</span>
+                                        }[studentResult.value] %}
+                                        | <span class="text-bold" style="color: {{ color }}">{{ ('milhq.course.class.result_option.' ~ studentResult.value)|trans|upper }}</span>
                                     {% endif %}
                                 </span>
+                                {% if class.result %}
+                                    {% set results = this.studentResults[student.soldier.id]|default(null) %}
+                                    {% if results %}
+                                        {% if results.qualifications is not empty or results.awards is not empty %}
+                                            <ul class="text-small ml-4 my-1">
+                                                {% for qualification in results.qualifications %}
+                                                    <li><i class="ph ph-medal"></i> {{ qualification.name }}{% if qualification.tier %} <span class="text-light">({{ qualification.tier }})</span>{% endif %}</li>
+                                                {% endfor %}
+                                                {% for award in results.awards %}
+                                                    <li><i class="ph ph-trophy"></i> {{ award.name }}{% if award.tier %} <span class="text-light">({{ award.tier }})</span>{% endif %}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if canManage and results.student.notes %}
+                                            <div class="text-small text-light ml-4 my-1 rich-text">{{ results.student.notes|rich }}</div>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
                             </td>
                             <td class="text-right">
                                 {% if canManage %}

@@ -5,7 +5,7 @@
     "license": "OSL-3.0",
     "require": {
         "php": ">=8.4",
-        "forumify/forumify-platform": "^1.1",
+        "forumify/forumify-platform": "^1.2.2",
         "league/commonmark": "^2.5"
     },
     "require-dev": {
@@ -22,7 +22,10 @@
         "symfony/stopwatch": "7.4.*",
         "symfony/web-profiler-bundle": "7.4.*",
         "zenstruck/foundry": "2.8.7",
-        "symfony/lock": "^8.0"
+        "symfony/lock": "7.4.*"
+    },
+    "conflict": {
+        "forumify/forumify-discord-plugin": "<1.1"
     },
     "autoload": {
         "psr-4": {
@@ -31,7 +34,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "PluginTests\\": "tests/"
+            "PluginTests\\": "tests/",
+            "Tests\\Tests\\Factories\\": "vendor/forumify/forumify-platform/tests/Tests/Factories/"
         }
     },
     "config": {
@@ -45,7 +49,7 @@
     "extra": {
         "forumify-plugin-class": "Forumify\\Milhq\\ForumifyMilhqPlugin",
         "branch-alias": {
-            "dev-master": "1.1.x-dev"
+            "dev-master": "1.2.x-dev"
         }
     }
 }

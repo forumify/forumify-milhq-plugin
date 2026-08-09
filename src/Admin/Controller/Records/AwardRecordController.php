@@ -16,6 +16,8 @@ class AwardRecordController extends AbstractRecordCrudController
     protected ?string $permissionCreate = 'milhq.admin.records.award_records.create';
     protected ?string $permissionDelete = 'milhq.admin.records.award_records.delete';
 
+    protected string $formTemplate = '@ForumifyMilhqPlugin/admin/records/award_form.html.twig';
+
     protected function getRecordType(): string
     {
         return 'award';

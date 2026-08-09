@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Components;
 
 use Doctrine\ORM\QueryBuilder;
 use Forumify\Milhq\Entity\Record\RankRecord;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Symfony\Component\Asset\Packages;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
@@ -14,8 +15,10 @@ class RankRecordTable extends AbstractRecordTable
 {
     protected array $searchFields = ['rank.name', 'type'];
 
-    public function __construct(private readonly Packages $packages)
-    {
+    public function __construct(
+        private readonly Packages $packages,
+        private readonly CacheManager $liip,
+    ) {
     }
 
     protected function getEntityClass(): string
@@ -45,10 +48,10 @@ class RankRecordTable extends AbstractRecordTable
 
     private function renderRank(string $rankName, RankRecord $record): string
     {
-        $image = $record->getRank()->getImage() ?? null;
-        if ($image !== null) {
-            $image = $this->packages->getUrl($image, 'milhq.asset');
-        }
+        $image = $record->getRank()->getImage();
+        $image = $image
+            ? $this->liip->getBrowserPath($this->packages->getUrl($image, 'milhq.asset'), 'milhq_small')
+            : null;
         $image = $image ? "<img src='$image' width='100%' height='auto' style='max-width: 24px; max-height: 24px;'>" : '';
 
         return "<div class='mr-1 flex justify-center items-center' style='width: 24px; height: 24px'>$image</div>" . $rankName;

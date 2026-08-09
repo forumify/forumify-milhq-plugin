@@ -13,7 +13,7 @@
     </div>
     {% if soldier.uniform %}
         <div class="text-center mb-4">
-            <img style="max-height: 530px; max-width: 100%" src="{{ asset(soldier.uniform, 'milhq.asset') }}">
+            <img style="max-height: 530px; max-width: 100%" src="{{ asset(soldier.uniform, 'milhq.asset')|imagine_filter('milhq_uniform') }}">
         </div>
     {% endif %}
     <div class="grid gap-4">
@@ -23,7 +23,7 @@
                     <div class="card-title">{{ 'milhq.soldier.rank'|trans }}</div>
                     <div class="card-body flex flex-col items-center">
                         {% if soldier.rank.image %}
-                            <img width="125px" height="auto" src="{{ asset(soldier.rank.image, 'milhq.asset') }}" alt="">
+                            <img width="125px" height="auto" src="{{ asset(soldier.rank.image, 'milhq.asset')|imagine_filter('milhq_large') }}" alt="">
                         {% endif %}
                         <div class="text-small text-center">
                             <p>{{ soldier.rank.name }}</p>
@@ -77,21 +77,13 @@
                         {% if tis %}
                             <p class="text-bold">{{ 'milhq.soldier.time_in_service'|trans }}</p>
                             <p class="mb-2">
-                                {{ [
-                                    'date_relative.years'|trans({ count: tis.format('%y') }),
-                                    'date_relative.months'|trans({ count: tis.format('%m') }),
-                                    'date_relative.days'|trans({ count: tis.format('%d') })
-                                ]|filter(v => v is not empty)|join(', ') }}
+                                {{ tis }}
                             </p>
                         {% endif %}
                         {% if tig %}
                             <p class="text-bold">{{ 'milhq.soldier.time_in_grade'|trans }}</p>
                             <p class="mb-2">
-                                {{ [
-                                    'date_relative.years'|trans({ count: tig.format('%y') }),
-                                    'date_relative.months'|trans({ count: tig.format('%m') }),
-                                    'date_relative.days'|trans({ count: tig.format('%d') })
-                                ]|filter(v => v is not empty)|join(', ') }}
+                                {{ tig }}
                             </p>
                         {% endif %}
                     </div>

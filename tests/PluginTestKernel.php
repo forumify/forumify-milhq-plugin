@@ -38,10 +38,15 @@ class PluginTestKernel extends ForumifyKernel
             new \Zenstruck\Foundry\ZenstruckFoundryBundle(),
             new \Forumify\Milhq\ForumifyMilhqPlugin(),
             new \ApiPlatform\Symfony\Bundle\ApiPlatformBundle(),
+            new \Liip\ImagineBundle\LiipImagineBundle(),
         ];
 
         if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
             yield new \Forumify\Calendar\ForumifyCalendarPlugin();
+        }
+
+        if (class_exists(\Forumify\Discord\ForumifyDiscordPlugin::class)) {
+            yield new \Forumify\Discord\ForumifyDiscordPlugin();
         }
     }
 }

@@ -21,13 +21,22 @@ jobs:
       - name: Setup JS
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Install dependencies
-        run: composer install
+      - parallel:
+        - name: Install PHP Dependencies
+          run: |
+            composer require --no-update \
+              "forumify/forumify-calendar-plugin:^1.1" \
+              "forumify/forumify-discord-plugin:^1.1"
+            composer install --no-progress
+
+        - name: Install JS Dependencies
+          working-directory: assets
+          run: npm install --force
 
       - name: Run PHP checks
         run: |
@@ -35,7 +44,5 @@ jobs:
           ./vendor/bin/phpstan analyze -v
 
       - name: Run JS checks
-        run: |
-          cd assets
-          npm install --force
-          npm run lint
+        working-directory: assets
+        run: npm run lint

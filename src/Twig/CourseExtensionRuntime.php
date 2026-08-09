@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Twig;
 
 use Doctrine\Common\Collections\Collection;
+use Forumify\Milhq\Entity\Award;
 use Forumify\Milhq\Entity\Course;
 use Forumify\Milhq\Entity\CourseClassInstructor;
 use Forumify\Milhq\Entity\CourseClassStudent;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Qualification;
+use Forumify\Milhq\Repository\AwardRepository;
 use Forumify\Milhq\Repository\QualificationRepository;
 use Forumify\Milhq\Service\SoldierService;
 use Twig\Extension\RuntimeExtensionInterface;
@@ -19,6 +21,7 @@ class CourseExtensionRuntime implements RuntimeExtensionInterface
     public function __construct(
         private readonly SoldierService $soldierService,
         private readonly QualificationRepository $qualificationRepository,
+        private readonly AwardRepository $awardRepository,
     ) {
     }
 
@@ -30,6 +33,16 @@ class CourseExtensionRuntime implements RuntimeExtensionInterface
     {
         $qualifications = $this->qualificationRepository->findBy(['id' => $ids]);
         return array_map((fn (Qualification $qual) => $qual->getName()), $qualifications);
+    }
+
+    /**
+     * @param array<int> $ids
+     * @return array<string>
+     */
+    public function getAwards(array $ids): array
+    {
+        $awards = $this->awardRepository->findBy(['id' => $ids]);
+        return array_map((fn (Award $award) => $award->getName()), $awards);
     }
 
     public function getPrerequisites(Course $course): array

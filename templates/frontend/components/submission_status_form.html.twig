@@ -1,0 +1,16 @@
+<div {{ attributes }}>
+    {{ form_start(form, {
+        attr: {
+            'data-action': 'live#action:prevent',
+            'data-live-action-param': 'save',
+        }
+    }) }}
+    {{ form_row(form.status) }}
+    {{ form_row(form.reason) }}
+    <div class="flex justify-center">
+        <button class="btn-primary">
+            {{ 'save'|trans }}
+        </button>
+    </div>
+    {{ form_end(form) }}
+</div>

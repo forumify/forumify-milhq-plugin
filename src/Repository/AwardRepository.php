@@ -16,4 +16,18 @@ class AwardRepository extends AbstractRepository
     {
         return Award::class;
     }
+
+    /**
+     * @return array<Award>
+     */
+    public function findByNameLike(string $name): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.name LIKE :name')
+            ->setParameter('name', '%' . $name . '%')
+            ->orderBy('e.position', 'ASC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -33,7 +33,7 @@ class CourseClassInstructor
         return $this->soldier;
     }
 
-    public function setSoldier(Soldier $soldier): void
+    public function setSoldier(?Soldier $soldier): void
     {
         $this->soldier = $soldier;
     }
