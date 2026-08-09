@@ -23,7 +23,7 @@
                     <div class="card-title">{{ 'milhq.soldier.rank'|trans }}</div>
                     <div class="card-body flex flex-col items-center">
                         {% if soldier.rank.image %}
-                            <img width="125px" height="auto" src="{{ asset(soldier.rank.image, 'milhq.asset')|imagine_filter('milhq_large') }}" alt="">
+                            <img width="128px" height="auto" src="{{ asset(soldier.rank.image, 'milhq.asset')|imagine_filter('milhq_small') }}" alt="">
                         {% endif %}
                         <div class="text-small text-center">
                             <p>{{ soldier.rank.name }}</p>
