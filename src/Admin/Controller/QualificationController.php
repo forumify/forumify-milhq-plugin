@@ -128,7 +128,7 @@ class QualificationController extends AbstractCrudController
     #[Route('/{id}/make-tier', '_make_tier')]
     public function makeTier(Request $request, Qualification $qualification): Response
     {
-        $form = $this->createForm(QualificationToTierType::class, ['qualification' => $qualification->getName()]);
+        $form = $this->createForm(QualificationToTierType::class, null, ['qualification' => $qualification]);
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {

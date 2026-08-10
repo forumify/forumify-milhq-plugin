@@ -6,9 +6,11 @@ namespace Forumify\Milhq\Admin\Form;
 
 use Forumify\Core\Form\EntityType;
 use Forumify\Milhq\Entity\Award;
+use Forumify\Milhq\Repository\AwardRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @extends AbstractType<array{
@@ -21,11 +23,20 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class AwardToTierType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefined('award')->setAllowedTypes('award', Award::class);
+    }
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        /** @var Award $award */
+        $award = $options['award'];
+
         $builder
             ->add('award', TextType::class, [
                 'disabled' => true,
+                'data' => $award->getName(),
             ])
             ->add('tierName', TextType::class, [
                 'help' => 'The name of the tier to be created, e.g.: if the award above is named "Combat Infantry Badge - Stage 1", you would fill in "Stage 1" here.',
@@ -35,6 +46,10 @@ class AwardToTierType extends AbstractType
                 'autocomplete' => true,
                 'choice_label' => 'name',
                 'help' => 'The award that will receive the new tier.',
+                'query_builder' => fn (AwardRepository $repository) => $repository
+                    ->createQueryBuilder('a')
+                    ->where('a != :award')
+                    ->setParameter('award', $award),
             ])
             ->add('targetAwardName', TextType::class, [
                 'required' => false,

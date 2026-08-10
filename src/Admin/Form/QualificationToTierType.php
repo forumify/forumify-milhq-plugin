@@ -6,9 +6,11 @@ namespace Forumify\Milhq\Admin\Form;
 
 use Forumify\Core\Form\EntityType;
 use Forumify\Milhq\Entity\Qualification;
+use Forumify\Milhq\Repository\QualificationRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @extends AbstractType<array{
@@ -21,11 +23,20 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class QualificationToTierType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $resolver->setDefined('qualification')->setAllowedTypes('qualification', Qualification::class);
+    }
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        /** @var Qualification $qualification */
+        $qualification = $options['qualification'];
+
         $builder
             ->add('qualification', TextType::class, [
                 'disabled' => true,
+                'data' => $qualification->getName(),
             ])
             ->add('tierName', TextType::class, [
                 'help' => 'The name of the tier to be created, e.g.: if the qualification above is named "Qualified with M4A1 (Expert)", you would fill in "Expert" here.',
@@ -35,6 +46,10 @@ class QualificationToTierType extends AbstractType
                 'autocomplete' => true,
                 'choice_label' => 'name',
                 'help' => 'The qualification that will receive the new tier.',
+                'query_builder' => fn (QualificationRepository $repository) => $repository
+                    ->createQueryBuilder('q')
+                    ->where('q != :qual')
+                    ->setParameter('qual', $qualification->getId()),
             ])
             ->add('targetQualificationName', TextType::class, [
                 'required' => false,
