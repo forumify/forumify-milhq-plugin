@@ -130,7 +130,7 @@ class AwardController extends AbstractCrudController
     #[Route('/{id}/make-tier', '_make_tier')]
     public function makeTier(Request $request, Award $award): Response
     {
-        $form = $this->createForm(AwardToTierType::class, ['award' => $award->getName()]);
+        $form = $this->createForm(AwardToTierType::class, null, ['award' => $award]);
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
