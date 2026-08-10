@@ -39,17 +39,26 @@ class SupervisorSubmissionList extends AbstractDoctrineList
             return $qb->andWhere('1 = 0');
         }
 
+        $forms = $this->formRepository
+            ->addACLToQuery($this->formRepository->createQueryBuilder('e'), 'supervisor_manage_submissions')
+            ->select('e.id')
+            ->getQuery()
+            ->getSingleColumnResult()
+        ;
+
         $qb
             ->join('e.soldier', 's')
             ->join('s.unit', 'u')
             ->join('e.form', 'f')
             ->andWhere('s.id != :self')
             ->andWhere('u.id IN (:units)')
+            ->andWhere('f.id IN (:forms)')
             ->orderBy('e.createdAt', 'DESC')
-            ->setParameter('units', $this->supervisedUnits)
             ->setParameter('self', $this->soldierId)
+            ->setParameter('units', $this->supervisedUnits)
+            ->setParameter('forms', $forms)
         ;
-        $this->formRepository->addACLToQuery($qb, 'supervisor_manage_submissions', FormSubmission::class, 'f');
+
         return $qb;
     }
 
