@@ -56,7 +56,7 @@ abstract class AbstractRecordTable extends AbstractDoctrineTable
         return $this;
     }
 
-    protected function addDocumentColumn(bool $recordTextModal = false, ?string $itemKey = null): static
+    protected function addDocumentColumn(bool $recordTextModal = false, ?string $itemKey = null, ?string $tierKey = null): static
     {
         $propAccess = PropertyAccess::createPropertyAccessor();
 
@@ -67,6 +67,9 @@ abstract class AbstractRecordTable extends AbstractDoctrineTable
                 'document' => $document,
                 'item' => $itemKey !== null
                     ? $propAccess->getValue($record, $itemKey)
+                    : null,
+                'tier' => $tierKey !== null
+                    ? $propAccess->getValue($record, $tierKey)
                     : null,
                 'record' => $record,
                 'showRecordText' => $recordTextModal,

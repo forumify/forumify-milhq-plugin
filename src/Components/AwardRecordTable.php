@@ -37,7 +37,7 @@ class AwardRecordTable extends AbstractRecordTable
                 'searchable' => false,
                 'sortable' => false,
             ])
-            ->addDocumentColumn(true, 'award');
+            ->addDocumentColumn(true, 'award', 'tier');
     }
 
     private function renderAward(?string $awardName, AwardRecord $record): string

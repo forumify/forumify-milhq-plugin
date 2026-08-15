@@ -28,19 +28,19 @@ class AssignmentRecord implements RecordInterface, AuditableEntityInterface
     #[Column(length: 16)]
     private string $type = self::TYPE_PRIMARY;
 
-    #[ORM\ManyToOne(targetEntity: Status::class)]
+    #[ORM\ManyToOne(targetEntity: Status::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Status $status = null;
 
-    #[ORM\ManyToOne(targetEntity: Unit::class)]
+    #[ORM\ManyToOne(targetEntity: Unit::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Unit $unit = null;
 
-    #[ORM\ManyToOne(targetEntity: Position::class)]
+    #[ORM\ManyToOne(targetEntity: Position::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Position $position = null;
 
-    #[ORM\ManyToOne(targetEntity: Specialty::class)]
+    #[ORM\ManyToOne(targetEntity: Specialty::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Specialty $specialty = null;
 
