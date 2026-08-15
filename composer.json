@@ -1,11 +1,13 @@
 {
     "name": "forumify/forumify-milhq-plugin",
     "type": "forumify-plugin",
-    "keywords": ["symfony-ux"],
+    "keywords": [
+        "symfony-ux"
+    ],
     "license": "OSL-3.0",
     "require": {
         "php": ">=8.4",
-        "forumify/forumify-platform": "^1.2.2",
+        "forumify/forumify-platform": "^1.3",
         "league/commonmark": "^2.5"
     },
     "require-dev": {
@@ -34,8 +36,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "PluginTests\\": "tests/",
-            "Tests\\Tests\\Factories\\": "vendor/forumify/forumify-platform/tests/Tests/Factories/"
+            "PluginTests\\": "tests/"
         }
     },
     "config": {

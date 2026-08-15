@@ -37,7 +37,7 @@ class QualificationRecordTable extends AbstractRecordTable
                 'searchable' => false,
                 'sortable' => false,
             ])
-            ->addDocumentColumn(true, 'qualification');
+            ->addDocumentColumn(true, 'qualification', 'tier');
     }
 
     private function renderQualification(string $qualificationName, QualificationRecord $record): string
