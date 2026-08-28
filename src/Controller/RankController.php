@@ -19,7 +19,7 @@ class RankController extends AbstractController
     ): Response {
         return $this->render('@ForumifyMilhqPlugin/frontend/rank/rank.html.twig', [
             'groups' => $rankGroupRepository->findBy([], ['position' => 'ASC']),
-            'ungroupedRanks' => $rankRepository->findBy(['group' => null], ['position' => 'ASC']),
+            'hasUngroupedRanks' => $rankRepository->count(['group' => null]) > 0,
         ]);
     }
 }

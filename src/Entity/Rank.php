@@ -30,13 +30,13 @@ class Rank implements GroupedEntityInterface, AuditableEntityInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
-    #[ORM\Column(length: 8, nullable: true)]
+    #[ORM\Column(length: 8)]
     #[Assert\Length(max: 8)]
-    private ?string $abbreviation = null;
+    private string $abbreviation = '';
 
-    #[ORM\Column(length: 16, nullable: true)]
+    #[ORM\Column(length: 16)]
     #[Assert\Length(max: 16)]
-    private ?string $paygrade = null;
+    private string $paygrade = '';
 
     #[ORM\ManyToOne(targetEntity: RankGroup::class, inversedBy: 'ranks')]
     #[ORM\JoinColumn(name: 'group_id', onDelete: 'SET NULL')]
@@ -62,22 +62,22 @@ class Rank implements GroupedEntityInterface, AuditableEntityInterface
         $this->description = $description;
     }
 
-    public function getAbbreviation(): ?string
+    public function getAbbreviation(): string
     {
         return $this->abbreviation;
     }
 
-    public function setAbbreviation(?string $abbreviation): void
+    public function setAbbreviation(string $abbreviation): void
     {
         $this->abbreviation = $abbreviation;
     }
 
-    public function getPaygrade(): ?string
+    public function getPaygrade(): string
     {
         return $this->paygrade;
     }
 
-    public function setPaygrade(?string $paygrade): void
+    public function setPaygrade(string $paygrade): void
     {
         $this->paygrade = $paygrade;
     }

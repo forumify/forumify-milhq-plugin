@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\EventSubscriber;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Forumify\Admin\Crud\Event\PreSaveCrudEvent;
 use Forumify\Milhq\Entity\Rank;
-use Forumify\Milhq\Entity\RankGroup;
 use Forumify\Milhq\Repository\RankRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -15,7 +13,6 @@ class RankGroupSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly RankRepository $rankRepository,
-        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -33,11 +30,9 @@ class RankGroupSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $originalData = $this->entityManager->getUnitOfWork()->getOriginalEntityData($rank);
-        $originalGroup = $originalData['group'] ?? null;
-        $originalGroupId = $originalGroup instanceof RankGroup ? $originalGroup->getId() : null;
-
-        if ($originalGroupId === $rank->getGroup()?->getId()) {
+        $submitted = $event->getForm()->get('oldGroupId')->getData();
+        $oldGroupId = is_numeric($submitted) ? (int)$submitted : null;
+        if ($oldGroupId === $rank->getGroup()?->getId()) {
             return;
         }
 

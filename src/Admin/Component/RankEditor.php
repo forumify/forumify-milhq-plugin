@@ -4,13 +4,8 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Admin\Component;
 
-use Doctrine\Common\Collections\Collection;
-use Forumify\Core\Repository\AbstractRepository;
-use Forumify\Milhq\Entity\GroupInterface;
 use Forumify\Milhq\Entity\Rank;
 use Forumify\Milhq\Entity\RankGroup;
-use Forumify\Milhq\Repository\RankGroupRepository;
-use Forumify\Milhq\Repository\RankRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 
@@ -21,25 +16,14 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 #[IsGranted('milhq.admin.organization.ranks.view')]
 class RankEditor extends AbstractGroupEditor
 {
-    public function __construct(
-        private readonly RankRepository $rankRepository,
-        private readonly RankGroupRepository $rankGroupRepository,
-    ) {
+    protected function getGroupEntityClass(): string
+    {
+        return RankGroup::class;
     }
 
-    protected function getGroupRepository(): AbstractRepository
+    protected function getItemEntityClass(): string
     {
-        return $this->rankGroupRepository;
-    }
-
-    protected function getItemRepository(): AbstractRepository
-    {
-        return $this->rankRepository;
-    }
-
-    public function getItems(GroupInterface $group): Collection
-    {
-        return $group->getRanks();
+        return Rank::class;
     }
 
     public function getGroupRoutePrefix(): string

@@ -11,6 +11,7 @@ use Forumify\Milhq\Entity\RankGroup;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -34,18 +35,25 @@ class RankType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $imagePreview = empty($options['data']) ? null : $options['data']->getImage();
+        $rank = $options['data'] ?? null;
+        $imagePreview = $rank?->getImage();
 
         $builder
             ->add('name', TextType::class)
             ->add('group', EntityType::class, [
+                'autocomplete' => true,
                 'class' => RankGroup::class,
                 'choice_label' => 'title',
+                'placeholder' => 'Ungrouped',
                 'help' => 'Optionally organize this rank into a group.',
                 'required' => false,
-                ...(empty($options['data']) && $options['group'] !== null
+                ...($rank === null && $options['group'] !== null
                     ? ['data' => $options['group']]
                     : []),
+            ])
+            ->add('oldGroupId', HiddenType::class, [
+                'data' => (string)$rank?->getGroup()?->getId(),
+                'mapped' => false,
             ])
             ->add('description', RichTextEditorType::class, [
                 'required' => false,

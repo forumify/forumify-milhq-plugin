@@ -177,6 +177,7 @@ milhq:
                 single: 'Equipment'
         group_editor:
             ungrouped: '{plural} without group'
+            search: 'Search {plural}...'
             create:
                 group: 'Create group'
                 item: 'Create {single}'
