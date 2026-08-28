@@ -46,7 +46,7 @@ jobs:
         uses: ./.github/workflows/setup-env
         with:
           plugin: forumify/forumify-calendar-plugin
-          plugin-version: 1.0.x-dev
+          plugin-version: ^1.1
 
       - name: Run tests
         run: vendor/bin/phpunit
@@ -70,7 +70,7 @@ jobs:
         uses: ./.github/workflows/setup-env
         with:
           plugin: forumify/forumify-discord-plugin
-          plugin-version: 1.1.x-dev
+          plugin-version: ^1.1
 
       - name: Run tests
         run: vendor/bin/phpunit

@@ -50,7 +50,7 @@ class RankRecordTable extends AbstractRecordTable
     {
         $image = $record->getRank()->getImage();
         $image = $image
-            ? $this->liip->getBrowserPath($this->packages->getUrl($image, 'milhq.asset'), 'milhq_small')
+            ? $this->liip->getBrowserPath($this->packages->getUrl($image, 'milhq.asset'), 'avatar_xs')
             : null;
         $image = $image ? "<img src='$image' width='100%' height='auto' style='max-width: 24px; max-height: 24px;'>" : '';
 

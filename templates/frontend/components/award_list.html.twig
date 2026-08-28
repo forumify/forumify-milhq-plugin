@@ -14,18 +14,18 @@
                     <div class="card-body grid gap-4">
                         <div class="col-xs-12 col-sm-3 col-lg-2 flex items-center justify-center">
                             {% if item.image %}
-                                <img src="{{ asset(item.image, 'milhq.asset')|imagine_filter('milhq_large') }}" width="100%" height="auto">
+                                <img src="{{ asset(item.image, 'milhq.asset')|imagine_filter('milhq_large') }}" style="width: 100%; max-width: 300px; height: auto;">
                             {% endif %}
                         </div>
                         <div class="col-xs-12 col-sm-9 col-lg-10">
                             {{ item.description|milhq_text }}
                             {% if item.tiers|length %}
                                 <h3>{{ 'milhq.award.tiers'|trans }}</h3>
-                                <div class="grid-xs-4 grid-sm-6 grid-md-12 gap-2">
+                                <div class="flex flex-wrap gap-2">
                                     {% for tier in item.tiers %}
-                                        <div class="flex flex-col justify-center items-center gap-2">
+                                        <div class="flex flex-col justify-center items-center gap-2" style="width: 80px;">
                                             {% if tier.image %}
-                                                <img src="{{ asset(tier.image, 'milhq.asset')|imagine_filter('milhq_small') }}">
+                                                <img src="{{ asset(tier.image, 'milhq.asset')|imagine_filter('milhq_small') }}" style="width: 100%; max-width: 64px; height: auto;">
                                             {% endif %}
                                             <span class="text-small text-center">{{ tier.name }}</span>
                                         </div>

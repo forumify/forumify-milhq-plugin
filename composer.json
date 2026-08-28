@@ -5,7 +5,7 @@
     "license": "OSL-3.0",
     "require": {
         "php": ">=8.4",
-        "forumify/forumify-platform": "^1.2",
+        "forumify/forumify-platform": "^1.2.2",
         "league/commonmark": "^2.5"
     },
     "require-dev": {
@@ -22,7 +22,10 @@
         "symfony/stopwatch": "7.4.*",
         "symfony/web-profiler-bundle": "7.4.*",
         "zenstruck/foundry": "2.8.7",
-        "symfony/lock": "^8.0"
+        "symfony/lock": "7.4.*"
+    },
+    "conflict": {
+        "forumify/forumify-discord-plugin": "<1.1"
     },
     "autoload": {
         "psr-4": {

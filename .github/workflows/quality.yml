@@ -30,8 +30,8 @@ jobs:
         - name: Install PHP Dependencies
           run: |
             composer require --no-update \
-              "forumify/forumify-calendar-plugin:1.0.x-dev" \
-              "forumify/forumify-discord-plugin:1.1.x-dev"
+              "forumify/forumify-calendar-plugin:^1.1" \
+              "forumify/forumify-discord-plugin:^1.1"
             composer install --no-progress
 
         - name: Install JS Dependencies

@@ -37,7 +37,7 @@ class AwardRecordTable extends AbstractRecordTable
                 'searchable' => false,
                 'sortable' => false,
             ])
-            ->addDocumentColumn(true, 'award');
+            ->addDocumentColumn(true, 'award', 'tier');
     }
 
     private function renderAward(?string $awardName, AwardRecord $record): string
@@ -47,7 +47,7 @@ class AwardRecordTable extends AbstractRecordTable
         $image = $tier !== null ? $tier->image : null;
         $image ??= $record->getAward()->getImage();
         $image = $image
-            ? $this->liip->getBrowserPath($this->packages->getUrl($image, 'milhq.asset'), 'milhq_small')
+            ? $this->liip->getBrowserPath($this->packages->getUrl($image, 'milhq.asset'), 'avatar_xs')
             : null;
         $image = $image ? "<img src='$image' width='100%' height='auto' style='max-width: 24px; max-height: 24px;'>" : '';
 
