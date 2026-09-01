@@ -61,7 +61,7 @@ class AdminMenuBuilder implements AdminMenuBuilderInterface
         $milhq->addItem(new Menu('Organization', ['icon' => 'ph ph-buildings', 'permission' => 'milhq.admin.organization.view'], [
             new MenuItem('Awards', $u('milhq_admin_award_list'), ['permission' => 'milhq.admin.organization.awards.view']),
             new MenuItem('Documents', $u('milhq_admin_document_list'), ['permission' => 'milhq.admin.organization.documents.view']),
-            new MenuItem('Equipment', $u('milhq_admin_equipment_list'), ['permission' => 'milhq.admin.equipment.view']),
+            new MenuItem('Equipment', $u('milhq_admin_equipment_list'), ['permission' => 'milhq.admin.organization.equipment.view']),
             new MenuItem('Forms', $u('milhq_admin_form_list'), ['permission' => 'milhq.admin.organization.forms.view']),
             new MenuItem('Positions', $u('milhq_admin_position_list'), ['permission' => 'milhq.admin.organization.positions.view']),
             new MenuItem('Qualifications', $u('milhq_admin_qualification_list'), ['permission' => 'milhq.admin.organization.qualifications.view']),
