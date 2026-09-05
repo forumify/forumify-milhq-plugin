@@ -94,10 +94,10 @@ class SoldierService
                 $valB = $propertyAccessor->getValue($b, $sortField);
 
                 if ($valA instanceof GroupedEntityInterface && $valB instanceof GroupedEntityInterface) {
-                    $groupPosA = $valA->getGroup()?->getPosition() ?? -1;
-                    $gorupPosB = $valB->getGroup()?->getPosition() ?? -1;
-                    if ($groupPosA !== $gorupPosB) {
-                        return $groupPosA - $gorupPosB;
+                    $groupPosA = $valA->getGroup()?->getPosition() ?? PHP_INT_MAX;
+                    $groupPosB = $valB->getGroup()?->getPosition() ?? PHP_INT_MAX;
+                    if ($groupPosA !== $groupPosB) {
+                        return $groupPosA - $groupPosB;
                     }
                 }
 
