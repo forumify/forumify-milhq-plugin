@@ -1,0 +1,9 @@
+{% extends '@Forumify/admin/base.html.twig' %}
+{% set title = (translationPrefix ~ 'plural')|trans|title %}
+{% block title_page %}
+    {{ title }}
+{% endblock %}
+{% block body %}
+    <h2>{{ title }}</h2>
+    {{ component(table) }}
+{% endblock %}

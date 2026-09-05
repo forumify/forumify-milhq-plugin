@@ -1,0 +1,126 @@
+{% set canManage = is_granted(this.managePermission) %}
+{% set reorderTemplate = '@ForumifyMilhqPlugin/admin/components/group_editor/reorder.html.twig' %}
+<div {{ attributes }}>
+    {% block editor_search %}
+        <div class="flex justify-end mb-4">
+            <input
+                type="search"
+                data-model="debounce(300)|search"
+                placeholder="{{ 'milhq.admin.group_editor.search'|trans({ plural: (this.itemTranslationPrefix ~ 'plural')|trans }) }}"
+            >
+        </div>
+    {% endblock %}
+
+    <div class="flex flex-col gap-4">
+        {% for section in this.sections %}
+            {% set group = section.group %}
+            {% set open = this.isOpen(group) %}
+            <div class="card">
+                <div class="card-title flex justify-between items-center">
+                    <div class="flex items-center">
+                        {% block group_toggle %}
+                            <button
+                                type="button"
+                                class="btn-link btn-small btn-icon p-1 mr-2"
+                                data-action="live#action"
+                                data-live-action-param="toggleGroup"
+                                data-live-group-id-param="{{ section.key }}"
+                            >
+                                <i class="ph ph-caret-{{ open ? 'down' : 'right' }}"></i>
+                            </button>
+                        {% endblock %}
+                        {% block group_reorder %}
+                            {% if group is not null and canManage %}
+                                {% include reorderTemplate with {
+                                    action: 'reorderGroup',
+                                    idParam: 'group-id',
+                                    id: group.id,
+                                    first: section.first,
+                                    last: section.last,
+                                } only %}
+                            {% endif %}
+                        {% endblock %}
+                        {% block group_title %}
+                            <h4 class="mb-0">
+                                {{ group is not null
+                                    ? group.title
+                                    : 'milhq.admin.group_editor.ungrouped'|trans({ plural: (this.itemTranslationPrefix ~ 'plural')|trans })|capitalize }}
+                            </h4>
+                        {% endblock %}
+                    </div>
+                    <div class="flex gap-2">
+                        {% block group_actions %}
+                            {% if group is not null and canManage %}
+                                <a class="btn-link btn-small btn-icon" href="{{ path(this.groupRoutePrefix ~ '_edit', { identifier: group.id }) }}">
+                                    <i class="ph ph-pencil-simple-line"></i>
+                                </a>
+                                <a class="btn-link btn-small btn-icon" href="{{ path(this.groupRoutePrefix ~ '_delete', { identifier: group.id }) }}">
+                                    <i class="ph ph-x"></i>
+                                </a>
+                            {% endif %}
+                        {% endblock %}
+                    </div>
+                </div>
+                {% if open %}
+                    <div class="card-body">
+                        <div class="flex flex-col gap-2">
+                            {% for item in this.items(group) %}
+                                {% block group_item %}
+                                    <div class="flex flex-row justify-between items-center">
+                                        <div class="flex items-center">
+                                            {% if canManage %}
+                                                {% include reorderTemplate with {
+                                                    action: 'reorderItem',
+                                                    idParam: 'item-id',
+                                                    id: item.id,
+                                                    first: loop.first,
+                                                    last: loop.last,
+                                                } only %}
+                                            {% endif %}
+                                            {% block group_item_label %}
+                                                {% if canManage %}
+                                                    <a href="{{ path(this.itemRoutePrefix ~ '_edit', { identifier: item.id }) }}">{{ item.name }}</a>
+                                                {% else %}
+                                                    {{ item.name }}
+                                                {% endif %}
+                                            {% endblock %}
+                                        </div>
+                                        <div class="flex gap-2">
+                                            {% block group_item_actions %}
+                                                {% if canManage %}
+                                                    <a class="btn-link btn-small btn-icon" href="{{ path(this.itemRoutePrefix ~ '_delete', { identifier: item.id }) }}">
+                                                        <i class="ph ph-x"></i>
+                                                    </a>
+                                                {% endif %}
+                                            {% endblock %}
+                                        </div>
+                                    </div>
+                                {% endblock %}
+                            {% endfor %}
+                            {% block group_create %}
+                                {% if canManage %}
+                                    <a
+                                        href="{{ path(this.itemRoutePrefix ~ '_create', { group: group is not null ? group.id : null }) }}"
+                                        class="btn-link"
+                                    >
+                                        <i class="ph ph-plus"></i>{{ 'milhq.admin.group_editor.create.item'|trans({ single: (this.itemTranslationPrefix ~ 'single')|trans }) }}
+                                    </a>
+                                {% endif %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    {% block editor_actions %}
+        {% if canManage %}
+            <div class="box mt-4">
+                <a href="{{ path(this.groupRoutePrefix ~ '_create') }}">
+                    <i class="ph ph-plus"></i>{{ 'milhq.admin.group_editor.create.group'|trans }}
+                </a>
+            </div>
+        {% endif %}
+    {% endblock %}
+</div>

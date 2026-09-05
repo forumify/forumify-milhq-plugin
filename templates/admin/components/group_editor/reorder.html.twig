@@ -1,0 +1,22 @@
+<div class="mr-2">
+    <button
+        class="btn-link btn-small btn-icon p-1"
+        data-action="live#action"
+        data-live-action-param="{{ action }}"
+        data-live-{{ idParam }}-param="{{ id }}"
+        data-live-direction-param="down"
+        {{ last ? 'disabled' : '' }}
+    >
+        <i class="ph ph-arrow-down"></i>
+    </button>
+    <button
+        class="btn-link btn-small btn-icon p-1"
+        data-action="live#action"
+        data-live-action-param="{{ action }}"
+        data-live-{{ idParam }}-param="{{ id }}"
+        data-live-direction-param="up"
+        {{ first ? 'disabled' : '' }}
+    >
+        <i class="ph ph-arrow-up"></i>
+    </button>
+</div>

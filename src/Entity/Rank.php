@@ -7,7 +7,6 @@ namespace Forumify\Milhq\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
-use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\SortableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Repository\RankRepository;
@@ -15,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RankRepository::class)]
 #[ORM\Table('milhq_rank')]
-class Rank implements SortableEntityInterface, AuditableEntityInterface
+class Rank implements GroupedEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use SortableEntityTrait;
@@ -38,6 +37,10 @@ class Rank implements SortableEntityInterface, AuditableEntityInterface
     #[ORM\Column(length: 16)]
     #[Assert\Length(max: 16)]
     private string $paygrade = '';
+
+    #[ORM\ManyToOne(targetEntity: RankGroup::class, inversedBy: 'ranks')]
+    #[ORM\JoinColumn(name: 'group_id', onDelete: 'SET NULL')]
+    private ?RankGroup $group = null;
 
     public function getName(): string
     {
@@ -87,6 +90,16 @@ class Rank implements SortableEntityInterface, AuditableEntityInterface
     public function setImage(?string $image): void
     {
         $this->image = $image;
+    }
+
+    public function getGroup(): ?RankGroup
+    {
+        return $this->group;
+    }
+
+    public function setGroup(?RankGroup $group): void
+    {
+        $this->group = $group;
     }
 
     public function getIdentifierForAudit(): string
