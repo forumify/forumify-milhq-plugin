@@ -40,10 +40,12 @@ class RankType extends AbstractType
             ->add('abbreviation', TextType::class, [
                 'help' => 'Add an abbreviation to the rank; e.g., PFC',
                 'required' => false,
+                'empty_data' => '',
             ])
             ->add('paygrade', TextType::class, [
                 'help' => 'Add a paygrade to the rank; e.g., PV1 = OR-1 (NATO) or E-1 (US Army)',
                 'required' => false,
+                'empty_data' => '',
             ])
             ->add('newImage', FileType::class, [
                 'attr' => [
