@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Admin\Form;
 
+use Forumify\Core\Form\EntityType;
 use Forumify\Core\Form\RichTextEditorType;
 use Forumify\Milhq\Entity\Award;
+use Forumify\Milhq\Entity\AwardGroup;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -26,15 +29,33 @@ class AwardType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Award::class,
             'image_required' => false,
+            'group' => null,
         ]);
+        $resolver->setAllowedTypes('group', ['null', AwardGroup::class]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $imagePreview = ($options['data'] ?? null)?->getImage();
+        $award = $options['data'] ?? null;
+        $imagePreview = $award?->getImage();
 
         $builder
             ->add('name', TextType::class)
+            ->add('group', EntityType::class, [
+                'autocomplete' => true,
+                'class' => AwardGroup::class,
+                'choice_label' => 'title',
+                'placeholder' => 'Ungrouped',
+                'help' => 'Optionally organize this award into a group.',
+                'required' => false,
+                ...($award === null && $options['group'] !== null
+                    ? ['data' => $options['group']]
+                    : []),
+            ])
+            ->add('oldGroupId', HiddenType::class, [
+                'data' => (string)$award?->getGroup()?->getId(),
+                'mapped' => false,
+            ])
             ->add('description', RichTextEditorType::class, [
                 'required' => false,
             ])

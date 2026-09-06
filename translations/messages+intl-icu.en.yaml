@@ -78,6 +78,10 @@ milhq:
                 edit: 'Editing {tier}'
                 removed: 'Award tier removed.'
                 saved: 'Award tier saved.'
+        award_group:
+            crud:
+                single: 'award group'
+                plural: 'award groups'
         document:
             crud:
                 single: 'document'
@@ -239,6 +243,7 @@ milhq:
         title: 'Awards'
         no_awards: 'No awards.'
         tiers: 'Tiers'
+        ungrouped_tab: 'Ungrouped awards'
     qualification:
         title: 'Qualifications'
         no_qualifications: 'No qualifications.'

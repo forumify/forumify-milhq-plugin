@@ -10,8 +10,10 @@ use Forumify\Milhq\Entity\Award;
 /**
  * @extends AbstractRepository<Award>
  */
-class AwardRepository extends AbstractRepository
+class AwardRepository extends AbstractRepository implements GroupScopedRepositoryInterface
 {
+    use GroupScopedRepositoryTrait;
+
     public static function getEntityClass(): string
     {
         return Award::class;
