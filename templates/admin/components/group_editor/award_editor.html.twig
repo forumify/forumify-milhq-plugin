@@ -1,0 +1,9 @@
+{% extends '@ForumifyMilhqPlugin/admin/components/group_editor/group_editor.html.twig' %}
+{% block group_item_actions %}
+    {% if canManage %}
+        <a class="btn-link btn-small btn-icon" href="{{ path('milhq_admin_award_make_tier', { id: item.id }) }}">
+            <i class="ph ph-caret-double-down"></i>
+        </a>
+    {% endif %}
+    {{ parent() }}
+{% endblock %}

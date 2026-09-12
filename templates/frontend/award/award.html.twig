@@ -1,5 +1,34 @@
 {% extends '@Forumify/frontend/base.html.twig' %}
 {% block title_page %}{{ 'milhq.award.title'|trans }}{% endblock %}
 {% block body %}
-    {{ component('AwardList', { size: 20 }) }}
+    {% if groups is not empty or hasUngroupedAwards %}
+        {% embed '@Forumify/components/tabs.html.twig' %}
+            {% block tabs %}
+                {% for group in groups %}
+                    <button type="button" class="btn-link" data-tab-id="award-group-{{ group.id }}">
+                        {{ group.title }}
+                    </button>
+                {% endfor %}
+                {% if hasUngroupedAwards %}
+                    <button type="button" class="btn-link" data-tab-id="award-group-ungrouped">
+                        {{ 'milhq.award.ungrouped_tab'|trans }}
+                    </button>
+                {% endif %}
+            {% endblock %}
+            {% block tabpanels %}
+                {% for group in groups %}
+                    <div id="award-group-{{ group.id }}">
+                        {{ component('AwardList', { key: 'award-list-' ~ group.id, groupId: group.id }) }}
+                    </div>
+                {% endfor %}
+                {% if hasUngroupedAwards %}
+                    <div id="award-group-ungrouped">
+                        {{ component('AwardList', { key: 'award-list-ungrouped', groupId: null }) }}
+                    </div>
+                {% endif %}
+            {% endblock %}
+        {% endembed %}
+    {% else %}
+        <p>{{ 'milhq.award.no_awards'|trans }}</p>
+    {% endif %}
 {% endblock %}

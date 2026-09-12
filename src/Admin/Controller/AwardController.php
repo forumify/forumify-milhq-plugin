@@ -12,6 +12,7 @@ use Forumify\Milhq\Admin\Form\AwardType;
 use Forumify\Milhq\Admin\Service\AwardToTierService;
 use Forumify\Milhq\Entity\Award;
 use Forumify\Milhq\Entity\AwardTier;
+use Forumify\Milhq\Repository\AwardGroupRepository;
 use Forumify\Milhq\Repository\AwardTierRepository;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,15 +29,19 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 #[IsGranted('milhq.admin.organization.awards.view')]
 class AwardController extends AbstractCrudController
 {
+    use GroupScopedCrudControllerTrait;
+
     protected ?string $permissionView = 'milhq.admin.organization.awards.view';
     protected ?string $permissionCreate = 'milhq.admin.organization.awards.create';
     protected ?string $permissionEdit = 'milhq.admin.organization.awards.manage';
     protected ?string $permissionDelete = 'milhq.admin.organization.awards.delete';
 
+    protected string $listTemplate = '@ForumifyMilhqPlugin/admin/components/group_editor/group_list.html.twig';
     protected string $formTemplate = '@ForumifyMilhqPlugin/admin/awards/form.html.twig';
 
     public function __construct(
         private readonly AwardTierRepository $awardTierRepository,
+        private readonly AwardGroupRepository $awardGroupRepository,
         private readonly MediaService $mediaService,
         private readonly FilesystemOperator $milhqAssetStorage,
         private readonly AwardToTierService $awardToTierService,
@@ -55,13 +60,14 @@ class AwardController extends AbstractCrudController
 
     protected function getTableName(): string
     {
-        return 'Milhq\\AwardTable';
+        return 'Milhq\\AwardEditor';
     }
 
     protected function getForm(?object $data): FormInterface
     {
         return $this->createForm(AwardType::class, $data, [
             'image_required' => $data === null,
+            'group' => $data === null ? $this->getGroupFromRequest($this->awardGroupRepository) : null,
         ]);
     }
 
