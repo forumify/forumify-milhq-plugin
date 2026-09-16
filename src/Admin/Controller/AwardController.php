@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Admin\Controller;
 
 use Forumify\Admin\Crud\AbstractCrudController;
-use Forumify\Core\Service\MediaService;
 use Forumify\Milhq\Admin\Form\AwardTierType;
 use Forumify\Milhq\Admin\Form\AwardToTierType;
 use Forumify\Milhq\Admin\Form\AwardType;
@@ -14,13 +13,11 @@ use Forumify\Milhq\Entity\Award;
 use Forumify\Milhq\Entity\AwardTier;
 use Forumify\Milhq\Repository\AwardGroupRepository;
 use Forumify\Milhq\Repository\AwardTierRepository;
-use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @extends AbstractCrudController<Award>
@@ -42,8 +39,6 @@ class AwardController extends AbstractCrudController
     public function __construct(
         private readonly AwardTierRepository $awardTierRepository,
         private readonly AwardGroupRepository $awardGroupRepository,
-        private readonly MediaService $mediaService,
-        private readonly FilesystemOperator $milhqAssetStorage,
         private readonly AwardToTierService $awardToTierService,
     ) {
     }
@@ -122,11 +117,6 @@ class AwardController extends AbstractCrudController
 
         /** @var AwardTier $tier */
         $tier = $form->getData();
-        $newImage = $form->get('newImage')->getData();
-        if ($newImage instanceof UploadedFile) {
-            $tier->image = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newImage);
-        }
-
         $this->awardTierRepository->save($tier);
 
         $this->addFlash('success', 'milhq.admin.award.tier.saved');

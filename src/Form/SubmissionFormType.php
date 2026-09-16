@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Form;
 
 use DateTime;
-use Forumify\Core\Service\MediaService;
+use Forumify\Core\Form\UploadType;
 use Forumify\Milhq\Entity\Form;
-use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -17,26 +16,18 @@ use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Traversable;
 
 class SubmissionFormType extends AbstractType implements DataMapperInterface
 {
     public const DATE_FORMAT = 'Y-m-d\TH:i:s.u\Z';
-
-    public function __construct(
-        private readonly FilesystemOperator $milhqAssetStorage,
-        private readonly MediaService $mediaService,
-    ) {
-    }
 
     public const FIELD_MAP = [
         'checkbox' => CheckboxType::class,
@@ -45,7 +36,7 @@ class SubmissionFormType extends AbstractType implements DataMapperInterface
         'date' => DateType::class,
         'datetime' => DateTimeType::class,
         'email' => EmailType::class,
-        'file' => FileType::class,
+        'file' => UploadType::class,
         'number' => NumberType::class,
         'password' => PasswordType::class,
         'select' => ChoiceType::class,
@@ -100,6 +91,11 @@ class SubmissionFormType extends AbstractType implements DataMapperInterface
                 $fieldOptions['widget'] = 'single_text';
             }
 
+            if ($type === UploadType::class) {
+                $fieldOptions['asset_package'] = 'milhq.asset';
+                $fieldOptions['filesystem'] = 'milhq_asset.storage';
+            }
+
             $builder->add($field->getKey(), $type, $fieldOptions);
         }
 
@@ -127,10 +123,6 @@ class SubmissionFormType extends AbstractType implements DataMapperInterface
             $value = $form->getData();
             if ($value instanceof DateTime) {
                 $value = $value->format(self::DATE_FORMAT);
-            }
-
-            if ($value instanceof UploadedFile) {
-                $value = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $value);
             }
 
             $viewData[$field] = $value;
