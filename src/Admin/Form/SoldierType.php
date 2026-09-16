@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Admin\Form;
 
 use Forumify\Core\Entity\User;
+use Forumify\Core\Form\UploadType;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Position;
 use Forumify\Milhq\Entity\Rank;
@@ -12,10 +13,8 @@ use Forumify\Milhq\Entity\Specialty;
 use Forumify\Milhq\Entity\Status;
 use Forumify\Milhq\Entity\Unit;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -25,11 +24,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class SoldierType extends AbstractType
 {
-    public function __construct(
-        private readonly Packages $packages,
-    ) {
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -39,9 +33,6 @@ class SoldierType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var Soldier|null $soldier */
-        $soldier = $options['data'] ?? null;
-
         $builder
             ->add('name', TextType::class)
             ->add('user', EntityType::class, [
@@ -94,34 +85,20 @@ class SoldierType extends AbstractType
                 'mapped' => false,
             ])
             // uniform
-            ->add('newUniform', FileType::class, [
-                'attr' => [
-                    'preview' => $soldier?->getUniform()
-                        ? $this->packages->getUrl($soldier->getUniform(), 'milhq.asset')
-                        : null,
-                ],
-                'constraints' => [
-                    new Assert\Image(
-                        maxSize: '1M',
-                    ),
-                ],
+            ->add('uniform', UploadType::class, [
+                'accept' => 'image/*',
+                'asset_package' => 'milhq.asset',
+                'file_constraints' => [new Assert\Image(maxSize: '1M')],
+                'filesystem' => 'milhq_asset.storage',
                 'label' => 'Uniform',
-                'mapped' => false,
                 'required' => false,
             ])
-            ->add('newSignature', FileType::class, [
-                'attr' => [
-                    'preview' => $soldier?->getSignature()
-                        ? $this->packages->getUrl($soldier->getSignature(), 'milhq.asset')
-                        : null,
-                ],
-                'constraints' => [
-                    new Assert\Image(
-                        maxSize: '1M',
-                    ),
-                ],
+            ->add('signature', UploadType::class, [
+                'accept' => 'image/*',
+                'asset_package' => 'milhq.asset',
+                'file_constraints' => [new Assert\Image(maxSize: '1M')],
+                'filesystem' => 'milhq_asset.storage',
                 'label' => 'Signature',
-                'mapped' => false,
                 'required' => false,
             ])
         ;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Admin\Form;
 
 use Forumify\Core\Form\RichTextEditorType;
+use Forumify\Core\Form\UploadType;
 use Forumify\Core\Repository\RoleRepository;
 use Forumify\Forum\Repository\ForumRepository;
 use Forumify\Milhq\Repository\FormRepository;
@@ -13,7 +14,6 @@ use Forumify\Plugin\Service\PluginVersionChecker;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -228,8 +228,11 @@ class ConfigurationType extends AbstractType
                     'label' => 'Website',
                     'required' => false,
                 ])
-                ->add('milhq__squadxml__new_picture', FileType::class, [
-                    'constraints' => [new Assert\File(maxSize: '1M')],
+                ->add('milhq__squadxml__picture', UploadType::class, [
+                    'accept' => '.paa',
+                    'asset_package' => 'milhq.asset',
+                    'file_constraints' => [new Assert\File(maxSize: '1M')],
+                    'filesystem' => 'milhq_asset.storage',
                     'help' => 'Logo in PAA format. Don\'t know how to create a PAA file? See <a href="https://community.bistudio.com/wiki/squad.xml#Logo_Creation">official documentation</a>, or use this <a href="https://paa.gruppe-adler.de/">online converter</a>.',
                     'help_html' => true,
                     'label' => 'Logo (.paa)',

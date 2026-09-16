@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Admin\Form;
 
 use Forumify\Core\Form\RichTextEditorType;
+use Forumify\Core\Form\UploadType;
 use Forumify\Milhq\Entity\Course;
 use Forumify\Milhq\Entity\Rank;
 use Forumify\Milhq\Repository\AwardRepository;
 use Forumify\Milhq\Repository\QualificationRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,7 +22,6 @@ class CourseType extends AbstractType
     public function __construct(
         private readonly QualificationRepository $qualificationRepository,
         private readonly AwardRepository $awardRepository,
-        private readonly Packages $packages,
     ) {
     }
 
@@ -36,8 +34,6 @@ class CourseType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $imagePreview = empty($options['data']) ? null : $options['data']->getImage();
-
         $qualifications = $this->qualificationRepository
             ->createQueryBuilder('q')
             ->select('q.id', 'q.name', )
@@ -63,19 +59,12 @@ class CourseType extends AbstractType
         $builder
             ->add('title')
             ->add('description', RichTextEditorType::class)
-            ->add('newImage', FileType::class, [
-                'attr' => [
-                    'preview' => $imagePreview
-                        ? $this->packages->getUrl($imagePreview, 'milhq.asset')
-                        : null,
-                ],
-                'constraints' => [
-                    new Assert\Image(
-                        maxSize: '10M',
-                    ),
-                ],
+            ->add('image', UploadType::class, [
+                'accept' => 'image/*',
+                'asset_package' => 'milhq.asset',
+                'file_constraints' => [new Assert\Image(maxSize: '10M')],
+                'filesystem' => 'milhq_asset.storage',
                 'label' => 'Image',
-                'mapped' => false,
                 'required' => false,
             ])
             ->add('minimumRank', EntityType::class, [

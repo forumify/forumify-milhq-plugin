@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Admin\Controller;
 
 use Forumify\Admin\Crud\AbstractCrudController;
-use Forumify\Core\Service\MediaService;
 use Forumify\Milhq\Admin\Form\QualificationTierType;
 use Forumify\Milhq\Admin\Form\QualificationToTierType;
 use Forumify\Milhq\Admin\Form\QualificationType;
@@ -13,9 +12,7 @@ use Forumify\Milhq\Admin\Service\QualificationToTierService;
 use Forumify\Milhq\Entity\Qualification;
 use Forumify\Milhq\Entity\QualificationTier;
 use Forumify\Milhq\Repository\QualificationTierRepository;
-use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -37,8 +34,6 @@ class QualificationController extends AbstractCrudController
 
     public function __construct(
         private readonly QualificationTierRepository $qualificationTierRepository,
-        private readonly MediaService $mediaService,
-        private readonly FilesystemOperator $milhqAssetStorage,
         private readonly QualificationToTierService $qualificationToTierService,
     ) {
     }
@@ -114,11 +109,6 @@ class QualificationController extends AbstractCrudController
 
         /** @var QualificationTier $tier */
         $tier = $form->getData();
-        $newImage = $form->get('newImage')->getData();
-        if ($newImage instanceof UploadedFile) {
-            $tier->image = $this->mediaService->saveToFilesystem($this->milhqAssetStorage, $newImage);
-        }
-
         $this->qualificationTierRepository->save($tier);
 
         $this->addFlash('success', 'milhq.admin.qualification.tier.saved');

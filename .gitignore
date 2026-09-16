@@ -16,3 +16,4 @@ var
 tests/src/
 tests/public/
 tests/config/reference.php
+tests/vendor
