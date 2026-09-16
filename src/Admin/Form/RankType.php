@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Admin\Form;
 
+use Forumify\Core\Form\EntityType;
 use Forumify\Core\Form\RichTextEditorType;
 use Forumify\Milhq\Entity\Rank;
+use Forumify\Milhq\Entity\RankGroup;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -25,25 +28,45 @@ class RankType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Rank::class,
             'image_required' => false,
+            'group' => null,
         ]);
+        $resolver->setAllowedTypes('group', ['null', RankGroup::class]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $imagePreview = empty($options['data']) ? null : $options['data']->getImage();
+        $rank = $options['data'] ?? null;
+        $imagePreview = $rank?->getImage();
 
         $builder
             ->add('name', TextType::class)
+            ->add('group', EntityType::class, [
+                'autocomplete' => true,
+                'class' => RankGroup::class,
+                'choice_label' => 'title',
+                'placeholder' => 'Ungrouped',
+                'help' => 'Optionally organize this rank into a group.',
+                'required' => false,
+                ...($rank === null && $options['group'] !== null
+                    ? ['data' => $options['group']]
+                    : []),
+            ])
+            ->add('oldGroupId', HiddenType::class, [
+                'data' => (string)$rank?->getGroup()?->getId(),
+                'mapped' => false,
+            ])
             ->add('description', RichTextEditorType::class, [
                 'required' => false,
             ])
             ->add('abbreviation', TextType::class, [
                 'help' => 'Add an abbreviation to the rank; e.g., PFC',
                 'required' => false,
+                'empty_data' => '',
             ])
             ->add('paygrade', TextType::class, [
                 'help' => 'Add a paygrade to the rank; e.g., PV1 = OR-1 (NATO) or E-1 (US Army)',
                 'required' => false,
+                'empty_data' => '',
             ])
             ->add('newImage', FileType::class, [
                 'attr' => [

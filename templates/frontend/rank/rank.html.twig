@@ -1,5 +1,34 @@
 {% extends '@Forumify/frontend/base.html.twig' %}
 {% block title_page %}{{ 'milhq.rank.title'|trans }}{% endblock %}
 {% block body %}
-    {{ component('RankList', { size: 20 }) }}
+    {% if groups is not empty or hasUngroupedRanks %}
+        {% embed '@Forumify/components/tabs.html.twig' %}
+            {% block tabs %}
+                {% for group in groups %}
+                    <button type="button" class="btn-link" data-tab-id="rank-group-{{ group.id }}">
+                        {{ group.title }}
+                    </button>
+                {% endfor %}
+                {% if hasUngroupedRanks %}
+                    <button type="button" class="btn-link" data-tab-id="rank-group-ungrouped">
+                        {{ 'milhq.rank.ungrouped_tab'|trans }}
+                    </button>
+                {% endif %}
+            {% endblock %}
+            {% block tabpanels %}
+                {% for group in groups %}
+                    <div id="rank-group-{{ group.id }}">
+                        {{ component('RankList', { key: 'rank-list-' ~ group.id, groupId: group.id }) }}
+                    </div>
+                {% endfor %}
+                {% if hasUngroupedRanks %}
+                    <div id="rank-group-ungrouped">
+                        {{ component('RankList', { key: 'rank-list-ungrouped', groupId: null }) }}
+                    </div>
+                {% endif %}
+            {% endblock %}
+        {% endembed %}
+    {% else %}
+        <p>{{ 'milhq.rank.no_ranks'|trans }}</p>
+    {% endif %}
 {% endblock %}

@@ -10,8 +10,10 @@ use Forumify\Milhq\Entity\Rank;
 /**
  * @extends AbstractRepository<Rank>
  */
-class RankRepository extends AbstractRepository
+class RankRepository extends AbstractRepository implements GroupScopedRepositoryInterface
 {
+    use GroupScopedRepositoryTrait;
+
     public static function getEntityClass(): string
     {
         return Rank::class;

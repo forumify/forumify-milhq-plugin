@@ -21,11 +21,11 @@ class AwardRecord implements RecordInterface, AuditableEntityInterface
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Soldier $soldier;
 
-    #[ORM\ManyToOne(targetEntity: Award::class)]
+    #[ORM\ManyToOne(targetEntity: Award::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Award $award;
 
-    #[ORM\ManyToOne(targetEntity: AwardTier::class)]
+    #[ORM\ManyToOne(targetEntity: AwardTier::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?AwardTier $tier = null;
 

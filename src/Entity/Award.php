@@ -10,7 +10,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
-use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\SortableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Repository\AwardRepository;
@@ -18,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AwardRepository::class)]
 #[ORM\Table('milhq_award')]
-class Award implements SortableEntityInterface, AuditableEntityInterface
+class Award implements GroupedEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use SortableEntityTrait;
@@ -47,6 +46,10 @@ class Award implements SortableEntityInterface, AuditableEntityInterface
 
     #[ORM\Column(type: Types::BOOLEAN)]
     public bool $autoAdvanceTiers = false;
+
+    #[ORM\ManyToOne(targetEntity: AwardGroup::class, inversedBy: 'awards')]
+    #[ORM\JoinColumn(name: 'group_id', onDelete: 'SET NULL')]
+    private ?AwardGroup $group = null;
 
     public function __construct()
     {
@@ -81,6 +84,16 @@ class Award implements SortableEntityInterface, AuditableEntityInterface
     public function setImage(?string $image): void
     {
         $this->image = $image;
+    }
+
+    public function getGroup(): ?AwardGroup
+    {
+        return $this->group;
+    }
+
+    public function setGroup(?AwardGroup $group): void
+    {
+        $this->group = $group;
     }
 
     public function getIdentifierForAudit(): string

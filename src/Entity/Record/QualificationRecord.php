@@ -21,11 +21,11 @@ class QualificationRecord implements RecordInterface, AuditableEntityInterface
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Soldier $soldier;
 
-    #[ORM\ManyToOne(targetEntity: Qualification::class)]
+    #[ORM\ManyToOne(targetEntity: Qualification::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Qualification $qualification;
 
-    #[ORM\ManyToOne(targetEntity: QualificationTier::class)]
+    #[ORM\ManyToOne(targetEntity: QualificationTier::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?QualificationTier $tier = null;
 

@@ -59,6 +59,12 @@ class ForumifyMilhqPlugin extends AbstractForumifyPlugin
                         'delete',
                         'create',
                     ],
+                    'equipment' => [
+                        'view',
+                        'manage',
+                        'delete',
+                        'create',
+                    ],
                     'forms' => [
                         'view',
                         'manage',
@@ -150,12 +156,6 @@ class ForumifyMilhqPlugin extends AbstractForumifyPlugin
                     'view',
                     'manage',
                     'delete',
-                ],
-                'equipment'=> [
-                    'view',
-                    'manage',
-                    'delete',
-                    'create',
                 ],
             ],
             'frontend' => [

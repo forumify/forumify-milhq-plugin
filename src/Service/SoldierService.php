@@ -11,6 +11,7 @@ use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\User;
 use Forumify\Core\Repository\SettingRepository;
 use Forumify\Milhq\Entity\Equipment;
+use Forumify\Milhq\Entity\GroupedEntityInterface;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
 use Forumify\Milhq\Form\Enlistment;
 use Forumify\Milhq\Entity\Soldier;
@@ -91,6 +92,14 @@ class SoldierService
             foreach ($sortOrder as $sortField) {
                 $valA = $propertyAccessor->getValue($a, $sortField);
                 $valB = $propertyAccessor->getValue($b, $sortField);
+
+                if ($valA instanceof GroupedEntityInterface && $valB instanceof GroupedEntityInterface) {
+                    $groupPosA = $valA->getGroup()?->getPosition() ?? PHP_INT_MAX;
+                    $groupPosB = $valB->getGroup()?->getPosition() ?? PHP_INT_MAX;
+                    if ($groupPosA !== $groupPosB) {
+                        return $groupPosA - $groupPosB;
+                    }
+                }
 
                 $aIsSortable = $valA instanceof SortableEntityInterface;
                 $bIsSortable = $valB instanceof SortableEntityInterface;

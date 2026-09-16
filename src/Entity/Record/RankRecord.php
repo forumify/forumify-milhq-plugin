@@ -20,7 +20,7 @@ class RankRecord implements RecordInterface, AuditableEntityInterface
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Soldier $soldier;
 
-    #[ORM\ManyToOne(targetEntity: Rank::class)]
+    #[ORM\ManyToOne(targetEntity: Rank::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private Rank $rank;
 
