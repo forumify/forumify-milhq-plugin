@@ -172,12 +172,23 @@ class ForumifyMilhqPlugin extends AbstractForumifyPlugin
 
         $configDir = $this->getPath() . '/config';
 
-        if (class_exists(ForumifyCalendarPlugin::class)) {
+        if ($this->isPluginLoaded($builder, ForumifyCalendarPlugin::class)) {
             $container->import($configDir . '/calendar.php');
         }
 
-        if (class_exists(ForumifyDiscordPlugin::class)) {
+        if ($this->isPluginLoaded($builder, ForumifyDiscordPlugin::class)) {
             $container->import($configDir . '/discord.php');
         }
+    }
+
+    /**
+     * @param class-string $pluginClass
+     */
+    private function isPluginLoaded(ContainerBuilder $builder, string $pluginClass): bool
+    {
+        /** @var array<string, class-string> $bundles */
+        $bundles = $builder->getParameter('kernel.bundles');
+
+        return in_array($pluginClass, $bundles, true);
     }
 }
