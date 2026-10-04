@@ -34,6 +34,9 @@ class Specialty implements SortableEntityInterface, AuditableEntityInterface
     #[Assert\NotBlank(allowNull: false)]
     private string $abbreviation = '';
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
     #[ORM\ManyToOne(targetEntity: Role::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     public ?Role $role = null;
@@ -66,6 +69,16 @@ class Specialty implements SortableEntityInterface, AuditableEntityInterface
     public function setAbbreviation(string $abbreviation): void
     {
         $this->abbreviation = $abbreviation;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): void
+    {
+        $this->image = $image;
     }
 
     public function getIdentifierForAudit(): string
