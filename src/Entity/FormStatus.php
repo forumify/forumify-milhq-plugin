@@ -1,0 +1,74 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Forumify\Milhq\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AuditableEntityInterface;
+use Forumify\Core\Entity\IdentifiableEntityTrait;
+use Forumify\Core\Entity\SortableEntityInterface;
+use Forumify\Core\Entity\SortableEntityTrait;
+use Forumify\Core\Entity\TimestampableEntityTrait;
+use Forumify\Milhq\Repository\FormStatusRepository;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ORM\Entity(repositoryClass: FormStatusRepository::class)]
+#[ORM\Table('milhq_form_status')]
+class FormStatus implements SortableEntityInterface, AuditableEntityInterface
+{
+    use IdentifiableEntityTrait;
+    use SortableEntityTrait;
+    use TimestampableEntityTrait;
+
+    #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'statuses')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private Form $form;
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(allowNull: false)]
+    private string $name;
+
+    #[ORM\Column(length: 7, options: ['fixed' => true])]
+    private string $color = '';
+
+    public function getForm(): Form
+    {
+        return $this->form;
+    }
+
+    public function setForm(Form $form): void
+    {
+        $this->form = $form;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function getColor(): string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): void
+    {
+        $this->color = $color;
+    }
+
+    public function getIdentifierForAudit(): string
+    {
+        return (string)$this->getId();
+    }
+
+    public function getNameForAudit(): string
+    {
+        return $this->getName();
+    }
+}

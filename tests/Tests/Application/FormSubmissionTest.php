@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PluginTests\Tests\Application;
 
 use Forumify\Milhq\Repository\FormRepository;
+use Forumify\Milhq\Repository\FormStatusRepository;
 use PluginTests\Tests\Factories\Milhq\FormFieldFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use PluginTests\Tests\Factories\Stories\MilsimStory;
@@ -21,7 +22,6 @@ class FormSubmissionTest extends MilhqWebTestCase
 
         $this->client->submitForm('Save', [
             'form[name]' => 'Leave Of Absence',
-            'form[defaultStatus]' => MilsimStory::statusPending()->getId(),
             'form[description]' => 'Form description',
             'form[instructions]' => '<p>Form instructions</p>',
             'form[successMessage]' => '<p>Form success message</p>',
@@ -33,6 +33,19 @@ class FormSubmissionTest extends MilhqWebTestCase
             'label' => 'Why do you want to take time off?',
             'form' => $form,
         ]);
+
+        foreach (['Pending', 'Approved'] as $statusName) {
+            $c = $this->client->request('GET', "/admin/milhq/forms/{$form->getId()}/statuses");
+            $this->client->click($c->filter('a[aria-label="New status"]')->link());
+            $this->client->submitForm('Save', ['form_status[name]' => $statusName]);
+        }
+
+        $formStatusRepository = self::getContainer()->get(FormStatusRepository::class);
+        $pending = $formStatusRepository->findOneBy(['form' => $form, 'name' => 'Pending']);
+        $approved = $formStatusRepository->findOneBy(['form' => $form, 'name' => 'Approved']);
+
+        $this->client->request('GET', "/admin/milhq/forms/{$form->getId()}/edit");
+        $this->client->submitForm('Save', ['form[defaultStatus]' => $pending->getId()]);
 
         $c = $this->client->request('GET', '/milhq/operations-center');
         $formLinks = $c->filter('a[href^="/milhq/form/"]');
@@ -50,7 +63,7 @@ class FormSubmissionTest extends MilhqWebTestCase
         $viewBtn = $c->filter('tbody > tr')->filter('a')->first()->link();
         $this->client->click($viewBtn);
 
-        $this->client->submitForm('Save', ['submission_status[status]' => MilsimStory::statusApproved()->getId()]);
+        $this->client->submitForm('Save', ['submission_status[status]' => $approved->getId()]);
         self::assertAnySelectorTextContains('span', 'Approved');
         self::assertAnySelectorTextContains('h4', 'Approved');
     }

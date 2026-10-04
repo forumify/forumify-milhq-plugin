@@ -93,10 +93,11 @@ class MigratePerscomController extends AbstractController
         $results['reportIns'] = $this->migrateTable('perscom_report_in', 'milhq_report_in', ['id', 'user_id' => 'soldier_id', 'last_report_in_date', 'return_status_id']);
 
         // Forms
-        $results['forms'] = $this->migrateTable('perscom_form', 'milhq_form', ['id', 'default_status_id', 'name', 'success_message', 'description', 'instructions', 'created_at', 'updated_at']);
+        $results['forms'] = $this->migrateTable('perscom_form', 'milhq_form', ['id', 'name', 'success_message', 'description', 'instructions', 'created_at', 'updated_at']);
         $results['formFields'] = $this->migrateTable('perscom_form_field', 'milhq_form_field', ['id', 'form_id', 'key', 'type', 'label', 'help', 'required', 'position', 'created_at', 'updated_at']);
         $this->fixFormFields();
-        $results['formSubmissions'] = $this->migrateTable('perscom_form_submission', 'milhq_form_submission', ['id', 'form_id', 'user_id' => 'soldier_id', 'status_id', 'data', 'status_reason', 'created_at', 'updated_at']);
+        $results['formSubmissions'] = $this->migrateTable('perscom_form_submission', 'milhq_form_submission', ['id', 'form_id', 'user_id' => 'soldier_id', 'data', 'status_reason', 'created_at', 'updated_at']);
+        $results['formStatuses'] = $this->migrateFormStatuses();
 
         // Courses
         $results['courses'] = $this->migrateTable('perscom_course', 'milhq_course', ['id', 'slug', 'title', 'description', 'image', 'minimum_rank_id', 'prerequisites', 'qualifications', 'position']);
@@ -272,6 +273,56 @@ class MigratePerscomController extends AbstractController
             $fieldOptions = json_encode(['options' => $newOptions]);
             $conn->executeStatement('UPDATE milhq_form_field SET `field_options` = ? WHERE `id` = ?', [$fieldOptions, $id]);
         }
+    }
+
+    /**
+     * @return Result
+     */
+    private function migrateFormStatuses(): array
+    {
+        $conn = $this->em->getConnection();
+        $result = ['count' => 0, 'messages' => []];
+
+        try {
+            $formIds = $conn->executeQuery('SELECT id FROM milhq_form')->fetchFirstColumn();
+            $statuses = $conn
+                ->executeQuery('SELECT id, name, color, position, created_at, updated_at FROM perscom_status')
+                ->fetchAllAssociative();
+
+            foreach ($formIds as $formId) {
+                foreach ($statuses as $status) {
+                    $conn->insert('milhq_form_status', [
+                        'form_id' => $formId,
+                        'name' => $status['name'],
+                        'color' => $status['color'],
+                        'position' => $status['position'],
+                        'created_at' => $status['created_at'],
+                        'updated_at' => $status['updated_at'],
+                    ]);
+                    $formStatusId = $conn->lastInsertId();
+
+                    $conn->executeStatement('
+                        UPDATE milhq_form f
+                        JOIN perscom_form pf ON pf.id = f.id
+                        SET f.default_status_id = ?
+                        WHERE f.id = ? AND pf.default_status_id = ?
+                    ', [$formStatusId, $formId, $status['id']]);
+
+                    $conn->executeStatement('
+                        UPDATE milhq_form_submission s
+                        JOIN perscom_form_submission ps ON ps.id = s.id
+                        SET s.status_id = ?
+                        WHERE s.form_id = ? AND ps.status_id = ?
+                    ', [$formStatusId, $formId, $status['id']]);
+
+                    $result['count']++;
+                }
+            }
+        } catch (Throwable $ex) {
+            $result['messages'][] = $ex->getMessage();
+        }
+
+        return $result;
     }
 
     private function fixCourseImages(array &$result): void

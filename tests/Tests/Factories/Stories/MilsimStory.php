@@ -14,6 +14,7 @@ use PluginTests\Tests\Factories\Forumify\ForumFactory;
 use PluginTests\Tests\Factories\Milhq\EquipmentFactory;
 use PluginTests\Tests\Factories\Milhq\FormFactory;
 use PluginTests\Tests\Factories\Milhq\FormFieldFactory;
+use PluginTests\Tests\Factories\Milhq\FormStatusFactory;
 use PluginTests\Tests\Factories\Milhq\PositionFactory;
 use PluginTests\Tests\Factories\Milhq\QualificationFactory;
 use PluginTests\Tests\Factories\Milhq\QualificationTierFactory;
@@ -25,16 +26,18 @@ use PluginTests\Tests\Factories\Milhq\UnitFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use Zenstruck\Foundry\Story;
 
+use function Zenstruck\Foundry\Persistence\save;
+
 /**
  * This story sets up organizational resources for a standard milsim unit.
  *
  * @method static Entity\Status statusActiveDuty()
  * @method static Entity\Status statusRetired()
- * @method static Entity\Status statusPending()
- * @method static Entity\Status statusApproved()
  * @method static Entity\Status statusCivilian()
  * @method static Entity\Status statusAwol()
  * @method static Entity\Form formEnlistment()
+ * @method static Entity\FormStatus formStatusPending()
+ * @method static Entity\FormStatus formStatusApproved()
  * @method static Entity\Unit unitFirstSquad()
  * @method static Entity\Unit unitSecondSquad()
  * @method static Entity\Unit unitCivilian()
@@ -74,11 +77,6 @@ class MilsimStory extends Story
         $this->addState('statusActiveDuty', $activeDuty);
         $retired = StatusFactory::createOne(['name' => 'Retired']);
         $this->addState('statusRetired', $retired);
-        $pending = StatusFactory::createOne(['name' => 'Pending']);
-        $this->addState('statusPending', $pending);
-        $approved = StatusFactory::createOne(['name' => 'Approved']);
-        $this->addState('statusApproved', $approved);
-        StatusFactory::createOne(['name' => 'Denied']);
         $civilian = StatusFactory::createOne(['name' => 'Civilian']);
         $this->addState('statusCivilian', $civilian);
         $awol = StatusFactory::createOne(['name' => 'AWOL']);
@@ -88,7 +86,6 @@ class MilsimStory extends Story
 
         // Forms
         $enlistmentForm = FormFactory::createOne([
-            'defaultStatus' => $pending,
             'instructions' => 'Enlistment Instructions',
             'name' => 'Enlistment',
             'successMessage' => 'Enlistment Success',
@@ -99,6 +96,14 @@ class MilsimStory extends Story
             'label' => 'Why would you like to join our unit',
             'required' => true,
         ]);
+
+        $pending = FormStatusFactory::createOne(['form' => $enlistmentForm, 'name' => 'Pending']);
+        $this->addState('formStatusPending', $pending);
+        $approved = FormStatusFactory::createOne(['form' => $enlistmentForm, 'name' => 'Approved']);
+        $this->addState('formStatusApproved', $approved);
+        FormStatusFactory::createOne(['form' => $enlistmentForm, 'name' => 'Denied']);
+        $enlistmentForm->setDefaultStatus($pending);
+        save($enlistmentForm);
 
         $this->settingRepository->set('milhq.enlistment.form', $enlistmentForm->getId());
         $this->addState('formEnlistment', $enlistmentForm);

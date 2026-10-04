@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Components;
 
+use Doctrine\ORM\EntityRepository;
 use Forumify\Core\Form\EntityType;
 use Forumify\Core\Security\VoterAttribute;
 use Forumify\Milhq\Admin\Service\SubmissionStatusUpdateService;
 use Forumify\Milhq\Entity\FormSubmission;
-use Forumify\Milhq\Entity\Status;
+use Forumify\Milhq\Entity\FormStatus;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormInterface;
@@ -41,7 +42,11 @@ class SubmissionStatusForm extends AbstractController
         return $this->createFormBuilder()
             ->add('status', EntityType::class, [
                 'choice_label' => 'name',
-                'class' => Status::class,
+                'class' => FormStatus::class,
+                'query_builder' => fn (EntityRepository $repository) => $repository
+                    ->createQueryBuilder('fs')
+                    ->where('fs.form = :form')
+                    ->setParameter('form', $this->submission->getForm()),
             ])
             ->add('reason', TextareaType::class, [
                 'empty_data' => '',

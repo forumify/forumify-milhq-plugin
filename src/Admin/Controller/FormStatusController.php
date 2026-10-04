@@ -5,26 +5,25 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Admin\Controller;
 
 use Forumify\Admin\Crud\AbstractCrudController;
-use Forumify\Milhq\Admin\Form\FormFieldType;
+use Forumify\Milhq\Admin\Form\FormStatusType;
 use Forumify\Milhq\Entity\Form;
-use Forumify\Milhq\Entity\FormField;
+use Forumify\Milhq\Entity\FormStatus;
 use Forumify\Milhq\Repository\FormRepository;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * @extends AbstractCrudController<FormField>
+ * @extends AbstractCrudController<FormStatus>
  */
-#[Route('/forms/{formId}/fields', 'form_field')]
+#[Route('/forms/{formId}/statuses', 'form_status')]
 #[IsGranted('milhq.admin.organization.forms.manage')]
-class FormFieldController extends AbstractCrudController
+class FormStatusController extends AbstractCrudController
 {
     protected string $listTemplate = '@ForumifyMilhqPlugin/admin/forms/nested_list.html.twig';
-    protected string $formTemplate = '@ForumifyMilhqPlugin/admin/forms/field_form.html.twig';
+    protected string $formTemplate = '@ForumifyMilhqPlugin/admin/forms/status_form.html.twig';
     protected string $deleteTemplate = '@ForumifyMilhqPlugin/admin/forms/nested_delete.html.twig';
 
     public function __construct(
@@ -40,23 +39,21 @@ class FormFieldController extends AbstractCrudController
 
     protected function getEntityClass(): string
     {
-        return FormField::class;
+        return FormStatus::class;
     }
 
     protected function getTableName(): string
     {
-        return 'Milhq\\FormFieldTable';
+        return 'Milhq\\FormStatusTable';
     }
 
     protected function getForm(?object $data): FormInterface
     {
-        $new = false;
         if ($data === null) {
-            $new = true;
-            $data = new FormField();
+            $data = new FormStatus();
             $data->setForm($this->getParent());
         }
-        return $this->createForm(FormFieldType::class, $data, ['new' => $new]);
+        return $this->createForm(FormStatusType::class, $data);
     }
 
     protected function templateParams(array $params = []): array
@@ -65,13 +62,6 @@ class FormFieldController extends AbstractCrudController
             'parentForm' => $this->getParent(),
             ...$params,
         ]);
-    }
-
-    protected function redirectAfterSave(mixed $entity, bool $isNew): Response
-    {
-        return $isNew
-            ? $this->redirectToRoute($this->getRoute('edit'), ['identifier' => $entity->getId()])
-            : $this->redirectToRoute($this->getRoute('list'), ['formId' => $this->getParent()->getId()]);
     }
 
     private function getParent(): Form

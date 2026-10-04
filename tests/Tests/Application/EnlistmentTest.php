@@ -42,6 +42,7 @@ class EnlistmentTest extends MilhqWebTestCase
             'soldier' => $soldier,
         ]);
         self::assertNotNull($submission);
+        self::assertSame(MilsimStory::formStatusPending()->getId(), $submission->getStatus()?->getId());
 
         $this->client->request('GET', '/milhq/enlist');
         self::assertAnySelectorTextContains('p', 'Your enlistment is being processed');
