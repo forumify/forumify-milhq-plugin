@@ -56,8 +56,10 @@ class EnlistService
         $soldier = $this->soldierService->getLoggedInSoldier()
             ?? $this->soldierService->createUser($enlistment);
 
+        $form = $this->getEnlistmentForm();
         $submission = new FormSubmission();
-        $submission->setForm($this->getEnlistmentForm());
+        $submission->setForm($form);
+        $submission->setStatus($form->getDefaultStatus());
         $submission->setSoldier($soldier);
         $submission->setData($enlistment->additionalFormData);
         $this->formSubmissionRepository->save($submission);

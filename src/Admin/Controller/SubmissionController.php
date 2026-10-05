@@ -56,7 +56,7 @@ class SubmissionController extends AbstractController
 
         $form = null;
         if ($canManage) {
-            $form = $this->createForm(SubmissionStatusType::class);
+            $form = $this->createForm(SubmissionStatusType::class, null, ['form' => $submission->getForm()]);
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $statusRecord = $form->getData();

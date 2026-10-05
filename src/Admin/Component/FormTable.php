@@ -46,6 +46,7 @@ class FormTable extends AbstractDoctrineTable
             $actions .= $this->renderAction('milhq_admin_form_edit', ['identifier' => $id], 'pencil-simple-line');
             $actions .= $this->renderAction('forumify_admin_acl', (array)$form->getACLParameters(), 'lock-simple');
             $actions .= $this->renderAction('milhq_admin_form_field_list', ['formId' => $id], 'textbox');
+            $actions .= $this->renderAction('milhq_admin_form_status_list', ['formId' => $id], 'tag');
         }
 
         if ($this->security->isGranted('milhq.admin.organization.forms.delete')) {

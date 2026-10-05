@@ -1,0 +1,10 @@
+{% extends '@Forumify/admin/crud/form.html.twig' %}
+{% block body %}
+    <div class="breadcrumbs text-small">
+        <a href="{{ path('milhq_admin_form_list') }}">Forms</a> &gt;
+        <a href="{{ path(route ~ '_list', { formId: parentForm.id }) }}">{{ parentForm.name }}</a>
+    </div>
+    {% include '@Forumify/admin/components/simple_form.html.twig' with {
+        cancelPath: path(route ~ '_list', { formId: parentForm.id })
+    } %}
+{% endblock %}

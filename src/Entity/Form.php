@@ -30,9 +30,9 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
     #[ORM\Column(type: Types::TEXT)]
     private string $successMessage = '';
 
-    #[ORM\ManyToOne(targetEntity: Status::class)]
+    #[ORM\ManyToOne(targetEntity: FormStatus::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    private ?Status $defaultStatus;
+    private ?FormStatus $defaultStatus = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private string $description = '';
@@ -47,10 +47,18 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $fields;
 
+    /**
+     * @var Collection<int, FormStatus>
+     */
+    #[ORM\OneToMany(mappedBy: 'form', targetEntity: FormStatus::class, cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    private Collection $statuses;
+
     public function __construct()
     {
         $this->submissions = new ArrayCollection();
         $this->fields = new ArrayCollection();
+        $this->statuses = new ArrayCollection();
     }
 
     public function getName(): string
@@ -73,12 +81,12 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
         $this->successMessage = $successMessage;
     }
 
-    public function getDefaultStatus(): ?Status
+    public function getDefaultStatus(): ?FormStatus
     {
         return $this->defaultStatus;
     }
 
-    public function setDefaultStatus(?Status $defaultStatus): void
+    public function setDefaultStatus(?FormStatus $defaultStatus): void
     {
         $this->defaultStatus = $defaultStatus;
     }
@@ -144,6 +152,24 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
     public function removeField(FormField $field): void
     {
         $this->fields->removeElement($field);
+    }
+
+    /**
+     * @return Collection<int, FormStatus>
+     */
+    public function getStatuses(): Collection
+    {
+        return $this->statuses;
+    }
+
+    public function addStatus(FormStatus $status): void
+    {
+        $this->statuses->add($status);
+    }
+
+    public function removeStatus(FormStatus $status): void
+    {
+        $this->statuses->removeElement($status);
     }
 
     public function getACLPermissions(): array

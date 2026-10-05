@@ -36,9 +36,7 @@ class CreateSubmissionController extends AbstractController
             $submission = new FormSubmission();
             $submission->setForm($submissionForm);
             $submission->setSoldier($soldier);
-            if ($submissionForm->getDefaultStatus()) {
-                $submission->setStatus($submissionForm->getDefaultStatus());
-            }
+            $submission->setStatus($submissionForm->getDefaultStatus());
             $submission->setData($form->getData());
 
             $this->formSubmissionRepository->save($submission);

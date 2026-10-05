@@ -19,19 +19,19 @@ class FormSubmission implements AuditableEntityInterface
     use TimestampableEntityTrait;
 
     #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'submissions')]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Form $form;
 
     #[ORM\ManyToOne(targetEntity: Soldier::class)]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Soldier $soldier;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $data = [];
 
-    #[ORM\ManyToOne(targetEntity: Status::class)]
+    #[ORM\ManyToOne(targetEntity: FormStatus::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    private ?Status $status = null;
+    private ?FormStatus $status = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $statusReason = null;
@@ -66,12 +66,12 @@ class FormSubmission implements AuditableEntityInterface
         $this->data = $data;
     }
 
-    public function getStatus(): ?Status
+    public function getStatus(): ?FormStatus
     {
         return $this->status;
     }
 
-    public function setStatus(?Status $status): void
+    public function setStatus(?FormStatus $status): void
     {
         $this->status = $status;
     }

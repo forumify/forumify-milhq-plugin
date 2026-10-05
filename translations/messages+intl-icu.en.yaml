@@ -94,6 +94,10 @@ milhq:
             crud:
                 single: 'field'
                 plural: 'fields'
+        form_status:
+            crud:
+                single: 'status'
+                plural: 'statuses'
         position:
             crud:
                 single: 'position'
