@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace PluginTests\Tests\Application;
 
+use Forumify\Milhq\Entity\Record\AssignmentRecord;
 use PluginTests\Tests\Factories\Milhq\AwardFactory;
 use PluginTests\Tests\Factories\Milhq\AwardTierFactory;
 use PluginTests\Tests\Factories\Milhq\QualificationFactory;
+use PluginTests\Tests\Factories\Milhq\PositionFactory;
 use PluginTests\Tests\Factories\Milhq\QualificationTierFactory;
+use PluginTests\Tests\Factories\Milhq\Record\AssignmentRecordFactory;
 use PluginTests\Tests\Factories\Milhq\Record\AwardRecordFactory;
 use PluginTests\Tests\Factories\Milhq\Record\QualificationRecordFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
+use PluginTests\Tests\Factories\Milhq\UnitFactory;
 use PluginTests\Tests\Factories\Stories\MilsimStory;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
 
@@ -236,5 +240,39 @@ class SoldierTest extends MilhqWebTestCase
         $html = $component->render()->crawler()->html();
         self::assertStringContainsString('Marksmanship Badge', $html);
         self::assertStringNotContainsString('Good Conduct Medal', $html);
+    }
+
+    public function testSecondaryAssignmentsAreSortedByUnitAndPosition(): void
+    {
+        $soldier = SoldierFactory::createOne();
+
+        $unitLast = UnitFactory::createOne(['name' => 'Unit Zulu', 'position' => 20]);
+        $unitFirst = UnitFactory::createOne(['name' => 'Unit Alpha', 'position' => 10]);
+        $positionLast = PositionFactory::createOne(['name' => 'Position Zulu', 'position' => 20]);
+        $positionFirst = PositionFactory::createOne(['name' => 'Position Alpha', 'position' => 10]);
+
+        $assignments = [
+            [$unitLast, $positionLast],
+            [$unitFirst, $positionLast],
+            [$unitLast, $positionFirst],
+            [$unitFirst, $positionFirst],
+        ];
+        foreach ($assignments as [$unit, $position]) {
+            AssignmentRecordFactory::createOne([
+                'soldier' => $soldier,
+                'type' => AssignmentRecord::TYPE_SECONDARY,
+                'unit' => $unit,
+                'position' => $position,
+            ]);
+        }
+
+        $c = $this->client->request('GET', '/milhq/soldier/' . $soldier->getId());
+        self::assertResponseIsSuccessful();
+
+        $text = $c->filter('#assignment')->text();
+        self::assertMatchesRegularExpression(
+            '/Unit Alpha.*Position Alpha.*Position Zulu.*Unit Zulu.*Position Alpha.*Position Zulu/',
+            $text,
+        );
     }
 }
