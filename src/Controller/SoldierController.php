@@ -102,19 +102,25 @@ class SoldierController extends AbstractController
 
     private function getSecondaryUnits(Soldier $soldier): array
     {
-        /** @var array<AssignmentRecord> */
-        $records = $this->assignmentRecordRepository->findBy([
-            'type' => 'secondary',
-            'soldier' => $soldier,
-        ]);
+        /** @var array<AssignmentRecord> $records */
+        $records = $this->assignmentRecordRepository
+            ->createQueryBuilder('ar')
+            ->addSelect('u', 'p')
+            ->join('ar.unit', 'u')
+            ->leftJoin('ar.position', 'p')
+            ->where('ar.soldier = :soldier')
+            ->andWhere('ar.type = :type')
+            ->orderBy('u.position', 'ASC')
+            ->addOrderBy('p.position', 'ASC')
+            ->setParameter('soldier', $soldier)
+            ->setParameter('type', AssignmentRecord::TYPE_SECONDARY)
+            ->getQuery()
+            ->getResult()
+        ;
 
         $grouped = [];
         foreach ($records as $record) {
             $unit = $record->getUnit();
-            if ($unit === null) {
-                continue;
-            }
-
             $unitId = $unit->getId();
             if (!isset($grouped[$unitId])) {
                 $grouped[$unitId] = ['name' => $unit->getName()];
