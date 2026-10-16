@@ -1,5 +1,34 @@
 {% extends '@Forumify/frontend/base.html.twig' %}
 {% block title_page %}{{ 'milhq.qualification.title'|trans }}{% endblock %}
 {% block body %}
-    {{ component('Milhq\\QualificationList', { size: 20 }) }}
+    {% if groups is not empty or hasUngroupedQualifications %}
+        {% embed '@Forumify/components/tabs.html.twig' %}
+            {% block tabs %}
+                {% for group in groups %}
+                    <button type="button" class="btn-link" data-tab-id="qualification-group-{{ group.id }}">
+                        {{ group.title }}
+                    </button>
+                {% endfor %}
+                {% if hasUngroupedQualifications %}
+                    <button type="button" class="btn-link" data-tab-id="qualification-group-ungrouped">
+                        {{ 'milhq.qualification.ungrouped_tab'|trans }}
+                    </button>
+                {% endif %}
+            {% endblock %}
+            {% block tabpanels %}
+                {% for group in groups %}
+                    <div id="qualification-group-{{ group.id }}">
+                        {{ component('Milhq\\QualificationList', { key: 'qualification-list-' ~ group.id, groupId: group.id }) }}
+                    </div>
+                {% endfor %}
+                {% if hasUngroupedQualifications %}
+                    <div id="qualification-group-ungrouped">
+                        {{ component('Milhq\\QualificationList', { key: 'qualification-list-ungrouped', groupId: null }) }}
+                    </div>
+                {% endif %}
+            {% endblock %}
+        {% endembed %}
+    {% else %}
+        <p>{{ 'milhq.qualification.no_qualifications'|trans }}</p>
+    {% endif %}
 {% endblock %}

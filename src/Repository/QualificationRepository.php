@@ -10,8 +10,10 @@ use Forumify\Milhq\Entity\Qualification;
 /**
  * @extends AbstractRepository<Qualification>
  */
-class QualificationRepository extends AbstractRepository
+class QualificationRepository extends AbstractRepository implements GroupScopedRepositoryInterface
 {
+    use GroupScopedRepositoryTrait;
+
     public static function getEntityClass(): string
     {
         return Qualification::class;

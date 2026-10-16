@@ -11,6 +11,7 @@ use Forumify\Milhq\Admin\Form\QualificationType;
 use Forumify\Milhq\Admin\Service\QualificationToTierService;
 use Forumify\Milhq\Entity\Qualification;
 use Forumify\Milhq\Entity\QualificationTier;
+use Forumify\Milhq\Repository\QualificationGroupRepository;
 use Forumify\Milhq\Repository\QualificationTierRepository;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,15 +26,19 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('milhq.admin.organization.view')]
 class QualificationController extends AbstractCrudController
 {
+    use GroupScopedCrudControllerTrait;
+
     protected ?string $permissionView = 'milhq.admin.organization.qualifications.view';
     protected ?string $permissionCreate = 'milhq.admin.organization.qualifications.create';
     protected ?string $permissionEdit = 'milhq.admin.organization.qualifications.manage';
     protected ?string $permissionDelete = 'milhq.admin.organization.qualifications.delete';
 
+    protected string $listTemplate = '@ForumifyMilhqPlugin/admin/components/group_editor/group_list.html.twig';
     protected string $formTemplate = '@ForumifyMilhqPlugin/admin/qualifications/form.html.twig';
 
     public function __construct(
         private readonly QualificationTierRepository $qualificationTierRepository,
+        private readonly QualificationGroupRepository $qualificationGroupRepository,
         private readonly QualificationToTierService $qualificationToTierService,
     ) {
     }
@@ -50,12 +55,14 @@ class QualificationController extends AbstractCrudController
 
     protected function getTableName(): string
     {
-        return 'Milhq\\QualificationTable';
+        return 'Milhq\\QualificationEditor';
     }
 
     protected function getForm(?object $data): FormInterface
     {
-        return $this->createForm(QualificationType::class, $data);
+        return $this->createForm(QualificationType::class, $data, [
+            'group' => $data === null ? $this->getGroupFromRequest($this->qualificationGroupRepository) : null,
+        ]);
     }
 
     protected function redirectAfterSave(mixed $entity, bool $isNew): Response

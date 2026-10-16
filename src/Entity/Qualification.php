@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
-use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\SortableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Repository\QualificationRepository;
@@ -17,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: QualificationRepository::class)]
 #[ORM\Table('milhq_qualification')]
-class Qualification implements SortableEntityInterface, AuditableEntityInterface
+class Qualification implements GroupedEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use SortableEntityTrait;
@@ -43,6 +42,10 @@ class Qualification implements SortableEntityInterface, AuditableEntityInterface
     )]
     #[ORM\OrderBy(['position' => 'DESC'])]
     public Collection $tiers;
+
+    #[ORM\ManyToOne(targetEntity: QualificationGroup::class, inversedBy: 'qualifications')]
+    #[ORM\JoinColumn(name: 'group_id', onDelete: 'SET NULL')]
+    private ?QualificationGroup $group = null;
 
     public function __construct()
     {
@@ -77,6 +80,16 @@ class Qualification implements SortableEntityInterface, AuditableEntityInterface
     public function setImage(?string $image): void
     {
         $this->image = $image;
+    }
+
+    public function getGroup(): ?QualificationGroup
+    {
+        return $this->group;
+    }
+
+    public function setGroup(?QualificationGroup $group): void
+    {
+        $this->group = $group;
     }
 
     public function getIdentifierForAudit(): string

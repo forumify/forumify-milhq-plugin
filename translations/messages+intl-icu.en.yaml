@@ -111,6 +111,10 @@ milhq:
                 edit: 'Editing {tier}'
                 removed: 'Qualification tier removed.'
                 saved: 'Qualification tier saved.'
+        qualification_group:
+            crud:
+                single: 'qualification group'
+                plural: 'qualification groups'
         rank:
             crud:
                 single: 'rank'
@@ -252,6 +256,7 @@ milhq:
         title: 'Qualifications'
         no_qualifications: 'No qualifications.'
         tiers: 'Tiers'
+        ungrouped_tab: 'Ungrouped qualifications'
     opcenter:
         operations_center: 'Operations Center'
         pfile: 'Personnel File'
