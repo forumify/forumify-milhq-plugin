@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SortableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 trait GroupEntityTrait
 {
@@ -16,6 +17,7 @@ trait GroupEntityTrait
     use TimestampableEntityTrait;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['RankGroup', 'AwardGroup', 'QualificationGroup'])]
     private string $title = '';
 
     public function getTitle(): string

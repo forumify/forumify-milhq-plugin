@@ -4,10 +4,18 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Api\Entity\NewAsset;
+use Forumify\Api\Serializer\Attribute\Asset;
 use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
@@ -19,12 +27,32 @@ use Forumify\Milhq\Entity\Record\CombatRecord;
 use Forumify\Milhq\Entity\Record\QualificationRecord;
 use Forumify\Milhq\Entity\Record\RankRecord;
 use Forumify\Milhq\Entity\Record\ServiceRecord;
+use Forumify\Milhq\Api\Processor\SoldierProcessor;
 use Forumify\Milhq\Repository\SoldierRepository;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SoldierRepository::class)]
 #[ORM\Table(name: 'milhq_soldier')]
 #[UniqueEntity('user', errorPath: 'user')]
+#[ApiResource(
+    routePrefix: '/milhq',
+    normalizationContext: ['groups' => ['MilhqSummary']],
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(
+            security: 'is_granted("milhq.admin.soldiers.create")',
+            processor: SoldierProcessor::class,
+        ),
+        new Patch(
+            security: 'is_granted("milhq.admin.soldiers.manage")',
+            processor: SoldierProcessor::class,
+        ),
+        new Delete(security: 'is_granted("milhq.admin.soldiers.delete")'),
+    ],
+)]
 class Soldier implements AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
@@ -32,36 +60,52 @@ class Soldier implements AuditableEntityInterface
 
     #[ORM\OneToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups(['Soldier', 'MilhqSummary'])]
     private ?User $user = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(allowNull: false)]
+    #[Groups(['Soldier', 'MilhqSummary'])]
     private string $name;
 
     #[ORM\ManyToOne(targetEntity: Rank::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups(['Soldier', 'MilhqSummary'])]
     private ?Rank $rank = null;
 
     #[ORM\ManyToOne(targetEntity: Unit::class, inversedBy: 'soldiers', fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups(['Soldier::read', 'MilhqSummary'])]
     private ?Unit $unit = null;
 
     #[ORM\ManyToOne(targetEntity: Position::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups(['Soldier::read', 'MilhqSummary'])]
     private ?Position $position = null;
 
     #[ORM\ManyToOne(targetEntity: Specialty::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups(['Soldier::read', 'MilhqSummary'])]
     private ?Specialty $specialty = null;
 
     #[ORM\ManyToOne(targetEntity: Status::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups(['Soldier::read', 'MilhqSummary'])]
     private ?Status $status = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups('Soldier')]
     private ?string $signature = null;
 
+    #[Asset('signature', 'milhq.asset', 'milhq_asset.storage')]
+    public ?NewAsset $newSignature = null;
+
     #[ORM\Column(nullable: true)]
+    #[Groups('Soldier')]
     private ?string $uniform = null;
+
+    #[Asset('uniform', 'milhq.asset', 'milhq_asset.storage')]
+    public ?NewAsset $newUniform = null;
 
     #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: ServiceRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $serviceRecords;
@@ -83,9 +127,11 @@ class Soldier implements AuditableEntityInterface
 
     #[ORM\OneToOne(targetEntity: Topic::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups('Soldier::read')]
     private ?Topic $enlistmentTopic = null;
 
     #[ORM\Column(type: Types::BIGINT, nullable: true, options: ['unsigned' => true])]
+    #[Groups('Soldier')]
     private ?int $steamId = null;
 
     public function __construct()

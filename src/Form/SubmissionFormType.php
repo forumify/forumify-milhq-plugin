@@ -45,6 +45,14 @@ class SubmissionFormType extends AbstractType implements DataMapperInterface
         'timezone' => TimezoneType::class,
     ];
 
+    /**
+     * @return list<string>
+     */
+    public static function getFieldTypes(): array
+    {
+        return array_keys(self::FIELD_MAP);
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['allowedTypes' => []]);

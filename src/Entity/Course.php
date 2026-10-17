@@ -4,8 +4,17 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Api\Entity\NewAsset;
+use Forumify\Api\Serializer\Attribute\Asset;
 use Forumify\Core\Entity\AccessControlledEntityInterface;
 use Forumify\Core\Entity\ACLParameters;
 use Forumify\Core\Entity\AuditableEntityInterface;
@@ -14,9 +23,24 @@ use Forumify\Core\Entity\SluggableEntityTrait;
 use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\SortableEntityTrait;
 use Forumify\Milhq\Repository\CourseRepository;
+use Forumify\Plugin\Attribute\PluginVersion;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[PluginVersion('forumify/forumify-milhq-plugin', 'premium')]
 #[ORM\Entity(repositoryClass: CourseRepository::class)]
 #[ORM\Table(name: 'milhq_course')]
+#[ApiResource(
+    routePrefix: '/milhq',
+    normalizationContext: ['groups' => ['MilhqSummary']],
+    operations: [
+        new Get(extraProperties: ['acl' => 'view']),
+        new GetCollection(extraProperties: ['acl' => 'view']),
+        new Post(security: 'is_granted("milhq.admin.courses.manage")'),
+        new Patch(security: 'is_granted("milhq.admin.courses.manage")'),
+        new Delete(security: 'is_granted("milhq.admin.courses.delete")'),
+    ],
+)]
 class Course implements AccessControlledEntityInterface, SortableEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
@@ -24,34 +48,45 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
     use SortableEntityTrait;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(allowNull: false)]
+    #[Groups(['Course', 'MilhqSummary'])]
     private string $title;
 
     #[ORM\Column(type: 'text')]
-    private string $description;
+    #[Groups('Course')]
+    private string $description = '';
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['Course', 'MilhqSummary'])]
     private ?string $image = null;
+
+    #[Asset('image', 'milhq.asset', 'milhq_asset.storage')]
+    public ?NewAsset $newImage = null;
 
     #[ORM\ManyToOne(targetEntity: Rank::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups('Course')]
     private ?Rank $minimumRank = null;
 
     /**
      * @var array<string|int>
      */
     #[ORM\Column(type: 'simple_array', nullable: true)]
+    #[Groups('Course')]
     private ?array $prerequisites = [];
 
     /**
      * @var array<string|int>
      */
     #[ORM\Column(type: 'simple_array', nullable: true)]
+    #[Groups('Course')]
     private ?array $qualifications = [];
 
     /**
      * @var array<string|int>
      */
     #[ORM\Column(type: 'simple_array', nullable: true)]
+    #[Groups('Course')]
     private ?array $awards = [];
 
     #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseClass::class, cascade: ['persist', 'remove'])]
@@ -59,7 +94,14 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
 
     #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseInstructor::class, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['position' => 'ASC'])]
+    #[Groups('Course::read')]
     private Collection $instructors;
+
+    public function __construct()
+    {
+        $this->classes = new ArrayCollection();
+        $this->instructors = new ArrayCollection();
+    }
 
     public function getTitle(): string
     {

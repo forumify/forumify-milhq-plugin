@@ -215,7 +215,7 @@ class SoldierService
 
         $secondaryAssigned = $this->assignmentRecordRepository
             ->createQueryBuilder('ar')
-            ->select('ar')
+            ->select('ar', 's')
             ->join('ar.soldier', 's')
             ->where('ar.type = :type')
             ->andWhere('ar.unit = :unit')
@@ -227,7 +227,7 @@ class SoldierService
 
         /** @var AssignmentRecord $secondary */
         foreach ($secondaryAssigned as $secondary) {
-            $soldier = $secondary->getSoldier();
+            $soldier = clone $secondary->getSoldier();
             $allSoldiers[$soldier->getId()] = $soldier;
             $soldier->setPosition($secondary->getPosition());
             $soldier->setSpecialty($secondary->getSpecialty());

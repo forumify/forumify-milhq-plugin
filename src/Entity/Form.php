@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -14,10 +20,21 @@ use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Repository\FormRepository;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FormRepository::class)]
 #[ORM\Table('milhq_form')]
+#[ApiResource(
+    routePrefix: '/milhq',
+    operations: [
+        new Get(extraProperties: ['acl' => 'create_submissions']),
+        new GetCollection(extraProperties: ['acl' => 'create_submissions']),
+        new Post(security: 'is_granted("milhq.admin.organization.forms.create")'),
+        new Patch(security: 'is_granted("milhq.admin.organization.forms.manage")'),
+        new Delete(security: 'is_granted("milhq.admin.organization.forms.delete")'),
+    ],
+)]
 class Form implements AccessControlledEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
@@ -25,19 +42,24 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
+    #[Groups('Form')]
     private string $name;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups('Form')]
     private string $successMessage = '';
 
     #[ORM\ManyToOne(targetEntity: FormStatus::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups('Form')]
     private ?FormStatus $defaultStatus = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups('Form')]
     private string $description = '';
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups('Form')]
     private string $instructions = '';
 
     #[ORM\OneToMany(mappedBy: 'form', targetEntity: FormSubmission::class)]
@@ -45,6 +67,7 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
 
     #[ORM\OneToMany(mappedBy: 'form', targetEntity: FormField::class, cascade: ['persist'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
+    #[Groups('Form::read')]
     private Collection $fields;
 
     /**
@@ -52,6 +75,7 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
      */
     #[ORM\OneToMany(mappedBy: 'form', targetEntity: FormStatus::class, cascade: ['persist'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
+    #[Groups('Form::read')]
     private Collection $statuses;
 
     public function __construct()

@@ -16,6 +16,8 @@ class RankFactory extends PersistentObjectFactory
 
     protected function defaults(): array|callable
     {
-        return [];
+        return [
+            'name' => self::faker()->unique()->jobTitle(),
+        ];
     }
 }

@@ -8,8 +8,14 @@ use DateInterval;
 use DateTimeImmutable;
 use Forumify\Core\Repository\SettingRepository;
 use Forumify\Calendar\ForumifyCalendarPlugin;
+use Forumify\Milhq\Repository\AfterActionReportRepository;
+use Forumify\Milhq\Entity\Operation;
+use Forumify\Testing\Factories\Core\ACLFactory;
+use Forumify\Testing\Factories\Core\UserFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PluginTests\Tests\Factories\Forumify\CalendarFactory;
+use PluginTests\Tests\Factories\Milhq\AfterActionReportFactory;
 use PluginTests\Tests\Factories\Milhq\OperationFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use PluginTests\Tests\Factories\Stories\MilsimStory;
@@ -148,5 +154,75 @@ class OperationsTest extends MilhqWebTestCase
 
         $calendar = CalendarFactory::find($calendar->getId());
         self::assertCount(1, $calendar->getEvents());
+    }
+
+    public function testViewerCanSeeAfterActionReportWithoutManageButtons(): void
+    {
+        $present = SoldierFactory::createOne(['name' => 'John Present']);
+        $absent = SoldierFactory::createOne(['name' => 'Jane Absent']);
+        $aar = AfterActionReportFactory::createOne([
+            'report' => '<p id="aar-report">We won.</p>',
+            'attendance' => ['present' => [$present->getId()], 'absent' => [$absent->getId()]],
+        ]);
+        ACLFactory::createOne([
+            'entity' => Operation::class,
+            'entityId' => (string)$aar->getMission()->getOperation()->getId(),
+            'permission' => 'view_after_action_reports',
+        ]);
+        $this->client->loginUser(UserFactory::createOne());
+
+        $this->client->request('GET', "/milhq/aar/{$aar->getId()}");
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('#aar-report');
+        self::assertSelectorTextContains('table.box tbody', 'John Present');
+        self::assertSelectorTextContains('table.box tbody', 'Jane Absent');
+        self::assertCount(1, $this->client->getCrawler()->filter('table.box tbody tr'));
+        self::assertSelectorNotExists("a[href*='/milhq/aar/{$aar->getId()}/edit']");
+        self::assertSelectorNotExists("a[href*='/milhq/aar/{$aar->getId()}/delete']");
+    }
+
+    public function testManagerSeesManageButtons(): void
+    {
+        $aar = AfterActionReportFactory::createOne();
+
+        $this->client->request('GET', "/milhq/aar/{$aar->getId()}");
+
+        self::assertSelectorExists("a[href*='/milhq/aar/{$aar->getId()}/edit']");
+        self::assertSelectorExists("a[href*='/milhq/aar/{$aar->getId()}/delete']");
+    }
+
+    public function testViewingAfterActionReportRequiresViewAccess(): void
+    {
+        $aar = AfterActionReportFactory::createOne();
+        $this->client->loginUser(UserFactory::createOne());
+
+        $this->client->request('GET', "/milhq/aar/{$aar->getId()}");
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
+    #[DataProvider('aarManagementActions')]
+    public function testAuthorWithoutAccessCannotManageAfterActionReport(string $action): void
+    {
+        $author = UserFactory::createOne();
+        $aarId = AfterActionReportFactory::createOne(['createdBy' => $author, 'report' => 'Original report'])->getId();
+        $this->client->loginUser($author);
+
+        $this->client->request('GET', "/milhq/aar/{$aarId}/{$action}?confirmed=1");
+
+        self::assertResponseStatusCodeSame(403);
+        $aar = self::getContainer()->get(AfterActionReportRepository::class)->find($aarId);
+        self::assertNotNull($aar);
+        self::assertSame('Original report', $aar->getReport());
+    }
+
+    /**
+     * @return iterable<array{string}>
+     */
+    public static function aarManagementActions(): iterable
+    {
+        yield 'edit' => ['edit'];
+        yield 'delete' => ['delete'];
     }
 }

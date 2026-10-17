@@ -5,9 +5,17 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Entity;
 
 use DateTime;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Api\Entity\NewAsset;
+use Forumify\Api\Serializer\Attribute\Asset;
 use Forumify\Core\Entity\AccessControlledEntityInterface;
 use Forumify\Core\Entity\ACLParameters;
 use Forumify\Core\Entity\AuditableEntityInterface;
@@ -15,9 +23,24 @@ use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SluggableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Repository\OperationRepository;
+use Forumify\Plugin\Attribute\PluginVersion;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[PluginVersion('forumify/forumify-milhq-plugin', 'premium')]
 #[ORM\Entity(repositoryClass: OperationRepository::class)]
 #[ORM\Table('milhq_operation')]
+#[ApiResource(
+    routePrefix: '/milhq',
+    order: ['start' => 'DESC'],
+    operations: [
+        new Get(extraProperties: ['acl' => 'view']),
+        new GetCollection(extraProperties: ['acl' => 'view']),
+        new Post(security: 'is_granted("milhq.admin.operations.manage")'),
+        new Patch(security: 'is_granted("milhq.admin.operations.manage")'),
+        new Delete(security: 'is_granted("milhq.admin.operations.delete")'),
+    ],
+)]
 class Operation implements AccessControlledEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
@@ -25,33 +48,46 @@ class Operation implements AccessControlledEntityInterface, AuditableEntityInter
     use TimestampableEntityTrait;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(allowNull: false)]
+    #[Groups(['Operation', 'MilhqSummary'])]
     private string $title;
 
     #[ORM\Column(type: 'text')]
-    private string $description;
+    #[Groups('Operation')]
+    private string $description = '';
 
     #[ORM\Column(type: 'text')]
+    #[Groups('Operation')]
     private string $content = '';
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['Operation', 'MilhqSummary'])]
     private ?string $image = null;
 
+    #[Asset('image', 'milhq.asset', 'milhq_asset.storage')]
+    public ?NewAsset $newImage = null;
+
     #[ORM\Column(type: 'date', nullable: true)]
+    #[Groups('Operation')]
     private ?DateTime $start = null;
 
     #[ORM\Column(type: 'date', nullable: true)]
+    #[Groups('Operation')]
     private ?DateTime $end = null;
 
     #[ORM\Column(type: 'text')]
+    #[Groups('Operation')]
     private string $missionBriefingTemplate = '';
 
     #[ORM\Column(type: 'text')]
+    #[Groups('Operation')]
     private string $afterActionReportTemplate = '';
 
     #[ORM\OneToMany(mappedBy: 'operation', targetEntity: Mission::class, cascade: ['persist', 'remove'])]
     private Collection $missions;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[Groups('Operation')]
     private bool $requestRsvp = false;
 
     public function __construct()

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Controller;
 
-use Forumify\Core\Entity\User;
 use Forumify\Core\Security\VoterAttribute;
 use Forumify\Milhq\Form\AfterActionReportType;
 use Forumify\Milhq\Entity\AfterActionReport;
@@ -44,7 +43,7 @@ class AfterActionReportController extends AbstractController
     {
         $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
             'entity' => $aar->getMission()->getOperation(),
-            'permission' => 'manage_after_action_reports',
+            'permission' => 'view_after_action_reports',
         ]);
 
         $allUserIds = [];
@@ -103,14 +102,10 @@ class AfterActionReportController extends AbstractController
     #[Route('/{id<\d+>}/edit', 'edit')]
     public function edit(AfterActionReport $aar, Request $request): Response
     {
-        /** @var User|null $user */
-        $user = $this->getUser();
-        if ($aar->getCreatedBy()?->getId() !== $user?->getId()) {
-            $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
-                'entity' => $aar->getMission()->getOperation(),
-                'permission' => 'manage_after_action_reports',
-            ]);
-        }
+        $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
+            'entity' => $aar->getMission()->getOperation(),
+            'permission' => 'manage_after_action_reports',
+        ]);
 
         return $this->handleAfterActionReportForm($aar, false, $request);
     }
@@ -118,14 +113,10 @@ class AfterActionReportController extends AbstractController
     #[Route('/{id<\d+>}/delete', 'delete')]
     public function delete(AfterActionReport $aar, Request $request): Response
     {
-        /** @var User|null $user */
-        $user = $this->getUser();
-        if ($aar->getCreatedBy()?->getId() !== $user?->getId()) {
-            $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
-                'entity' => $aar->getMission()->getOperation(),
-                'permission' => 'manage_after_action_reports',
-            ]);
-        }
+        $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
+            'entity' => $aar->getMission()->getOperation(),
+            'permission' => 'manage_after_action_reports',
+        ]);
 
         if (!$request->query->get('confirmed')) {
             return $this->render('@ForumifyMilhqPlugin/frontend/aar/delete.html.twig', [

@@ -12,6 +12,8 @@ use Forumify\Core\Entity\BlameableEntityTrait;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SluggableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 trait MissionFields
 {
@@ -21,31 +23,41 @@ trait MissionFields
     use TimestampableEntityTrait;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(allowNull: false)]
+    #[Groups(['Mission', 'MilhqSummary'])]
     private string $title;
 
     #[ORM\Column(type: 'text')]
-    private string $briefing;
+    #[Groups('Mission')]
+    private string $briefing = '';
 
     #[ORM\Column(type: 'datetime')]
+    #[Assert\NotNull]
+    #[Groups(['Mission', 'MilhqSummary'])]
     private DateTime $start;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?DateTime $end;
+    #[Groups(['Mission', 'MilhqSummary'])]
+    private ?DateTime $end = null;
 
     #[ORM\ManyToOne(targetEntity: Operation::class, fetch: 'EXTRA_LAZY', inversedBy: 'missions')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[Groups('Mission::read')]
     private Operation $operation;
 
     #[ORM\OneToMany(mappedBy: 'mission', targetEntity: AfterActionReport::class, cascade: ['persist', 'remove'])]
     private Collection $afterActionReports;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
-    private bool $sendNotification;
+    #[Groups('Mission')]
+    private bool $sendNotification = false;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
-    private bool $createCombatRecords;
+    #[Groups('Mission')]
+    private bool $createCombatRecords = false;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups('Mission')]
     private ?string $combatRecordText = null;
 
     #[ORM\OneToMany(mappedBy: 'mission', targetEntity: MissionRsvp::class, fetch: 'EXTRA_LAZY', cascade: ['persist', 'remove'])]

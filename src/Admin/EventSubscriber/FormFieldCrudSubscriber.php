@@ -7,7 +7,6 @@ namespace Forumify\Milhq\Admin\EventSubscriber;
 use Forumify\Admin\Crud\Event\PreSaveCrudEvent;
 use Forumify\Milhq\Entity\FormField;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class FormFieldCrudSubscriber implements EventSubscriberInterface
 {
@@ -21,18 +20,6 @@ class FormFieldCrudSubscriber implements EventSubscriberInterface
      */
     public function preSaveField(PreSaveCrudEvent $event): void
     {
-        $field = $event->getEntity();
-        if (!empty($field->getKey())) {
-            return;
-        }
-
-        $key = new AsciiSlugger()
-            ->slug($field->getLabel())
-            ->slice(0, 64)
-            ->lower()
-            ->toString()
-        ;
-
-        $field->setKey($key);
+        $event->getEntity()->generateKeyIfEmpty();
     }
 }

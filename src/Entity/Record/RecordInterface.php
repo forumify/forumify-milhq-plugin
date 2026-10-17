@@ -35,4 +35,6 @@ interface RecordInterface
     public function getUpdatedAt(): ?DateTime;
 
     public function setUpdatedAt(?DateTime $updatedAt): void;
+
+    public function shouldSendNotification(): bool;
 }

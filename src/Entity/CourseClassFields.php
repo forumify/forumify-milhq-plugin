@@ -12,6 +12,8 @@ use Doctrine\ORM\Mapping\Column;
 use Forumify\Core\Entity\BlameableEntityTrait;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 trait CourseClassFields
 {
@@ -21,24 +23,36 @@ trait CourseClassFields
 
     #[ORM\ManyToOne(targetEntity: Course::class, inversedBy: 'classes')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[Groups('CourseClass::read')]
     private Course $course;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(allowNull: false)]
+    #[Groups(['CourseClass', 'MilhqSummary'])]
     private string $title;
 
     #[ORM\Column(type: 'text')]
-    private string $description;
+    #[Groups('CourseClass')]
+    private string $description = '';
 
     #[ORM\Column(type: 'datetime')]
+    #[Assert\NotNull]
+    #[Groups(['CourseClass', 'MilhqSummary'])]
     private DateTime $signupFrom;
 
     #[ORM\Column(type: 'datetime')]
+    #[Assert\NotNull]
+    #[Groups(['CourseClass', 'MilhqSummary'])]
     private DateTime $signupUntil;
 
     #[ORM\Column(type: 'datetime')]
+    #[Assert\NotNull]
+    #[Groups(['CourseClass', 'MilhqSummary'])]
     private DateTime $start;
 
     #[ORM\Column(type: 'datetime')]
+    #[Assert\NotNull]
+    #[Groups(['CourseClass', 'MilhqSummary'])]
     private DateTime $end;
 
     /**
@@ -50,6 +64,7 @@ trait CourseClassFields
         cascade: ['persist', 'remove'],
         orphanRemoval: true,
     )]
+    #[Groups('CourseClass::read')]
     private Collection $instructors;
 
     /**
@@ -61,11 +76,14 @@ trait CourseClassFields
         cascade: ['persist', 'remove'],
         orphanRemoval: true,
     )]
+    #[Groups('CourseClass::read')]
     private Collection $students;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups('CourseClass')]
     private ?int $studentSlots = null;
 
+    #[Groups('CourseClass')]
     #[Column(type: 'boolean', options: ['default' => false])]
     private bool $result = false;
 
