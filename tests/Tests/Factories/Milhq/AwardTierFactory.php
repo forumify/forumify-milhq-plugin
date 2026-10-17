@@ -16,6 +16,9 @@ class AwardTierFactory extends PersistentObjectFactory
 
     protected function defaults(): array|callable
     {
-        return [];
+        return [
+            'parent' => AwardFactory::new(),
+            'name' => self::faker()->word(),
+        ];
     }
 }

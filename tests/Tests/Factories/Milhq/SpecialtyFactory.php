@@ -18,6 +18,7 @@ class SpecialtyFactory extends PersistentObjectFactory
     {
         return [
             'name' => self::faker()->sentence(),
+            'abbreviation' => strtoupper(self::faker()->lexify('???')),
         ];
     }
 }

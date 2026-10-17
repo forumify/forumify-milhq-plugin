@@ -16,6 +16,9 @@ class QualificationTierFactory extends PersistentObjectFactory
 
     protected function defaults(): array|callable
     {
-        return [];
+        return [
+            'parent' => QualificationFactory::new(),
+            'name' => self::faker()->word(),
+        ];
     }
 }

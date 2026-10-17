@@ -30,6 +30,8 @@
                 <element value="Assert\"/>
                 <element value="Groups"/>
                 <element value="UniqueEntity"/>
+                <element value="ApiResource"/>
+                <element value="ApiProperty"/>
                 <element value="Route"/>
                 <element value="AsLiveComponent"/>
                 <element value="LiveAction"/>

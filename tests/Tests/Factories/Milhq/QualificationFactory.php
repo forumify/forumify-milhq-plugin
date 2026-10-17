@@ -19,6 +19,8 @@ class QualificationFactory extends PersistentObjectFactory
 
     protected function defaults(): array|callable
     {
-        return [];
+        return [
+            'name' => self::faker()->unique()->words(3, true),
+        ];
     }
 }

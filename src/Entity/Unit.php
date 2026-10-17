@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -16,10 +22,21 @@ use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\SortableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Repository\UnitRepository;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UnitRepository::class)]
 #[ORM\Table('milhq_unit')]
+#[ApiResource(
+    routePrefix: '/milhq',
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(security: 'is_granted("milhq.admin.organization.units.create")'),
+        new Patch(security: 'is_granted("milhq.admin.organization.units.manage")'),
+        new Delete(security: 'is_granted("milhq.admin.organization.units.delete")'),
+    ],
+)]
 class Unit implements SortableEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
@@ -28,9 +45,11 @@ class Unit implements SortableEntityInterface, AuditableEntityInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
+    #[Groups(['Unit', 'MilhqSummary'])]
     private string $name;
 
     #[ORM\Column(type: 'text')]
+    #[Groups('Unit')]
     private string $description = '';
 
     #[ORM\OneToMany(mappedBy: 'unit', targetEntity: Soldier::class)]
@@ -48,9 +67,11 @@ class Unit implements SortableEntityInterface, AuditableEntityInterface
         joinColumns: new JoinColumn(onDelete: 'CASCADE'),
         inverseJoinColumns: new JoinColumn(onDelete: 'CASCADE'),
     )]
+    #[Groups('Unit')]
     public Collection $supervisors;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => 1])]
+    #[Groups('Unit')]
     public bool $markSupervisorsOnRoster = true;
 
     #[ORM\ManyToOne(targetEntity: Role::class)]
@@ -58,11 +79,13 @@ class Unit implements SortableEntityInterface, AuditableEntityInterface
     public ?Role $role = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['Unit', 'MilhqSummary'])]
     private ?string $designation = null;
 
     /** @var Collection<int, Equipment> */
     #[ORM\ManyToMany(targetEntity: Equipment::class)]
     #[ORM\JoinTable('milhq_unit_vehicles')]
+    #[Groups('Unit')]
     private Collection $vehicles;
 
     public function __construct()

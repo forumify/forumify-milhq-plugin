@@ -17,6 +17,7 @@ class StatusFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
+            'name' => self::faker()->unique()->word(),
             'color' => self::faker()->hexColor(),
         ];
     }

@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,6 +17,16 @@ use Forumify\Milhq\Repository\QualificationGroupRepository;
 
 #[ORM\Entity(repositoryClass: QualificationGroupRepository::class)]
 #[ORM\Table('milhq_qualification_group')]
+#[ApiResource(
+    routePrefix: '/milhq',
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(security: 'is_granted("milhq.admin.organization.qualifications.create")'),
+        new Patch(security: 'is_granted("milhq.admin.organization.qualifications.manage")'),
+        new Delete(security: 'is_granted("milhq.admin.organization.qualifications.delete")'),
+    ],
+)]
 class QualificationGroup implements GroupInterface
 {
     use GroupEntityTrait;

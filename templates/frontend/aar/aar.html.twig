@@ -44,8 +44,8 @@
             </tr>
             </thead>
             <tbody>
-            {% set rowCount = max(attendance|map(state => state|length)) - 1 %}
-            {% for i in 0..rowCount %}
+            {% set rowCount = max([0]|merge(attendance|map(state => state|length))) %}
+            {% for i in rowCount > 0 ? 0..(rowCount - 1) : [] %}
                 <tr>
                     {% for state in attendanceStates %}
                         <td>

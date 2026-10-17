@@ -10,6 +10,7 @@ use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Entity\Document;
 use Forumify\Milhq\Entity\Soldier;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @phpstan-require-implements AuditableEntityInterface
@@ -21,14 +22,20 @@ trait RecordFields
 
     #[ORM\ManyToOne(targetEntity: Soldier::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups('Record::read')]
     private ?Soldier $author = null;
 
     #[ORM\Column(type: 'text')]
+    #[Groups('Record')]
     private string $text = '';
 
     #[ORM\ManyToOne(targetEntity: Document::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups('Record')]
     private ?Document $document = null;
+
+    #[Groups('Record::write')]
+    public bool $sendNotification = false;
 
     public function getAuthor(): ?Soldier
     {
@@ -68,6 +75,11 @@ trait RecordFields
     public function setDocument(?Document $document): void
     {
         $this->document = $document;
+    }
+
+    public function shouldSendNotification(): bool
+    {
+        return $this->sendNotification;
     }
 
     public function getIdentifierForAudit(): string

@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,10 +20,21 @@ use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\SortableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
 use Forumify\Milhq\Repository\RosterRepository;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RosterRepository::class)]
 #[ORM\Table('milhq_roster')]
+#[ApiResource(
+    routePrefix: '/milhq',
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(security: 'is_granted("milhq.admin.organization.rosters.create")'),
+        new Patch(security: 'is_granted("milhq.admin.organization.rosters.manage")'),
+        new Delete(security: 'is_granted("milhq.admin.organization.rosters.delete")'),
+    ],
+)]
 class Roster implements SortableEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
@@ -26,9 +43,11 @@ class Roster implements SortableEntityInterface, AuditableEntityInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
+    #[Groups('Roster')]
     private string $name;
 
     #[ORM\Column(type: 'text')]
+    #[Groups('Roster')]
     private string $description = '';
 
     #[ORM\ManyToMany(targetEntity: Unit::class, inversedBy: 'rosters')]
@@ -38,6 +57,7 @@ class Roster implements SortableEntityInterface, AuditableEntityInterface
         inverseJoinColumns: new JoinColumn(nullable: false, onDelete: 'CASCADE')
     )]
     #[ORM\OrderBy(['position' => 'ASC'])]
+    #[Groups('Roster')]
     private Collection $units;
 
     public function __construct()

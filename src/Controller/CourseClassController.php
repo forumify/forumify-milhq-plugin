@@ -60,6 +60,11 @@ class CourseClassController extends AbstractController
     #[Route('/class/{id}/delete', 'delete')]
     public function delete(Request $request, CourseClass $class): Response
     {
+        $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
+            'entity' => $class->getCourse(),
+            'permission' => 'manage_classes',
+        ]);
+
         if (!$request->query->get('confirmed')) {
             return $this->render('@ForumifyMilhqPlugin/frontend/course/class_delete.html.twig', [
                 'class' => $class,

@@ -46,6 +46,17 @@ class AfterActionReportService
             }
         }
         $aar->setAttendance($attendance);
+        $this->save($aar, $isNew);
+    }
+
+    public function save(AfterActionReport $aar, bool $isNew): void
+    {
+        $attendance = $aar->getAttendance();
+        foreach ($this->getAttendanceStates() as $state) {
+            $attendance[$state] ??= [];
+        }
+        $aar->setAttendance($attendance);
+
         $this->afterActionReportRepository->save($aar);
 
         if (!$isNew) {

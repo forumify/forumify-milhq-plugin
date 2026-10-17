@@ -11,9 +11,11 @@ use Forumify\Milhq\Repository\CourseClassRepository;
 use Forumify\Milhq\Repository\CourseInstructorRepository;
 use Forumify\Milhq\Repository\QualificationRecordRepository;
 use Forumify\Milhq\Repository\ServiceRecordRepository;
+use Forumify\Testing\Factories\Core\UserFactory;
 use PluginTests\Tests\Application\MilhqWebTestCase;
 use PluginTests\Tests\Factories\Milhq\AwardFactory;
 use PluginTests\Tests\Factories\Milhq\AwardTierFactory;
+use PluginTests\Tests\Factories\Milhq\CourseClassFactory;
 use PluginTests\Tests\Factories\Milhq\Record\QualificationRecordFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use PluginTests\Tests\Factories\Stories\MilsimStory;
@@ -218,5 +220,27 @@ class CoursesTest extends MilhqWebTestCase
         foreach (['Attended CLS 001 as Safety Officer', 'Graduated CLS 001'] as $expected) {
             self::assertContains($expected, $realServiceRecords);
         }
+    }
+
+    public function testDeleteClass(): void
+    {
+        $class = CourseClassFactory::createOne();
+        $classId = $class->getId();
+
+        $this->client->request('GET', "/milhq/courses/class/{$classId}/delete?confirmed=1");
+
+        self::assertResponseIsSuccessful();
+        self::assertNull(self::getContainer()->get(CourseClassRepository::class)->find($classId));
+    }
+
+    public function testDeleteClassRequiresManageClasses(): void
+    {
+        $classId = CourseClassFactory::createOne()->getId();
+        $this->client->loginUser(UserFactory::createOne());
+
+        $this->client->request('GET', "/milhq/courses/class/{$classId}/delete?confirmed=1");
+
+        self::assertResponseStatusCodeSame(403);
+        self::assertNotNull(self::getContainer()->get(CourseClassRepository::class)->find($classId));
     }
 }
