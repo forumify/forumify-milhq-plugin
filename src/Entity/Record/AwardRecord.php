@@ -19,6 +19,7 @@ use Forumify\Milhq\Api\Processor\RecordProcessor;
 use Forumify\Milhq\Repository\AwardRecordRepository;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: AwardRecordRepository::class)]
 #[ORM\Table('milhq_record_award')]
@@ -82,5 +83,24 @@ class AwardRecord implements RecordInterface, AuditableEntityInterface
     public function setTier(?AwardTier $tier): void
     {
         $this->tier = $tier;
+    }
+
+    #[Assert\Callback]
+    public function validateTier(ExecutionContextInterface $context): void
+    {
+        if (!isset($this->award) || $this->award->autoAdvanceTiers) {
+            return;
+        }
+
+        if ($this->tier === null) {
+            if (!$this->award->tiers->isEmpty()) {
+                $context->buildViolation('This award requires a tier to be selected.')->atPath('tier')->addViolation();
+            }
+            return;
+        }
+
+        if ($this->tier->parent->getId() !== $this->award->getId()) {
+            $context->buildViolation('This tier does not belong to the selected award.')->atPath('tier')->addViolation();
+        }
     }
 }

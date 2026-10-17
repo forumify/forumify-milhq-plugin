@@ -19,7 +19,6 @@ use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\SortableEntityTrait;
 use Forumify\Core\Entity\TimestampableEntityTrait;
-use Forumify\Milhq\Api\Processor\FormFieldProcessor;
 use Forumify\Milhq\Form\SubmissionFormType;
 use Forumify\Milhq\Repository\FormFieldRepository;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -35,10 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     routePrefix: '/milhq',
     operations: [
         new Get(extraProperties: ['acl' => ['permission' => 'create_submissions', 'entity' => 'form']]),
-        new Patch(
-            security: 'is_granted("milhq.admin.organization.forms.manage")',
-            processor: FormFieldProcessor::class,
-        ),
+        new Patch(security: 'is_granted("milhq.admin.organization.forms.manage")'),
         new Delete(security: 'is_granted("milhq.admin.organization.forms.manage")'),
         new GetCollection(
             uriTemplate: '/forms/{formId}/fields',
@@ -54,7 +50,6 @@ use Symfony\Component\Validator\Constraints as Assert;
             ],
             security: 'is_granted("milhq.admin.organization.forms.manage")',
             provider: CreateProvider::class,
-            processor: FormFieldProcessor::class,
         ),
     ],
 )]
@@ -74,6 +69,7 @@ class FormField implements SortableEntityInterface, AuditableEntityInterface
     private string $key = '';
 
     #[ORM\Column(length: 64)]
+    #[Assert\NotNull]
     #[Assert\Choice(callback: [SubmissionFormType::class, 'getFieldTypes'])]
     #[Groups(['FormField', 'Form::read'])]
     private string $type;
@@ -81,7 +77,7 @@ class FormField implements SortableEntityInterface, AuditableEntityInterface
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(allowNull: false)]
     #[Groups(['FormField', 'Form::read'])]
-    private string $label;
+    private string $label = '';
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['FormField', 'Form::read'])]

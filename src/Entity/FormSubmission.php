@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['MilhqSummary']],
     order: ['createdAt' => 'DESC'],
     operations: [
-        new Get(security: 'object.getSoldier().getUser()?.getId() == user.getUserId() or is_granted("ACCESS_CONTROL_LIST", {"permission": "view_submissions", "entity": object.getForm()})'),
+        new Get(security: 'is_granted("MILHQ_FORM_SUBMISSION_VIEW", object)'),
         new GetCollection(extraProperties: ['acl' => ['permission' => 'view_submissions', 'entity' => 'form']]),
         new Patch(
             normalizationContext: ['groups' => ['FormSubmission::read', 'MilhqSummary']],
@@ -51,7 +51,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
                 'formId' => new Link(
                     fromClass: Form::class,
                     toProperty: 'form',
-                    security: 'is_granted("ACCESS_CONTROL_LIST", {"permission": "create_submissions", "entity": form})',
+                    security: 'is_granted("MILHQ_FORM_SUBMISSION_CREATE", form)',
                 ),
             ],
             normalizationContext: ['groups' => ['FormSubmission::read', 'MilhqSummary']],

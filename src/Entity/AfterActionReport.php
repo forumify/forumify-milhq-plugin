@@ -53,7 +53,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                 'missionId' => new Link(
                     fromClass: Mission::class,
                     toProperty: 'mission',
-                    security: 'is_granted("ACCESS_CONTROL_LIST", {"permission": "manage_after_action_reports", "entity": mission.getOperation()})',
+                    security: 'is_granted("MILHQ_AFTER_ACTION_REPORT_MANAGE", mission)',
                 ),
             ],
             provider: CreateProvider::class,

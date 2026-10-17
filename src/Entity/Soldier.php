@@ -27,9 +27,11 @@ use Forumify\Milhq\Entity\Record\CombatRecord;
 use Forumify\Milhq\Entity\Record\QualificationRecord;
 use Forumify\Milhq\Entity\Record\RankRecord;
 use Forumify\Milhq\Entity\Record\ServiceRecord;
+use Forumify\Milhq\Api\Processor\SoldierProcessor;
 use Forumify\Milhq\Repository\SoldierRepository;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SoldierRepository::class)]
 #[ORM\Table(name: 'milhq_soldier')]
@@ -40,8 +42,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(security: 'is_granted("milhq.admin.soldiers.create")'),
-        new Patch(security: 'is_granted("milhq.admin.soldiers.manage")'),
+        new Post(
+            security: 'is_granted("milhq.admin.soldiers.create")',
+            processor: SoldierProcessor::class,
+        ),
+        new Patch(
+            security: 'is_granted("milhq.admin.soldiers.manage")',
+            processor: SoldierProcessor::class,
+        ),
         new Delete(security: 'is_granted("milhq.admin.soldiers.delete")'),
     ],
 )]
@@ -56,6 +64,7 @@ class Soldier implements AuditableEntityInterface
     private ?User $user = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(allowNull: false)]
     #[Groups(['Soldier', 'MilhqSummary'])]
     private string $name;
 
@@ -66,22 +75,22 @@ class Soldier implements AuditableEntityInterface
 
     #[ORM\ManyToOne(targetEntity: Unit::class, inversedBy: 'soldiers', fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    #[Groups(['Soldier', 'MilhqSummary'])]
+    #[Groups(['Soldier::read', 'MilhqSummary'])]
     private ?Unit $unit = null;
 
     #[ORM\ManyToOne(targetEntity: Position::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    #[Groups(['Soldier', 'MilhqSummary'])]
+    #[Groups(['Soldier::read', 'MilhqSummary'])]
     private ?Position $position = null;
 
     #[ORM\ManyToOne(targetEntity: Specialty::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    #[Groups(['Soldier', 'MilhqSummary'])]
+    #[Groups(['Soldier::read', 'MilhqSummary'])]
     private ?Specialty $specialty = null;
 
     #[ORM\ManyToOne(targetEntity: Status::class, fetch: 'EAGER')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    #[Groups(['Soldier', 'MilhqSummary'])]
+    #[Groups(['Soldier::read', 'MilhqSummary'])]
     private ?Status $status = null;
 
     #[ORM\Column(nullable: true)]

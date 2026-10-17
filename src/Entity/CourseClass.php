@@ -50,7 +50,7 @@ if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
                     'courseId' => new Link(
                         fromClass: Course::class,
                         toProperty: 'course',
-                        security: 'is_granted("ACCESS_CONTROL_LIST", {"permission": "manage_classes", "entity": course})',
+                        security: 'is_granted("MILHQ_COURSE_CLASS_MANAGE", course)',
                     ),
                 ],
                 provider: CreateProvider::class,
@@ -121,7 +121,7 @@ if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
                     'courseId' => new Link(
                         fromClass: Course::class,
                         toProperty: 'course',
-                        security: 'is_granted("ACCESS_CONTROL_LIST", {"permission": "manage_classes", "entity": course})',
+                        security: 'is_granted("MILHQ_COURSE_CLASS_MANAGE", course)',
                     ),
                 ],
                 provider: CreateProvider::class,

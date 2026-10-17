@@ -11,6 +11,8 @@ use Forumify\Testing\Api\Crud\GetTestTrait;
 use Forumify\Testing\Factories\OAuth\OAuthClientFactory;
 use PluginTests\Tests\Factories\Milhq\AwardFactory;
 use PluginTests\Tests\Factories\Milhq\AwardTierFactory;
+use PluginTests\Tests\Factories\Milhq\QualificationFactory;
+use PluginTests\Tests\Factories\Milhq\QualificationTierFactory;
 use PluginTests\Tests\Factories\Milhq\RankFactory;
 use PluginTests\Tests\Factories\Milhq\Record\ServiceRecordFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
@@ -83,6 +85,53 @@ class RecordApiTest extends ApiTestCase
         self::assertSame('Good Conduct', $first['award']['name']);
         self::assertSame('Bronze', $first['tier']['name']);
         self::assertSame('Silver', $second['tier']['name']);
+    }
+
+    public function testAwardRecordTierMustBelongToAward(): void
+    {
+        $award = AwardFactory::createOne();
+        AwardTierFactory::createOne(['parent' => $award]);
+        $soldier = '/api/milhq/soldiers/' . SoldierFactory::createOne()->getId();
+
+        $missing = $this->request('POST', '/api/milhq/award-records', [
+            'json' => ['soldier' => $soldier, 'award' => "/api/milhq/awards/{$award->getId()}"],
+        ]);
+        $foreign = $this->request('POST', '/api/milhq/award-records', [
+            'json' => [
+                'soldier' => $soldier,
+                'award' => "/api/milhq/awards/{$award->getId()}",
+                'tier' => '/api/milhq/award-tiers/' . AwardTierFactory::createOne()->getId(),
+            ],
+        ]);
+
+        self::assertSame(422, $missing->getStatusCode());
+        self::assertSame(422, $foreign->getStatusCode());
+    }
+
+    public function testQualificationRecordTierMustBelongToQualification(): void
+    {
+        $qualification = QualificationFactory::createOne();
+        $tier = QualificationTierFactory::createOne(['parent' => $qualification]);
+        $soldier = '/api/milhq/soldiers/' . SoldierFactory::createOne()->getId();
+        $qualificationIri = "/api/milhq/qualifications/{$qualification->getId()}";
+
+        $missing = $this->request('POST', '/api/milhq/qualification-records', [
+            'json' => ['soldier' => $soldier, 'qualification' => $qualificationIri],
+        ]);
+        $foreign = $this->request('POST', '/api/milhq/qualification-records', [
+            'json' => [
+                'soldier' => $soldier,
+                'qualification' => $qualificationIri,
+                'tier' => '/api/milhq/qualification-tiers/' . QualificationTierFactory::createOne()->getId(),
+            ],
+        ]);
+        $valid = $this->post('/api/milhq/qualification-records', [
+            'json' => ['soldier' => $soldier, 'qualification' => $qualificationIri, 'tier' => "/api/milhq/qualification-tiers/{$tier->getId()}"],
+        ]);
+
+        self::assertSame(422, $missing->getStatusCode());
+        self::assertSame(422, $foreign->getStatusCode());
+        self::assertSame($tier->getId(), $valid['tier']['id']);
     }
 
     public function testPostRejectsInvalidRankRecordType(): void

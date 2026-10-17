@@ -27,9 +27,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
     normalizationContext: ['groups' => ['MilhqSummary']],
     operations: [
         new Get(extraProperties: ['acl' => ['permission' => 'view_missions', 'entity' => 'mission.operation']]),
-        new Delete(
-            security: 'object.getSoldier()?.getUser()?.getId() == user.getUserId() or is_granted("ACCESS_CONTROL_LIST", {"permission": "manage_missions", "entity": object.getMission().getOperation()})',
-        ),
+        new Delete(security: 'is_granted("MILHQ_MISSION_RSVP_DELETE", object)'),
         new GetCollection(
             uriTemplate: '/missions/{missionId}/rsvps',
             uriVariables: [
@@ -43,7 +41,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
                 'missionId' => new Link(
                     fromClass: Mission::class,
                     toProperty: 'mission',
-                    security: 'is_granted("ACCESS_CONTROL_LIST", {"permission": "view_missions", "entity": mission.getOperation()})',
+                    security: 'is_granted("MILHQ_MISSION_RSVP_CREATE", mission)',
                 ),
             ],
             provider: CreateProvider::class,

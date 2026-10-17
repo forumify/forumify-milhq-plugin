@@ -45,7 +45,7 @@ use Forumify\Milhq\Entity\Enum\CourseResult;
                 'classId' => new Link(
                     fromClass: CourseClass::class,
                     toProperty: 'class',
-                    security: 'is_granted("ACCESS_CONTROL_LIST", {"permission": "manage_classes", "entity": courseClass.getCourse()})',
+                    security: 'is_granted("MILHQ_COURSE_CLASS_MANAGE", courseClass)',
                     securityObjectName: 'courseClass',
                 ),
             ],
@@ -88,9 +88,7 @@ class CourseClassStudent
 
     #[ORM\Column(type: 'text', nullable: true)]
     #[Groups(['CourseClassStudent', 'CourseClass::read'])]
-    #[ApiProperty(
-        security: 'object === null or is_granted("ACCESS_CONTROL_LIST", {"permission": "manage_classes", "entity": object.getClass().getCourse()})',
-    )]
+    #[ApiProperty(security: 'object === null or is_granted("MILHQ_COURSE_CLASS_MANAGE", object)')]
     private ?string $notes = null;
 
     public function getSoldier(): ?Soldier

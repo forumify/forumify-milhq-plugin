@@ -67,19 +67,22 @@ class RosterApiTest extends ApiTestCase
     public function testSecondaryAssignmentsAppearWithTheirPosition(): void
     {
         MilsimStory::load();
-        $soldier = MilsimStory::firstSquad()[5];
+        $leader = MilsimStory::firstSquad()[0];
         $medic = PositionFactory::createOne(['name' => 'Combat Medic']);
         AssignmentRecordFactory::createOne([
-            'soldier' => $soldier,
+            'soldier' => $leader,
             'type' => 'secondary',
             'unit' => MilsimStory::unitSecondSquad(),
             'position' => $medic,
         ]);
 
         $units = $this->getCollection('/api/milhq/rosters/' . MilsimStory::rosterAlphaCompany()->getId() . '/units');
+        $units = array_column($units, 'soldiers', 'id');
 
-        $secondSquad = array_column($units[1]['soldiers'], null, 'id');
-        self::assertArrayHasKey($soldier->getId(), $secondSquad);
-        self::assertSame('Combat Medic', $secondSquad[$soldier->getId()]['position']['name']);
+        $firstSquad = array_column($units[MilsimStory::unitFirstSquad()->getId()], null, 'id');
+        $secondSquad = array_column($units[MilsimStory::unitSecondSquad()->getId()], null, 'id');
+        self::assertSame('Combat Medic', $secondSquad[$leader->getId()]['position']['name']);
+        self::assertSame('Squad Leader', $firstSquad[$leader->getId()]['position']['name']);
+        self::assertSame('Squad Leader', $this->get("/api/milhq/soldiers/{$leader->getId()}")['position']['name']);
     }
 }

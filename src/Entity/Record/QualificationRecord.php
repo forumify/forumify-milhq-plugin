@@ -19,6 +19,7 @@ use Forumify\Milhq\Api\Processor\RecordProcessor;
 use Forumify\Milhq\Repository\QualificationRecordRepository;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: QualificationRecordRepository::class)]
 #[ORM\Table('milhq_record_qualification')]
@@ -92,5 +93,24 @@ class QualificationRecord implements RecordInterface, AuditableEntityInterface
     public function setTier(?QualificationTier $tier): void
     {
         $this->tier = $tier;
+    }
+
+    #[Assert\Callback]
+    public function validateTier(ExecutionContextInterface $context): void
+    {
+        if (!isset($this->qualification)) {
+            return;
+        }
+
+        if ($this->tier === null) {
+            if (!$this->qualification->tiers->isEmpty()) {
+                $context->buildViolation('This qualification requires a tier to be selected.')->atPath('tier')->addViolation();
+            }
+            return;
+        }
+
+        if ($this->tier->parent->getId() !== $this->qualification->getId()) {
+            $context->buildViolation('This tier does not belong to the selected qualification.')->atPath('tier')->addViolation();
+        }
     }
 }

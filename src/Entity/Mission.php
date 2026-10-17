@@ -46,7 +46,7 @@ if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
                     'operationId' => new Link(
                         fromClass: Operation::class,
                         toProperty: 'operation',
-                        security: 'is_granted("ACCESS_CONTROL_LIST", {"permission": "manage_missions", "entity": operation})',
+                        security: 'is_granted("MILHQ_MISSION_MANAGE", operation)',
                     ),
                 ],
                 provider: CreateProvider::class,
@@ -113,7 +113,7 @@ if (class_exists(\Forumify\Calendar\ForumifyCalendarPlugin::class)) {
                     'operationId' => new Link(
                         fromClass: Operation::class,
                         toProperty: 'operation',
-                        security: 'is_granted("ACCESS_CONTROL_LIST", {"permission": "manage_missions", "entity": operation})',
+                        security: 'is_granted("MILHQ_MISSION_MANAGE", operation)',
                     ),
                 ],
                 provider: CreateProvider::class,

@@ -100,6 +100,51 @@ class OperationApiTest extends ApiTestCase
         self::assertSame(0, MissionRsvpFactory::count(['soldier' => $soldier->getId()]));
     }
 
+    public function testCannotDeleteOtherSoldiersRsvp(): void
+    {
+        $user = UserFactory::createOne();
+        SoldierFactory::createOne(['user' => $user]);
+        $rsvp = MissionRsvpFactory::createOne(['soldier' => SoldierFactory::createOne()]);
+
+        $response = $this->request('DELETE', "/api/milhq/mission-rsvps/{$rsvp->getId()}", [
+            'headers' => ['Authorization' => 'Bearer ' . self::getContainer()->get(TokenService::class)->createJwt($user)],
+        ]);
+
+        self::assertSame(403, $response->getStatusCode());
+        self::assertSame(1, MissionRsvpFactory::count(['id' => $rsvp->getId()]));
+    }
+
+    public function testMissionViewerCannotCreateMissions(): void
+    {
+        $operation = OperationFactory::createOne();
+        ACLFactory::createOne([
+            'entity' => Operation::class,
+            'entityId' => (string)$operation->getId(),
+            'permission' => 'view_missions',
+        ]);
+        $this->oauthClient = OAuthClientFactory::createOne();
+
+        $response = $this->request('POST', "/api/milhq/operations/{$operation->getId()}/missions", [
+            'json' => ['title' => 'Unauthorized mission', 'start' => '2026-11-08T18:00:00+00:00'],
+        ]);
+
+        self::assertSame(403, $response->getStatusCode());
+    }
+
+    public function testRsvpRequiresMissionAccess(): void
+    {
+        $user = UserFactory::createOne();
+        SoldierFactory::createOne(['user' => $user]);
+        $mission = MissionFactory::createOne();
+
+        $response = $this->request('POST', "/api/milhq/missions/{$mission->getId()}/rsvps", [
+            'json' => ['going' => true],
+            'headers' => ['Authorization' => 'Bearer ' . self::getContainer()->get(TokenService::class)->createJwt($user)],
+        ]);
+
+        self::assertSame(403, $response->getStatusCode());
+    }
+
     public function testRsvpRequiresSoldier(): void
     {
         $mission = MissionFactory::createOne();

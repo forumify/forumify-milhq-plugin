@@ -47,6 +47,7 @@ class Document implements AuditableEntityInterface
     private string $description = '';
 
     #[ORM\Column(type: 'text')]
+    #[Assert\NotNull]
     #[Groups('Document')]
     private string $content;
 

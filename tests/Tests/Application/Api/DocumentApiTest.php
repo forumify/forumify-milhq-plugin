@@ -39,4 +39,11 @@ class DocumentApiTest extends ApiTestCase
     {
         return ['name' => 'Promotion Certificate'];
     }
+
+    public function testPostRequiresContent(): void
+    {
+        $response = $this->request('POST', self::endpoint(), ['json' => ['name' => 'Award Certificate']]);
+
+        self::assertSame(422, $response->getStatusCode());
+    }
 }

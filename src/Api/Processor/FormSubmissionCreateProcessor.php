@@ -6,12 +6,18 @@ namespace Forumify\Milhq\Api\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use DateTime;
+use DateTimeInterface;
 use Forumify\Milhq\Entity\FormField;
 use Forumify\Milhq\Entity\FormSubmission;
+use Forumify\Milhq\Form\SubmissionFormType;
 use Forumify\Milhq\Repository\FormSubmissionRepository;
 use Forumify\Milhq\Service\SoldierService;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @implements ProcessorInterface<FormSubmission, FormSubmission>
@@ -21,6 +27,7 @@ class FormSubmissionCreateProcessor implements ProcessorInterface
     public function __construct(
         private readonly SoldierService $soldierService,
         private readonly FormSubmissionRepository $formSubmissionRepository,
+        private readonly ValidatorInterface $validator,
     ) {
     }
 
@@ -53,19 +60,19 @@ class FormSubmissionCreateProcessor implements ProcessorInterface
             $key = $field->getKey();
             $value = $submitted[$key] ?? null;
 
-            if ($value === null || $value === '') {
-                if ($field->isRequired()) {
-                    $errors[] = "\"$key\" is required.";
-                }
-                continue;
+            $constraints = $field->isRequired() ? [new Assert\NotBlank()] : [];
+            if ($value !== null && $value !== '') {
+                $constraints[] = $this->getTypeConstraint($field);
             }
 
-            if ($field->getType() === 'select' && !in_array($value, $this->getChoices($field), true)) {
-                $errors[] = "\"$key\" must be one of: " . implode(', ', $this->getChoices($field)) . '.';
-                continue;
+            $violations = $this->validator->validate($value, new Assert\Sequentially($constraints));
+            foreach ($violations as $violation) {
+                $errors[] = "\"$key\": {$violation->getMessage()}";
             }
 
-            $data[$key] = $value;
+            if ($value !== null && $value !== '' && $violations->count() === 0) {
+                $data[$key] = $this->normalizeValue($field, $value);
+            }
         }
 
         if (!empty($errors)) {
@@ -75,11 +82,29 @@ class FormSubmissionCreateProcessor implements ProcessorInterface
         return $data;
     }
 
-    /**
-     * @return list<mixed>
-     */
-    private function getChoices(FormField $field): array
+    private function getTypeConstraint(FormField $field): Constraint
     {
-        return array_column($field->fieldOptions['options'] ?? [], 'key');
+        return match ($field->getType()) {
+            'checkbox' => new Assert\Type('bool'),
+            'color' => new Assert\Sequentially([new Assert\Type('string'), new Assert\CssColor(Assert\CssColor::HEX_LONG)]),
+            'country' => new Assert\Sequentially([new Assert\Type('string'), new Assert\Country()]),
+            'date' => new Assert\Sequentially([new Assert\Type('string'), new Assert\Date()]),
+            'datetime' => new Assert\Sequentially([new Assert\Type('string'), new Assert\DateTime(DateTimeInterface::ATOM)]),
+            'email' => new Assert\Sequentially([new Assert\Type('string'), new Assert\Email()]),
+            'file' => new Assert\IsNull(message: 'File uploads are not supported through the API.'),
+            'number' => new Assert\Type('numeric'),
+            'select' => new Assert\Choice(array_column($field->fieldOptions['options'] ?? [], 'key')),
+            'timezone' => new Assert\Sequentially([new Assert\Type('string'), new Assert\Timezone()]),
+            default => new Assert\Type('string'),
+        };
+    }
+
+    private function normalizeValue(FormField $field, mixed $value): mixed
+    {
+        return match ($field->getType()) {
+            'date', 'datetime' => new DateTime($value)->format(SubmissionFormType::DATE_FORMAT),
+            'number' => (float)$value,
+            default => $value,
+        };
     }
 }

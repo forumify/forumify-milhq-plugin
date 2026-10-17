@@ -60,6 +60,24 @@ class SoldierApiTest extends ApiTestCase
         self::assertSame('#00ff00', $response['status']['color']);
     }
 
+    public function testPostRequiresName(): void
+    {
+        self::assertSame(422, $this->request('POST', self::endpoint())->getStatusCode());
+        self::assertSame(422, $this->request('POST', self::endpoint(), ['json' => ['name' => '']])->getStatusCode());
+    }
+
+    public function testAssignmentCanOnlyChangeThroughAssignmentRecords(): void
+    {
+        $unit = UnitFactory::createOne(['name' => 'First Squad']);
+        $soldier = SoldierFactory::createOne(['unit' => $unit]);
+
+        $response = $this->patch(self::endpoint() . "/{$soldier->getId()}", [
+            'json' => ['unit' => '/api/milhq/units/' . UnitFactory::createOne()->getId()],
+        ]);
+
+        self::assertSame('First Squad', $response['unit']['name']);
+    }
+
     public function testPatchAssignsRelationsByIri(): void
     {
         $rank = RankFactory::createOne();

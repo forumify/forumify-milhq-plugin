@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PluginTests\Tests\Application\Api;
 
+use Forumify\Milhq\Entity\Course;
 use Forumify\Milhq\Entity\Enum\CourseResult;
 use Forumify\Milhq\Repository\QualificationRecordRepository;
 use Forumify\Milhq\Repository\ServiceRecordRepository;
@@ -12,6 +13,7 @@ use Forumify\Testing\Api\Crud\DeleteTestTrait;
 use Forumify\Testing\Api\Crud\GetCollectionTestTrait;
 use Forumify\Testing\Api\Crud\GetTestTrait;
 use Forumify\Testing\Api\Crud\PatchTestTrait;
+use Forumify\Testing\Factories\Core\ACLFactory;
 use Forumify\Testing\Factories\OAuth\OAuthClientFactory;
 use PluginTests\Tests\Factories\Milhq\CourseClassFactory;
 use PluginTests\Tests\Factories\Milhq\CourseClassInstructorFactory;
@@ -162,6 +164,54 @@ class CourseClassApiTest extends ApiTestCase
         ]);
 
         self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testClassViewerCannotManageClassOrSeeNotes(): void
+    {
+        $student = CourseClassStudentFactory::createOne(['notes' => 'Needs more practice']);
+        $class = $student->getClass();
+        $this->grantCourseAccess($class->getCourse(), 'view_classes');
+        $this->oauthClient = OAuthClientFactory::createOne();
+
+        $response = $this->get(self::endpoint() . "/{$class->getId()}");
+        self::assertArrayNotHasKey('notes', $response['students'][0]);
+
+        $soldier = '/api/milhq/soldiers/' . SoldierFactory::createOne()->getId();
+        $createClass = $this->request('POST', "/api/milhq/courses/{$class->getCourse()->getId()}/classes", [
+            'json' => ['title' => 'Unauthorized class'],
+        ]);
+        $addStudent = $this->request('POST', "/api/milhq/course-classes/{$class->getId()}/students", [
+            'json' => ['soldier' => $soldier],
+        ]);
+        $addInstructor = $this->request('POST', "/api/milhq/course-classes/{$class->getId()}/instructors", [
+            'json' => ['soldier' => $soldier],
+        ]);
+
+        self::assertSame(403, $createClass->getStatusCode());
+        self::assertSame(403, $addStudent->getStatusCode());
+        self::assertSame(403, $addInstructor->getStatusCode());
+    }
+
+    public function testClassManagerSeesNotes(): void
+    {
+        $student = CourseClassStudentFactory::createOne(['notes' => 'Needs more practice']);
+        $class = $student->getClass();
+        $this->grantCourseAccess($class->getCourse(), 'view_classes');
+        $this->grantCourseAccess($class->getCourse(), 'manage_classes');
+        $this->oauthClient = OAuthClientFactory::createOne();
+
+        $response = $this->get(self::endpoint() . "/{$class->getId()}");
+
+        self::assertSame('Needs more practice', $response['students'][0]['notes']);
+    }
+
+    private function grantCourseAccess(Course $course, string $permission): void
+    {
+        ACLFactory::createOne([
+            'entity' => Course::class,
+            'entityId' => (string)$course->getId(),
+            'permission' => $permission,
+        ]);
     }
 
     public function testClassesWithoutAccessAreHidden(): void

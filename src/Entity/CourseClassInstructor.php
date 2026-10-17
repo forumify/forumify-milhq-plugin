@@ -43,7 +43,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                 'classId' => new Link(
                     fromClass: CourseClass::class,
                     toProperty: 'class',
-                    security: 'is_granted("ACCESS_CONTROL_LIST", {"permission": "manage_classes", "entity": courseClass.getCourse()})',
+                    security: 'is_granted("MILHQ_COURSE_CLASS_MANAGE", courseClass)',
                     securityObjectName: 'courseClass',
                 ),
             ],
