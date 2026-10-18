@@ -38,6 +38,9 @@ class SoldierController extends AbstractController
         ]);
     }
 
+    /**
+     * @return array<array<string, mixed>>
+     */
     private function getAwardCounts(Soldier $soldier): array
     {
         $awards = $this->awardRecordRepository
@@ -100,6 +103,9 @@ class SoldierController extends AbstractController
         return $highest;
     }
 
+    /**
+     * @return array<int, array{name: string, records?: array<string>}>
+     */
     private function getSecondaryUnits(Soldier $soldier): array
     {
         /** @var array<AssignmentRecord> $records */
@@ -121,6 +127,10 @@ class SoldierController extends AbstractController
         $grouped = [];
         foreach ($records as $record) {
             $unit = $record->getUnit();
+            if ($unit === null) {
+                continue;
+            }
+
             $unitId = $unit->getId();
             if (!isset($grouped[$unitId])) {
                 $grouped[$unitId] = ['name' => $unit->getName()];

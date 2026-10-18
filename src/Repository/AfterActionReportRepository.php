@@ -7,6 +7,7 @@ namespace Forumify\Milhq\Repository;
 use Forumify\Core\Repository\AbstractRepository;
 use Forumify\Milhq\Entity\AfterActionReport;
 use Forumify\Milhq\Entity\Operation;
+use Forumify\Milhq\Entity\Unit;
 
 /**
  * @extends AbstractRepository<AfterActionReport>
@@ -19,7 +20,7 @@ class AfterActionReportRepository extends AbstractRepository
     }
 
     /**
-     * @param array<int> $units
+     * @param array<Unit> $units
      * @param array<Operation> $operations
      * @return array<AfterActionReport>
      */

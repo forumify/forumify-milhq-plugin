@@ -14,6 +14,7 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 #[AsLiveComponent('Milhq\\QualificationRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
 class QualificationRecordTable extends AbstractRecordTable
 {
+    /** @var array<string> */
     protected array $searchFields = ['qualification.name'];
 
     public function __construct(

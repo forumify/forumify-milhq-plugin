@@ -50,6 +50,7 @@ class Roster implements SortableEntityInterface, AuditableEntityInterface
     #[Groups('Roster')]
     private string $description = '';
 
+    /** @var Collection<int, Unit> */
     #[ORM\ManyToMany(targetEntity: Unit::class, inversedBy: 'rosters')]
     #[ORM\JoinTable(
         name: 'milhq_roster_units',
@@ -93,6 +94,9 @@ class Roster implements SortableEntityInterface, AuditableEntityInterface
         return $this->units;
     }
 
+    /**
+     * @param Collection<int, Unit> $units
+     */
     public function setUnits(Collection $units): void
     {
         $this->units = $units;

@@ -56,7 +56,7 @@ class QualificationRecord implements RecordInterface, AuditableEntityInterface
     private Soldier $soldier;
 
     #[ORM\ManyToOne(targetEntity: Qualification::class, fetch: 'EAGER')]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotNull]
     #[Groups('QualificationRecord')]
     private Qualification $qualification;

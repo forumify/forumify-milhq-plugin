@@ -18,7 +18,9 @@ class MissionRoster extends AbstractController
 
     public Mission $mission;
 
+    /** @var array<int, MissionRsvp> */
     private array $rsvpsByUserId = [];
+    /** @var array<int, Unit>|null */
     private ?array $unitsWithRSVPs = null;
 
     public function __construct(
@@ -26,6 +28,9 @@ class MissionRoster extends AbstractController
     ) {
     }
 
+    /**
+     * @return array<int, Unit>
+     */
     public function getUnitsWithRSVPs(): array
     {
         if ($this->unitsWithRSVPs !== null) {
@@ -49,6 +54,9 @@ class MissionRoster extends AbstractController
         return $this->unitsWithRSVPs;
     }
 
+    /**
+     * @return array<Soldier>
+     */
     public function getUsersInUnitWithRSVPs(Unit $unit): array
     {
         $this->getRSVPsByUserId();

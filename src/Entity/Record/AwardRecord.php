@@ -55,7 +55,7 @@ class AwardRecord implements RecordInterface, AuditableEntityInterface
     private Soldier $soldier;
 
     #[ORM\ManyToOne(targetEntity: Award::class, fetch: 'EAGER')]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotNull]
     #[Groups('AwardRecord')]
     private Award $award;

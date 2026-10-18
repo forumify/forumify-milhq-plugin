@@ -41,9 +41,12 @@ class NewRecordNotificationType extends AbstractEmailNotificationType
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getDescriptionPayload(Notification $notification): array
     {
-        $context = $notification->getDeserializedContext();
+        $context = $notification->getDeserializedContext() ?? [];
         $type = $context['type'];
         $data = $context['data'];
 
@@ -86,8 +89,8 @@ class NewRecordNotificationType extends AbstractEmailNotificationType
         return '@ForumifyMilhqPlugin/emails/notifications/new_record.html.twig';
     }
 
-    private function getTypeFromContext(Notification $notification)
+    private function getTypeFromContext(Notification $notification): string
     {
-        return $notification->getDeserializedContext()['type'];
+        return $notification->getDeserializedContext()['type'] ?? '';
     }
 }

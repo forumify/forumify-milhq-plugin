@@ -51,12 +51,11 @@ class EnlistService
         return $this->formRepository->find($formId);
     }
 
-    public function enlist(Enlistment $enlistment): Soldier
+    public function enlist(Enlistment $enlistment, Form $form): Soldier
     {
         $soldier = $this->soldierService->getLoggedInSoldier()
             ?? $this->soldierService->createUser($enlistment);
 
-        $form = $this->getEnlistmentForm();
         $submission = new FormSubmission();
         $submission->setForm($form);
         $submission->setStatus($form->getDefaultStatus());

@@ -36,6 +36,9 @@ class DocumentExtensionRuntime implements RuntimeExtensionInterface
         return $this->parseRecurse($document->getContent(), $replacers);
     }
 
+    /**
+     * @param array<string, callable(): string> $replacers
+     */
     private function parseRecurse(string $content, array $replacers): string
     {
         $openPos = strpos($content, '{');
@@ -94,7 +97,7 @@ class DocumentExtensionRuntime implements RuntimeExtensionInterface
             return [
                 'award_record_award' => fn () => $record->getAward()->getName(),
                 'award_record_award_image' => fn () => $this->img($record->getTier()?->image ?: $record->getAward()->getImage()),
-                'award_record_award_tier' => fn () => $record->getTier()?->name,
+                'award_record_award_tier' => fn () => $record->getTier()->name ?? '',
                 'award_record_date' => fn () => $this->date($record->getCreatedAt()),
                 'award_record_text' => fn () => $record->getText(),
             ];
@@ -112,7 +115,7 @@ class DocumentExtensionRuntime implements RuntimeExtensionInterface
                 'qualification_record_date' => fn () => $this->date($record->getCreatedAt()),
                 'qualification_record_qualification' => fn () => $record->getQualification()->getName(),
                 'qualification_record_qualification_image' => fn () => $this->img($record->getTier()?->image ?: $record->getQualification()->getImage()),
-                'qualification_record_qualification_tier' => fn () => $record->getTier()?->name,
+                'qualification_record_qualification_tier' => fn () => $record->getTier()->name ?? '',
                 'qualification_record_text' => fn () => $record->getText(),
             ];
         }

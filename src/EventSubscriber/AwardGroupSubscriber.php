@@ -23,10 +23,13 @@ class AwardGroupSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @param PreSaveCrudEvent<Award> $event
+     */
     public function onPreSave(PreSaveCrudEvent $event): void
     {
         $award = $event->getEntity();
-        if ($event->isNew() || !$award instanceof Award) {
+        if ($event->isNew()) {
             return;
         }
 

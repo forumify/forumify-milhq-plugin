@@ -33,7 +33,7 @@ class SubmissionStatusUpdatedNotificationType extends AbstractEmailNotificationT
 
     public function getDescription(Notification $notification): string
     {
-        $context = $notification->getDeserializedContext();
+        $context = $notification->getDeserializedContext() ?? [];
         return $this->translator->trans('milhq.notification.submission_status_updated.description', [
             'form' => $context['form'],
             'status' => $context['status'],
@@ -47,7 +47,7 @@ class SubmissionStatusUpdatedNotificationType extends AbstractEmailNotificationT
 
     public function getUrl(Notification $notification): string
     {
-        $context = $notification->getDeserializedContext();
+        $context = $notification->getDeserializedContext() ?? [];
         return $this->urlGenerator->generate('milhq_operations_center', [
             'submission' => $context['submissionId'],
         ]);

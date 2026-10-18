@@ -8,6 +8,9 @@ use Forumify\Core\Repository\AbstractRepository;
 use Forumify\Milhq\Entity\Record\RankRecord;
 use Forumify\Milhq\Entity\Soldier;
 
+/**
+ * @extends AbstractRepository<RankRecord>
+ */
 class RankRecordRepository extends AbstractRepository
 {
     public static function getEntityClass(): string

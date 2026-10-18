@@ -29,6 +29,9 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<array<string, mixed>>
+ */
 class RecordType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
@@ -86,6 +89,9 @@ class RecordType extends AbstractType
             ]);
     }
 
+    /**
+     * @param FormBuilderInterface<array<string, mixed>|null> $builder
+     */
     private function addAwardFields(FormBuilderInterface $builder): void
     {
         $builder
@@ -155,6 +161,9 @@ class RecordType extends AbstractType
         }
     }
 
+    /**
+     * @param FormBuilderInterface<array<string, mixed>|null> $builder
+     */
     private function addRankFields(FormBuilderInterface $builder): void
     {
         $builder
@@ -171,6 +180,9 @@ class RecordType extends AbstractType
             ]);
     }
 
+    /**
+     * @param FormBuilderInterface<array<string, mixed>|null> $builder
+     */
     private function addAssignmentFields(FormBuilderInterface $builder): void
     {
         $builder
@@ -211,6 +223,9 @@ class RecordType extends AbstractType
             ]);
     }
 
+    /**
+     * @param FormBuilderInterface<array<string, mixed>|null> $builder
+     */
     private function addQualificationFields(FormBuilderInterface $builder): void
     {
         $builder

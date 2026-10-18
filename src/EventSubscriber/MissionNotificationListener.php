@@ -8,6 +8,7 @@ use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
 use Forumify\Milhq\Entity\Mission;
 use Forumify\Core\Entity\Notification;
+use Forumify\Core\Entity\User;
 use Forumify\Core\Notification\NotificationService;
 use Forumify\Core\Repository\ACLRepository;
 use Forumify\Core\Repository\SettingRepository;
@@ -46,8 +47,7 @@ class MissionNotificationListener
     }
 
     /**
-     * @param Mission $mission
-     * @return array
+     * @return array<User>
      */
     private function getRecipientsForMission(Mission $mission): array
     {
@@ -69,6 +69,9 @@ class MissionNotificationListener
         return $recipients;
     }
 
+    /**
+     * @return array<User>
+     */
     private function getForumifyUsersWithMissionAccess(Mission $mission): array
     {
         $operation = $mission->getOperation();
@@ -91,6 +94,7 @@ class MissionNotificationListener
     }
 
     /**
+     * @param array<User> $users
      * @return array<Soldier>
      */
     private function getActiveDutySoldiersByUser(array $users): array

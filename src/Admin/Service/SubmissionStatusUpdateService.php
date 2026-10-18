@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Admin\Service;
 
 use Forumify\Core\Entity\Notification;
 use Forumify\Core\Notification\NotificationService;
+use Forumify\Milhq\Entity\FormStatus;
 use Forumify\Milhq\Entity\FormSubmission;
 use Forumify\Milhq\Notification\SubmissionStatusUpdatedNotificationType;
 use Forumify\Milhq\Repository\FormSubmissionRepository;
@@ -18,6 +19,9 @@ class SubmissionStatusUpdateService
     ) {
     }
 
+    /**
+     * @param array{status: FormStatus|null, reason?: string|null, sendNotification?: bool} $statusRecord
+     */
     public function createStatusRecord(FormSubmission $submission, array $statusRecord): void
     {
         $submission->setStatus($statusRecord['status']);

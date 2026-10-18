@@ -7,6 +7,9 @@ namespace Forumify\Milhq\Repository;
 use Forumify\Core\Repository\AbstractRepository;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
 
+/**
+ * @extends AbstractRepository<AssignmentRecord>
+ */
 class AssignmentRecordRepository extends AbstractRepository
 {
     public static function getEntityClass(): string

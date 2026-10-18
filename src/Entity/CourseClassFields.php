@@ -22,7 +22,7 @@ trait CourseClassFields
     use TimestampableEntityTrait;
 
     #[ORM\ManyToOne(targetEntity: Course::class, inversedBy: 'classes')]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Groups('CourseClass::read')]
     private Course $course;
 
@@ -171,6 +171,9 @@ trait CourseClassFields
         return $this->instructors;
     }
 
+    /**
+     * @param Collection<int, CourseClassInstructor>|array<int, CourseClassInstructor> $instructors
+     */
     public function setInstructors(Collection|array $instructors): void
     {
         $this->instructors = $instructors instanceof Collection
@@ -197,6 +200,9 @@ trait CourseClassFields
         return $this->students;
     }
 
+    /**
+     * @param Collection<int, CourseClassStudent>|array<int, CourseClassStudent> $students
+     */
     public function setStudents(Collection|array $students): void
     {
         $this->students = $students instanceof Collection

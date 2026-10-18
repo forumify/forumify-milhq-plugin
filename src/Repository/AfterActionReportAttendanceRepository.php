@@ -20,7 +20,7 @@ class AfterActionReportAttendanceRepository extends AbstractRepository
 
     /**
      * @param array<AfterActionReport> $afterActionReports
-     * @return list<int>
+     * @return array<int>
      */
     public function findSoldierIdsWithStateInAll(string $state, array $afterActionReports): array
     {
@@ -53,6 +53,7 @@ class AfterActionReportAttendanceRepository extends AbstractRepository
             return [];
         }
 
+        /** @var list<array{missionId: int|string, soldierId: int|string, state: string}> $rows */
         $rows = $this->createQueryBuilder('a')
             ->select('IDENTITY(aar.mission) AS missionId', 'IDENTITY(a.soldier) AS soldierId', 'a.state')
             ->join('a.afterActionReport', 'aar')

@@ -23,10 +23,13 @@ class QualificationGroupSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @param PreSaveCrudEvent<Qualification> $event
+     */
     public function onPreSave(PreSaveCrudEvent $event): void
     {
         $qualification = $event->getEntity();
-        if ($event->isNew() || !$qualification instanceof Qualification) {
+        if ($event->isNew()) {
             return;
         }
 

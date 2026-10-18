@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Admin\Controller;
 
 use Forumify\Milhq\Admin\Form\SubmissionStatusType;
 use Forumify\Milhq\Admin\Service\SubmissionStatusUpdateService;
+use Forumify\Milhq\Entity\FormStatus;
 use Forumify\Milhq\Entity\FormSubmission;
 use Forumify\Milhq\Repository\FormRepository;
 use Forumify\Milhq\Repository\FormSubmissionRepository;
@@ -59,6 +60,7 @@ class SubmissionController extends AbstractController
             $form = $this->createForm(SubmissionStatusType::class, null, ['form' => $submission->getForm()]);
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
+                /** @var array{status: FormStatus, reason: string, sendNotification: bool} $statusRecord */
                 $statusRecord = $form->getData();
                 $submissionStatusUpdateService->createStatusRecord($submission, $statusRecord);
 

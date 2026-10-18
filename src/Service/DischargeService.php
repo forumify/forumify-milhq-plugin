@@ -81,7 +81,7 @@ class DischargeService
         $rankRecord = new RankRecord();
         $rankRecord->setSoldier($discharge->user);
 
-        if ($discharge->rank->getPosition() < $discharge->user->getRank()->getPosition()) {
+        if ($newRank->getPosition() < $oldRank->getPosition()) {
             $type = 'promotion';
         } else {
             $type = 'demotion';

@@ -107,21 +107,27 @@ class Soldier implements AuditableEntityInterface
     #[Asset('uniform', 'milhq.asset', 'milhq_asset.storage')]
     public ?NewAsset $newUniform = null;
 
+    /** @var Collection<int, ServiceRecord> */
     #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: ServiceRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $serviceRecords;
 
+    /** @var Collection<int, AwardRecord> */
     #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: AwardRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $awardRecords;
 
+    /** @var Collection<int, CombatRecord> */
     #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: CombatRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $combatRecords;
 
+    /** @var Collection<int, RankRecord> */
     #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: RankRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $rankRecords;
 
+    /** @var Collection<int, AssignmentRecord> */
     #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: AssignmentRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $assignmentRecords;
 
+    /** @var Collection<int, QualificationRecord> */
     #[ORM\OneToMany(mappedBy: 'soldier', targetEntity: QualificationRecord::class, fetch: 'EXTRA_LAZY')]
     private Collection $qualificationRecords;
 
@@ -234,41 +240,65 @@ class Soldier implements AuditableEntityInterface
         $this->uniform = $uniform;
     }
 
+    /**
+     * @return Collection<int, ServiceRecord>
+     */
     public function getServiceRecords(): Collection
     {
         return $this->serviceRecords;
     }
 
+    /**
+     * @param Collection<int, ServiceRecord> $serviceRecords
+     */
     public function setServiceRecords(Collection $serviceRecords): void
     {
         $this->serviceRecords = $serviceRecords;
     }
 
+    /**
+     * @return Collection<int, AwardRecord>
+     */
     public function getAwardRecords(): Collection
     {
         return $this->awardRecords;
     }
 
+    /**
+     * @param Collection<int, AwardRecord> $awardRecords
+     */
     public function setAwardRecords(Collection $awardRecords): void
     {
         $this->awardRecords = $awardRecords;
     }
 
+    /**
+     * @return Collection<int, CombatRecord>
+     */
     public function getCombatRecords(): Collection
     {
         return $this->combatRecords;
     }
 
+    /**
+     * @param Collection<int, CombatRecord> $combatRecords
+     */
     public function setCombatRecords(Collection $combatRecords): void
     {
         $this->combatRecords = $combatRecords;
     }
 
+    /**
+     * @return Collection<int, RankRecord>
+     */
     public function getRankRecords(): Collection
     {
         return $this->rankRecords;
     }
 
+    /**
+     * @param Collection<int, RankRecord> $rankRecords
+     */
     public function setRankRecords(Collection $rankRecords): void
     {
         $this->rankRecords = $rankRecords;
@@ -282,16 +312,25 @@ class Soldier implements AuditableEntityInterface
         return $this->assignmentRecords;
     }
 
+    /**
+     * @param Collection<int, AssignmentRecord> $assignmentRecords
+     */
     public function setAssignmentRecords(Collection $assignmentRecords): void
     {
         $this->assignmentRecords = $assignmentRecords;
     }
 
+    /**
+     * @return Collection<int, QualificationRecord>
+     */
     public function getQualificationRecords(): Collection
     {
         return $this->qualificationRecords;
     }
 
+    /**
+     * @param Collection<int, QualificationRecord> $qualificationRecords
+     */
     public function setQualificationRecords(Collection $qualificationRecords): void
     {
         $this->qualificationRecords = $qualificationRecords;

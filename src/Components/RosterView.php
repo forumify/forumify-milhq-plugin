@@ -32,6 +32,9 @@ class RosterView extends AbstractController
     ) {
     }
 
+    /**
+     * @return array<Roster>
+     */
     public function getRosters(): array
     {
         $this->rosters = $this->rosterRepository->findBy([], ['position' => 'ASC']);

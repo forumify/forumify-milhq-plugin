@@ -10,6 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<QualificationGroup>
+ */
 class QualificationGroupType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void

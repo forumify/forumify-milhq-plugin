@@ -62,9 +62,11 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
     #[Groups('Form')]
     private string $instructions = '';
 
+    /** @var Collection<int, FormSubmission> */
     #[ORM\OneToMany(mappedBy: 'form', targetEntity: FormSubmission::class)]
     private Collection $submissions;
 
+    /** @var Collection<int, FormField> */
     #[ORM\OneToMany(mappedBy: 'form', targetEntity: FormField::class, cascade: ['persist'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
     #[Groups('Form::read')]
@@ -135,11 +137,17 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
         $this->instructions = $instructions;
     }
 
+    /**
+     * @return Collection<int, FormSubmission>
+     */
     public function getSubmissions(): Collection
     {
         return $this->submissions;
     }
 
+    /**
+     * @param Collection<int, FormSubmission> $submissions
+     */
     public function setSubmissions(Collection $submissions): void
     {
         $this->submissions = $submissions;
@@ -163,6 +171,9 @@ class Form implements AccessControlledEntityInterface, AuditableEntityInterface
         return $this->fields;
     }
 
+    /**
+     * @param Collection<int, FormField> $fields
+     */
     public function setFields(Collection $fields): void
     {
         $this->fields = $fields;

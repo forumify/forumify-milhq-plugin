@@ -29,6 +29,7 @@ abstract class AbstractRecordTable extends AbstractDoctrineTable
 
     protected TranslatorInterface $translator;
     protected Environment $twig;
+    /** @var array<string> */
     protected array $searchFields = ['text'];
 
     protected function buildTable(): void

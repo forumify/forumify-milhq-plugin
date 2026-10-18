@@ -16,6 +16,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use function Symfony\Component\String\u;
 
+/**
+ * @extends AbstractType<FormField|null>
+ */
 class FormFieldType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void

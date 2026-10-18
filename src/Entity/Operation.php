@@ -83,6 +83,7 @@ class Operation implements AccessControlledEntityInterface, AuditableEntityInter
     #[Groups('Operation')]
     private string $afterActionReportTemplate = '';
 
+    /** @var Collection<int, Mission> */
     #[ORM\OneToMany(mappedBy: 'operation', targetEntity: Mission::class, cascade: ['persist', 'remove'])]
     private Collection $missions;
 
@@ -156,13 +157,16 @@ class Operation implements AccessControlledEntityInterface, AuditableEntityInter
     }
 
     /**
-     * @return Collection<Mission>
+     * @return Collection<int, Mission>
      */
     public function getMissions(): Collection
     {
         return $this->missions;
     }
 
+    /**
+     * @param Collection<int, Mission> $missions
+     */
     public function setMissions(Collection $missions): void
     {
         $this->missions = $missions;

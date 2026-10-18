@@ -34,6 +34,7 @@ class RecordService
     }
 
     /**
+     * @param array<string, mixed> $data
      * @throws MilhqException
      */
     public function createRecord(string $type, array $data): void

@@ -140,6 +140,7 @@ class AwardController extends AbstractCrudController
             ]);
         }
 
+        /** @var array{tierName: string, targetAward: Award, targetAwardName: string|null, targetTierName: string|null} $data */
         $data = $form->getData();
         $this->awardToTierService->awardToTier(
             $award,

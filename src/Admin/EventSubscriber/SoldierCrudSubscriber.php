@@ -41,6 +41,9 @@ class SoldierCrudSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param FormInterface<Soldier> $form
+     */
     private function deleteRemovedAssignmentRecords(Soldier $soldier, FormInterface $form): void
     {
         $qb = $this

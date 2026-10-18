@@ -18,7 +18,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Throwable;
 
 /**
- * @phpstan-type Result array{count: int, messages: array<string>}
+ * @phpstan-type Result array{count: int|string, messages: array<string>}
  */
 #[IsGranted('milhq.admin.configuration.manage')]
 class MigratePerscomController extends AbstractController
@@ -62,6 +62,9 @@ class MigratePerscomController extends AbstractController
         ]);
     }
 
+    /**
+     * @return array<string, Result>
+     */
     private function migrateAll(): array
     {
         $results = [];
@@ -154,6 +157,9 @@ class MigratePerscomController extends AbstractController
         return ['count' => count($milhqSettings), 'messages' => []];
     }
 
+    /**
+     * @return Result
+     */
     private function migrateRoles(): array
     {
         $conn = $this->em->getConnection();
@@ -216,6 +222,8 @@ class MigratePerscomController extends AbstractController
     }
 
     /**
+     * @param array<int|string, string> $columns
+     * @param array<string> $imageColumns
      * @return Result
      */
     private function migrateTable(string $from, string $to, array $columns, array $imageColumns = []): array
@@ -389,6 +397,9 @@ class MigratePerscomController extends AbstractController
         return $result;
     }
 
+    /**
+     * @param Result $result
+     */
     private function fixCourseImages(array &$result): void
     {
         $conn = $this->em->getConnection();
@@ -403,6 +414,9 @@ class MigratePerscomController extends AbstractController
         }
     }
 
+    /**
+     * @param Result $result
+     */
     private function fixOperationImages(array &$result): void
     {
         $conn = $this->em->getConnection();

@@ -10,6 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<CourseClass>
+ */
 class ClassResultType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void

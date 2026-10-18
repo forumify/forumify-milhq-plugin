@@ -45,6 +45,9 @@ class CourseExtensionRuntime implements RuntimeExtensionInterface
         return array_map((fn (Award $award) => $award->getName()), $awards);
     }
 
+    /**
+     * @return array<string>
+     */
     public function getPrerequisites(Course $course): array
     {
         $prerequisites = [];
@@ -72,12 +75,17 @@ class CourseExtensionRuntime implements RuntimeExtensionInterface
             return [];
         }
 
-        $soldiers = $soldiersInClass
-            ->map(fn (CourseClassInstructor|CourseClassStudent $ccx) => $ccx->getSoldier())
-            ->toArray();
+        $soldiers = [];
+        $courseUsers = [];
+        foreach ($soldiersInClass as $courseUser) {
+            $soldier = $courseUser->getSoldier();
+            if ($soldier === null) {
+                continue;
+            }
 
-        $soldierIds = array_map(fn (Soldier $soldier) => $soldier->getId(), $soldiers);
-        $courseUsers = array_combine($soldierIds, $soldiersInClass->toArray());
+            $soldiers[] = $soldier;
+            $courseUsers[$soldier->getId()] = $courseUser;
+        }
 
         $this->soldierService->sortSoldiers($soldiers);
 

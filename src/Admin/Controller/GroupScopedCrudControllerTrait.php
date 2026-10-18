@@ -13,6 +13,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 trait GroupScopedCrudControllerTrait
 {
+    /**
+     * @template TGroup of GroupInterface
+     * @param AbstractRepository<TGroup> $groupRepository
+     * @return TGroup|null
+     */
     protected function getGroupFromRequest(AbstractRepository $groupRepository): ?GroupInterface
     {
         $groupId = $this->container
@@ -25,7 +30,6 @@ trait GroupScopedCrudControllerTrait
             return null;
         }
 
-        $group = $groupRepository->find($groupId);
-        return $group instanceof GroupInterface ? $group : null;
+        return $groupRepository->find($groupId);
     }
 }

@@ -60,7 +60,7 @@ class FormField implements SortableEntityInterface, AuditableEntityInterface
     use TimestampableEntityTrait;
 
     #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'fields')]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Groups('FormField::read')]
     private Form $form;
 
@@ -87,6 +87,7 @@ class FormField implements SortableEntityInterface, AuditableEntityInterface
     #[Groups(['FormField', 'Form::read'])]
     private bool $required = false;
 
+    /** @var array<string, mixed>|null */
     #[ORM\Column(type: Types::JSON, nullable: true)]
     #[Groups(['FormField', 'Form::read'])]
     public ?array $fieldOptions = null;

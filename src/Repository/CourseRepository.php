@@ -21,10 +21,10 @@ class CourseRepository extends AbstractRepository
     public function getHighestPosition(object $entity): int
     {
         try {
-            return $this->createQueryBuilder('e')
+            return (int)$this->createQueryBuilder('e')
                 ->select('MAX(e.position)')
                 ->getQuery()
-                ->getSingleScalarResult() ?? 0;
+                ->getSingleScalarResult();
         } catch (\Exception) {
             return 0;
         }

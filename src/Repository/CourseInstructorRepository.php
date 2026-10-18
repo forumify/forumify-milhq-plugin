@@ -23,13 +23,13 @@ class CourseInstructorRepository extends AbstractRepository
     public function getHighestPosition(object $entity): int
     {
         try {
-            return $this
+            return (int)$this
                 ->createQueryBuilder('e')
                 ->select('MAX(e.position)')
                 ->where('e.course = :course')
                 ->setParameter('course', $entity->getCourse())
                 ->getQuery()
-                ->getSingleScalarResult() ?? 0
+                ->getSingleScalarResult()
             ;
         } catch (\Exception) {
             return 0;

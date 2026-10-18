@@ -20,8 +20,12 @@ use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @extends AbstractType<array<string, mixed>>
+ */
 class ConfigurationType extends AbstractType
 {
+    /** @var array<string, int>|null */
     private ?array $statusChoices = null;
 
     public function __construct(
@@ -242,6 +246,9 @@ class ConfigurationType extends AbstractType
         }
     }
 
+    /**
+     * @return array<string, int>
+     */
     private function getForumChoices(): array
     {
         $choices = $this->forumRepository
@@ -256,6 +263,9 @@ class ConfigurationType extends AbstractType
         );
     }
 
+    /**
+     * @return array<string, int>
+     */
     private function getRoleChoices(): array
     {
         $choices = $this->roleRepository
@@ -270,6 +280,9 @@ class ConfigurationType extends AbstractType
         );
     }
 
+    /**
+     * @return array<string, int>
+     */
     private function getStatusChoices(): array
     {
         if ($this->statusChoices !== null) {
@@ -290,6 +303,9 @@ class ConfigurationType extends AbstractType
         return $this->statusChoices;
     }
 
+    /**
+     * @return array<string, int>
+     */
     private function getFormChoices(): array
     {
         $choices = $this->formRepository
