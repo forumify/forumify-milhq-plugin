@@ -23,10 +23,13 @@ class RankGroupSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @param PreSaveCrudEvent<Rank> $event
+     */
     public function onPreSave(PreSaveCrudEvent $event): void
     {
         $rank = $event->getEntity();
-        if ($event->isNew() || !$rank instanceof Rank) {
+        if ($event->isNew()) {
             return;
         }
 

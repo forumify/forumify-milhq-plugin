@@ -26,6 +26,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SoldierService
 {
+    /** @var array<int, Soldier|null> */
     private array $userIdToSoldier = [];
 
     public function __construct(
@@ -77,7 +78,10 @@ class SoldierService
         return $soldier;
     }
 
-    public function sortSoldiers(&$users): void
+    /**
+     * @param array<Soldier> $users
+     */
+    public function sortSoldiers(array &$users): void
     {
         $sortOrder = $this->settingRepository->get('milhq.roster.user_sort_order');
         $sortOrder = empty($sortOrder)
@@ -174,15 +178,19 @@ class SoldierService
         }
 
         $supervisors = $this->getUnitSupervisors($unit);
-        if ($soldier->getPosition() === null) {
+        $position = $soldier->getPosition();
+        if ($position === null) {
             return $supervisors;
         }
 
         $supervisors = array_filter(
             $supervisors,
-            fn (Soldier $supervisor) => $soldier->getPosition()->getPosition() > $supervisor->getPosition()->getPosition(),
+            fn (Soldier $supervisor) => $position->getPosition() > ($supervisor->getPosition()?->getPosition() ?? PHP_INT_MAX),
         );
-        usort($supervisors, fn (Soldier $a, Soldier $b) => $a->getPosition()->getPosition() <=> $b->getPosition()->getPosition());
+        usort(
+            $supervisors,
+            fn (Soldier $a, Soldier $b) => ($a->getPosition()?->getPosition() ?? PHP_INT_MAX) <=> ($b->getPosition()?->getPosition() ?? PHP_INT_MAX),
+        );
         return $supervisors;
     }
 

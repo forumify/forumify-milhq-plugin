@@ -11,6 +11,9 @@ use Forumify\Milhq\Admin\Service\RecordService;
 use stdClass;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * @extends AbstractCrudController<object>
+ */
 abstract class AbstractRecordCrudController extends AbstractCrudController
 {
     protected bool $allowEdit = false;
@@ -36,7 +39,7 @@ abstract class AbstractRecordCrudController extends AbstractCrudController
 
     protected function save(bool $isNew, FormInterface $form): object
     {
-        /** @var array $recordData */
+        /** @var array<string, mixed> $recordData */
         $recordData = $form->getData();
         $this->recordService->createRecord($this->getRecordType(), $recordData);
 

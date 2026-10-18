@@ -20,6 +20,9 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<AfterActionReport>
+ */
 class AfterActionReportType extends AbstractType
 {
     public function __construct(private readonly SoldierRepository $soldierRepository)

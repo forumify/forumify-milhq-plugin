@@ -49,6 +49,9 @@ class AfterActionReportService
         }
     }
 
+    /**
+     * @return array<string>
+     */
     public function getAttendanceStates(): array
     {
         $attendanceStates = $this->settingRepository->get('milhq.operations.attendance_states') ?? [];
@@ -107,7 +110,7 @@ class AfterActionReportService
     /**
      * @param array<Soldier> $absentSoldiers
      */
-    private function handleAbsenceNotification(array $absentSoldiers, AfterActionReport $aar)
+    private function handleAbsenceNotification(array $absentSoldiers, AfterActionReport $aar): void
     {
         $s = $this->settingRepository->get(...);
         $notificationEnabled = (bool)$s('milhq.operations.absent_notification');

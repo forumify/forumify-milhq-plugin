@@ -11,6 +11,7 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 #[AsLiveComponent('Milhq\\AssignmentRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
 class AssignmentRecordTable extends AbstractRecordTable
 {
+    /** @var array<string> */
     protected array $searchFields = ['position.name', 'unit.name'];
 
     protected function getEntityClass(): string

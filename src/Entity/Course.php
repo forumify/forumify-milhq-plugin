@@ -69,29 +69,31 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
     private ?Rank $minimumRank = null;
 
     /**
-     * @var array<string|int>
+     * @var array<string>|null
      */
     #[ORM\Column(type: 'simple_array', nullable: true)]
     #[Groups('Course')]
     private ?array $prerequisites = [];
 
     /**
-     * @var array<string|int>
+     * @var array<string>|null
      */
     #[ORM\Column(type: 'simple_array', nullable: true)]
     #[Groups('Course')]
     private ?array $qualifications = [];
 
     /**
-     * @var array<string|int>
+     * @var array<string>|null
      */
     #[ORM\Column(type: 'simple_array', nullable: true)]
     #[Groups('Course')]
     private ?array $awards = [];
 
+    /** @var Collection<int, CourseClass> */
     #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseClass::class, cascade: ['persist', 'remove'])]
     private Collection $classes;
 
+    /** @var Collection<int, CourseInstructor> */
     #[ORM\OneToMany(mappedBy: 'course', targetEntity: CourseInstructor::class, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['position' => 'ASC'])]
     #[Groups('Course::read')]
@@ -156,7 +158,7 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
      */
     public function setPrerequisites(?array $prerequisites): void
     {
-        $this->prerequisites = $prerequisites;
+        $this->prerequisites = $prerequisites === null ? null : array_map(fn (int|string $id) => (string)$id, $prerequisites);
     }
 
     /**
@@ -172,7 +174,7 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
      */
     public function setQualifications(?array $qualifications): void
     {
-        $this->qualifications = $qualifications;
+        $this->qualifications = $qualifications === null ? null : array_map(fn (int|string $id) => (string)$id, $qualifications);
     }
 
     /**
@@ -188,24 +190,36 @@ class Course implements AccessControlledEntityInterface, SortableEntityInterface
      */
     public function setAwards(?array $awards): void
     {
-        $this->awards = $awards;
+        $this->awards = $awards === null ? null : array_map(fn (int|string $id) => (string)$id, $awards);
     }
 
+    /**
+     * @return Collection<int, CourseClass>
+     */
     public function getClasses(): Collection
     {
         return $this->classes;
     }
 
+    /**
+     * @param Collection<int, CourseClass> $classes
+     */
     public function setClasses(Collection $classes): void
     {
         $this->classes = $classes;
     }
 
+    /**
+     * @return Collection<int, CourseInstructor>
+     */
     public function getInstructors(): Collection
     {
         return $this->instructors;
     }
 
+    /**
+     * @param Collection<int, CourseInstructor> $instructors
+     */
     public function setInstructors(Collection $instructors): void
     {
         $this->instructors = $instructors;

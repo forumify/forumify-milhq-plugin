@@ -151,7 +151,10 @@ class AfterActionReportController extends AbstractController
         $usersToRsvp = [];
         /** @var MissionRsvp $rsvp */
         foreach ($rsvps as $rsvp) {
-            $usersToRsvp[$rsvp->getSoldier()->getId()] = $rsvp->isGoing();
+            $soldierId = $rsvp->getSoldier()?->getId();
+            if ($soldierId !== null) {
+                $usersToRsvp[$soldierId] = $rsvp->isGoing();
+            }
         }
 
         $response = [];

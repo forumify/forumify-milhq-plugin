@@ -6,9 +6,11 @@ namespace Forumify\Milhq\Components;
 
 use DateTime;
 use Forumify\Core\Security\VoterAttribute;
+use Forumify\Milhq\Entity\Award;
 use Forumify\Milhq\Entity\CourseClass;
 use Forumify\Milhq\Entity\CourseClassInstructor;
 use Forumify\Milhq\Entity\CourseClassStudent;
+use Forumify\Milhq\Entity\Qualification;
 use Forumify\Milhq\Repository\AwardRepository;
 use Forumify\Milhq\Repository\CourseClassInstructorRepository;
 use Forumify\Milhq\Repository\CourseClassStudentRepository;
@@ -92,7 +94,7 @@ class CourseClassView extends AbstractController
 
     /**
      * @param array<int, int|null> $map
-     * @param array<int, object> $entities
+     * @param array<int, Award|Qualification> $entities
      * @return array<array{name: string, tier: string|null}>
      */
     private function resolveAchievements(array $map, array $entities): array
@@ -121,8 +123,9 @@ class CourseClassView extends AbstractController
     }
 
     /**
-     * @param array<object> $entities
-     * @return array<int, object>
+     * @template TEntity of Award|Qualification
+     * @param array<TEntity> $entities
+     * @return array<int, TEntity>
      */
     private function indexById(array $entities): array
     {
@@ -174,7 +177,8 @@ class CourseClassView extends AbstractController
             return true;
         }
 
-        return $minimumRank->getPosition() >= $soldier->getRank()->getPosition();
+        $rank = $soldier->getRank();
+        return $rank !== null && $minimumRank->getPosition() >= $rank->getPosition();
     }
 
     public function isSignedUpAsStudent(): bool

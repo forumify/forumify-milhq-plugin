@@ -18,7 +18,7 @@ class MissionListener
 {
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly ?CalendarEventRepository $calendarEventRepository = null,
+        private readonly CalendarEventRepository $calendarEventRepository,
     ) {
     }
 
@@ -31,7 +31,7 @@ class MissionListener
         }
 
         $event = $mission->getCalendarEvent() ?? new CalendarEvent();
-        $event->setCalendar($mission->getCalendar());
+        $event->setCalendar($calendar);
         $event->setTitle($mission->getTitle());
         $event->setStart($mission->getStart());
         $event->setEnd($mission->getEnd());
@@ -46,11 +46,6 @@ class MissionListener
 
     public function postRemove(Mission $mission): void
     {
-        if ($this->calendarEventRepository === null) {
-            // Calendar plugin not installed
-            return;
-        }
-
         $event = $mission->getCalendarEvent();
         if ($event === null) {
             return;

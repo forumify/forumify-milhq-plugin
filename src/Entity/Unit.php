@@ -52,9 +52,11 @@ class Unit implements SortableEntityInterface, AuditableEntityInterface
     #[Groups('Unit')]
     private string $description = '';
 
+    /** @var Collection<int, Soldier> */
     #[ORM\OneToMany(mappedBy: 'unit', targetEntity: Soldier::class)]
     private Collection $soldiers;
 
+    /** @var Collection<int, Roster> */
     #[ORM\ManyToMany(targetEntity: Roster::class, mappedBy: 'units')]
     private Collection $rosters;
 
@@ -132,11 +134,17 @@ class Unit implements SortableEntityInterface, AuditableEntityInterface
         $this->soldiers = $users;
     }
 
+    /**
+     * @return Collection<int, Roster>
+     */
     public function getRosters(): Collection
     {
         return $this->rosters;
     }
 
+    /**
+     * @param Collection<int, Roster> $rosters
+     */
     public function setRosters(Collection $rosters): void
     {
         $this->rosters = $rosters;

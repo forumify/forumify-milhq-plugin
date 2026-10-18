@@ -12,6 +12,9 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveListener;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 
+/**
+ * @extends AbstractDoctrineList<FormSubmission>
+ */
 #[AsLiveComponent('Milhq\\SupervisorSubmissionList', '@ForumifyMilhqPlugin/frontend/components/supervisor_submission_list.html.twig')]
 class SupervisorSubmissionList extends AbstractDoctrineList
 {

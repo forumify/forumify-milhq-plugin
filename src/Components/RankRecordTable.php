@@ -13,6 +13,7 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 #[AsLiveComponent('Milhq\\RankRecordTable', '@ForumifyMilhqPlugin/frontend/components/record_table.html.twig')]
 class RankRecordTable extends AbstractRecordTable
 {
+    /** @var array<string> */
     protected array $searchFields = ['rank.name', 'type'];
 
     public function __construct(

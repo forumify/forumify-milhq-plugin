@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Controller;
 
 use Forumify\Core\Entity\User;
 use Forumify\Core\Repository\SettingRepository;
+use Forumify\Milhq\Form\Enlistment;
 use Forumify\Milhq\Form\EnlistmentType;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Service\EnlistService;
@@ -66,7 +67,9 @@ class EnlistController extends AbstractController
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $soldier = $this->enlistService->enlist($form->getData());
+            /** @var Enlistment $enlistment */
+            $enlistment = $form->getData();
+            $soldier = $this->enlistService->enlist($enlistment, $enlistmentForm);
 
             return $this->render('@ForumifyMilhqPlugin/frontend/enlistment/enlist_success.html.twig', [
                 'enlistmentTopic' => $soldier->getEnlistmentTopic(),

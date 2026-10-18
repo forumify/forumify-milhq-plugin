@@ -24,7 +24,8 @@
         "symfony/stopwatch": "7.4.*",
         "symfony/web-profiler-bundle": "7.4.*",
         "zenstruck/foundry": "2.8.7",
-        "symfony/lock": "7.4.*"
+        "symfony/lock": "7.4.*",
+        "phpstan/phpstan-doctrine": "^2.0"
     },
     "conflict": {
         "forumify/forumify-discord-plugin": "<1.1"

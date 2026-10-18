@@ -139,6 +139,7 @@ class QualificationController extends AbstractCrudController
             ]);
         }
 
+        /** @var array{tierName: string, targetQualification: Qualification, targetQualificationName: string|null, targetTierName: string|null} $data */
         $data = $form->getData();
         $this->qualificationToTierService->qualificationToTier(
             $qualification,

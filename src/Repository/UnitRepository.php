@@ -18,6 +18,9 @@ class UnitRepository extends AbstractRepository
         return Unit::class;
     }
 
+    /**
+     * @return array<Unit>
+     */
     public function findBySoldierIsSupervisor(Soldier|int $soldier): array
     {
         $soldierId = $soldier instanceof Soldier ? $soldier->getId() : $soldier;

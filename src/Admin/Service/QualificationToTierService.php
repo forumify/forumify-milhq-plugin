@@ -19,7 +19,7 @@ class QualificationToTierService
     }
 
     /**
-     * @param array{tierName?: string, targetQualificationName?: string, targetTierName?: string} $options
+     * @param array{tierName?: string|null, targetQualificationName?: string|null, targetTierName?: string|null} $options
      */
     public function qualificationToTier(Qualification $qualification, Qualification $targetQualification, array $options = []): void
     {

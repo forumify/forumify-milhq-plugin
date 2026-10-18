@@ -41,10 +41,11 @@ trait MissionFields
     private ?DateTime $end = null;
 
     #[ORM\ManyToOne(targetEntity: Operation::class, fetch: 'EXTRA_LAZY', inversedBy: 'missions')]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Groups('Mission::read')]
     private Operation $operation;
 
+    /** @var Collection<int, AfterActionReport> */
     #[ORM\OneToMany(mappedBy: 'mission', targetEntity: AfterActionReport::class, cascade: ['persist', 'remove'])]
     private Collection $afterActionReports;
 
@@ -60,6 +61,7 @@ trait MissionFields
     #[Groups('Mission')]
     private ?string $combatRecordText = null;
 
+    /** @var Collection<int, MissionRsvp> */
     #[ORM\OneToMany(mappedBy: 'mission', targetEntity: MissionRsvp::class, fetch: 'EXTRA_LAZY', cascade: ['persist', 'remove'])]
     private Collection $rsvps;
 
@@ -120,13 +122,16 @@ trait MissionFields
     }
 
     /**
-     * @return Collection<AfterActionReport>
+     * @return Collection<int, AfterActionReport>
      */
     public function getAfterActionReports(): Collection
     {
         return $this->afterActionReports;
     }
 
+    /**
+     * @param Collection<int, AfterActionReport> $afterActionReports
+     */
     public function setAfterActionReports(Collection $afterActionReports): void
     {
         $this->afterActionReports = $afterActionReports;
@@ -175,6 +180,9 @@ trait MissionFields
         return $this->rsvps;
     }
 
+    /**
+     * @param Collection<int, MissionRsvp> $rsvps
+     */
     public function setRsvps(Collection $rsvps): void
     {
         $this->rsvps = $rsvps;

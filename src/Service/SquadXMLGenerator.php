@@ -47,6 +47,10 @@ class SquadXMLGenerator
 XML;
 
         $xml = $root->asXML();
+        if ($xml === false) {
+            throw new \RuntimeException('Unable to generate squad XML.');
+        }
+
         $xml = substr($xml, strpos($xml, "\n") + 1);
 
         return $header . "\n" . $xml;
@@ -66,7 +70,7 @@ XML;
         foreach ($users as $user) {
             $member = $root->addChild('member');
             $member->addAttribute('id', (string)$user->getSteamId());
-            $member->addAttribute('nick', $user->getUser()?->getDisplayName());
+            $member->addAttribute('nick', $user->getUser()?->getDisplayName() ?? '');
             $member->addChild('name', $user->getName());
             $member->addChild('email', 'N/A');
             $member->addChild('icq', 'N/A');

@@ -11,7 +11,6 @@ use Forumify\Milhq\Entity\FormStatus;
 use Forumify\Milhq\Repository\FormRepository;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -27,7 +26,6 @@ class FormStatusController extends AbstractCrudController
     protected string $deleteTemplate = '@ForumifyMilhqPlugin/admin/forms/nested_delete.html.twig';
 
     public function __construct(
-        private readonly RequestStack $requestStack,
         private readonly FormRepository $formRepository,
     ) {
     }
@@ -66,8 +64,7 @@ class FormStatusController extends AbstractCrudController
 
     private function getParent(): Form
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $form = $this->formRepository->find($request->attributes->get('formId'));
+        $form = $this->formRepository->find($this->getRequest()->attributes->get('formId'));
         if ($form === null) {
             throw $this->createNotFoundException();
         }
@@ -75,6 +72,9 @@ class FormStatusController extends AbstractCrudController
         return $form;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     protected function redirectToRoute(string $route, array $parameters = [], int $status = 302): RedirectResponse
     {
         $parameters['formId'] = $this->getParent()->getId();

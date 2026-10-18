@@ -76,6 +76,7 @@ class FormSubmission implements AuditableEntityInterface
     #[Groups('FormSubmission::read')]
     private Soldier $soldier;
 
+    /** @var array<string, mixed>|null */
     #[ORM\Column(type: Types::JSON, nullable: true)]
     #[Groups(['FormSubmission::read', 'FormSubmission::create'])]
     private ?array $data = [];
@@ -112,11 +113,17 @@ class FormSubmission implements AuditableEntityInterface
         $this->soldier = $soldier;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getData(): ?array
     {
         return $this->data;
     }
 
+    /**
+     * @param array<string, mixed>|null $data
+     */
     public function setData(?array $data): void
     {
         $this->data = $data;

@@ -7,6 +7,9 @@ namespace Forumify\Milhq\Repository;
 use Forumify\Core\Repository\AbstractRepository;
 use Forumify\Milhq\Entity\Document;
 
+/**
+ * @extends AbstractRepository<Document>
+ */
 class DocumentRepository extends AbstractRepository
 {
     public static function getEntityClass(): string

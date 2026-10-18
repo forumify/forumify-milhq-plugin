@@ -19,7 +19,7 @@ class AwardToTierService
     }
 
     /**
-     * @param array{tierName?: string, targetAwardName?: string, targetTierName?: string} $options
+     * @param array{tierName?: string|null, targetAwardName?: string|null, targetTierName?: string|null} $options
      */
     public function awardToTier(Award $award, Award $targetAward, array $options = []): void
     {

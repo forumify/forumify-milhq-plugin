@@ -37,6 +37,9 @@ class SubmissionStatusForm extends AbstractController
     ) {
     }
 
+    /**
+     * @return FormInterface<array{status: FormStatus, reason: string}|null>
+     */
     protected function instantiateForm(): FormInterface
     {
         return $this->createFormBuilder()
@@ -74,6 +77,7 @@ class SubmissionStatusForm extends AbstractController
 
         $this->submitForm();
 
+        /** @var array{status: FormStatus, reason: string} $statusRecord */
         $statusRecord = $this->getForm()->getData();
         $statusRecord['sendNotification'] = true;
         $this->submissionStatusUpdateService->createStatusRecord($this->submission, $statusRecord);

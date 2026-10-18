@@ -9,6 +9,9 @@ use Forumify\Milhq\Entity\Award;
 use Forumify\Milhq\Entity\Record\AwardRecord;
 use Forumify\Milhq\Entity\Soldier;
 
+/**
+ * @extends AbstractRepository<AwardRecord>
+ */
 class AwardRecordRepository extends AbstractRepository
 {
     public static function getEntityClass(): string

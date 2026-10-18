@@ -12,6 +12,9 @@ use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Equipment>
+ */
 class EquipmentFormType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void

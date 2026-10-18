@@ -22,9 +22,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Traversable;
 
+/**
+ * @extends AbstractType<array<string, mixed>>
+ */
 class SubmissionFormType extends AbstractType implements DataMapperInterface
 {
     public const DATE_FORMAT = 'Y-m-d\TH:i:s.u\Z';
@@ -110,7 +114,9 @@ class SubmissionFormType extends AbstractType implements DataMapperInterface
         $builder->setDataMapper($this);
     }
 
-    /** @inheritDoc */
+    /**
+     * @param Traversable<string, FormInterface<mixed>> $forms
+     */
     public function mapDataToForms(mixed $viewData, Traversable $forms): void
     {
         foreach ($forms as $field => $form) {
@@ -124,7 +130,9 @@ class SubmissionFormType extends AbstractType implements DataMapperInterface
         }
     }
 
-    /** @inheritDoc */
+    /**
+     * @param Traversable<string, FormInterface<mixed>> $forms
+     */
     public function mapFormsToData(Traversable $forms, mixed &$viewData): void
     {
         foreach ($forms as $field => $form) {

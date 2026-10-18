@@ -26,6 +26,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @phpstan-type Achievement array{name: string, kind: string, entityId: int, tiered: bool}
+ *
+ * @extends AbstractType<CourseClassStudent>
  */
 class ClassStudentResultType extends AbstractType
 {
@@ -95,6 +97,7 @@ class ClassStudentResultType extends AbstractType
     }
 
     /**
+     * @param FormBuilderInterface<CourseClassStudent|null> $builder
      * @return Achievement
      */
     private function addAchievementField(FormBuilderInterface $builder, Award|Qualification $achievement): array

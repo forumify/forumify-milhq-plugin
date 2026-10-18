@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Components;
 
 use DateTime;
+use Doctrine\Common\Collections\Collection;
 use Forumify\Milhq\Entity\AfterActionReport;
 use Forumify\Milhq\Entity\Operation;
 use Forumify\Milhq\Entity\Position;
@@ -35,9 +36,13 @@ class AttendanceSheet extends AbstractController
     use ComponentWithFormTrait;
 
     public ?string $error = null;
+    /** @var array<int, Unit>|null */
     public ?array $units = null;
+    /** @var array<int, Mission>|null */
     public ?array $missions = null;
+    /** @var array<int, array<Soldier>>|null */
     public ?array $users = null;
+    /** @var array<int, array<int, string>>|null */
     public ?array $sheet = null;
 
     public function __construct(
@@ -47,6 +52,9 @@ class AttendanceSheet extends AbstractController
     ) {
     }
 
+    /**
+     * @return FormInterface<array<string, mixed>|null>
+     */
     protected function instantiateForm(): FormInterface
     {
         return $this->createFormBuilder()
@@ -105,6 +113,7 @@ class AttendanceSheet extends AbstractController
     {
         $this->submitForm();
 
+        /** @var array{from: DateTime, to: DateTime, unit: Collection<int, Unit>, position: Collection<int, Position>, specialty: Collection<int, Specialty>, operation: Collection<int, Operation>} $data */
         $data = $this->getForm()->getData();
 
         $data['from']->setTime(0, 0, 0);
@@ -127,8 +136,8 @@ class AttendanceSheet extends AbstractController
         $aars = $this->aarRepository->findByMissionStartAndUnit(
             $data['from'],
             $data['to'],
-            $data['unit']?->toArray() ?? [],
-            $data['operation']?->toArray() ?? [],
+            $data['unit']->toArray(),
+            $data['operation']->toArray(),
         );
         $missions = [];
         $units = [];
@@ -138,6 +147,9 @@ class AttendanceSheet extends AbstractController
             $missions[$mission->getId()] = $mission;
 
             $unit = $aar->getUnit();
+            if ($unit === null) {
+                continue;
+            }
             $units[$unit->getId()] = $unit;
         }
         uasort($units, fn(Unit $a, Unit $b): int => $a->getPosition() <=> $b->getPosition());
@@ -145,10 +157,10 @@ class AttendanceSheet extends AbstractController
         $users = [];
         foreach ($units as $i => $unit) {
             $unitUsers = $unit->getSoldiers()->filter(function (Soldier $soldier) use ($specialties, $positions) {
-                if (!empty($specialties) && !in_array($soldier->getSpecialty()->getId(), $specialties, true)) {
+                if (!empty($specialties) && !in_array($soldier->getSpecialty()?->getId(), $specialties, true)) {
                     return false;
                 }
-                if (!empty($positions) && !in_array($soldier->getPosition()->getId(), $positions, true)) {
+                if (!empty($positions) && !in_array($soldier->getPosition()?->getId(), $positions, true)) {
                     return false;
                 }
                 return true;
@@ -215,9 +227,12 @@ class AttendanceSheet extends AbstractController
         return $this->getUserPercentage($userId, ['present', 'excused']) ?? 0;
     }
 
+    /**
+     * @param array<string> $states
+     */
     private function getUserPercentage(int $userId, array $states): ?int
     {
-        return $this->getPercentage(array_column($this->sheet, $userId), $states);
+        return $this->getPercentage(array_column($this->sheet ?? [], $userId), $states);
     }
 
     public function missionTotalPresent(int $missionId): ?int
@@ -237,7 +252,7 @@ class AttendanceSheet extends AbstractController
 
     private function getMissionTotal(int $missionId, string $state): int
     {
-        return count(array_keys($this->sheet[$missionId], $state, true));
+        return count(array_keys($this->sheet[$missionId] ?? [], $state, true));
     }
 
     public function missionPercentageAttended(int $missionId): ?int
@@ -250,9 +265,12 @@ class AttendanceSheet extends AbstractController
         return $this->getMissionPercentage($missionId, ['present', 'excused']);
     }
 
+    /**
+     * @param array<string> $states
+     */
     private function getMissionPercentage(int $missionId, array $states): ?int
     {
-        return $this->getPercentage($this->sheet[$missionId], $states);
+        return $this->getPercentage($this->sheet[$missionId] ?? [], $states);
     }
 
     /**
