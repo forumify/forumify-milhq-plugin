@@ -20,7 +20,7 @@ class CombatRecordTable extends AbstractRecordTable
     /**
      * @param CombatRecord $record
      */
-    protected function getDocumentColumnContext(RecordInterface $record): array
+    protected function getActionsColumnContext(RecordInterface $record): array
     {
         return ['mission' => $record->getAfterActionReport()?->getMission()];
     }

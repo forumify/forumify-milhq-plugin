@@ -43,7 +43,7 @@ class RankRecordTable extends AbstractRecordTable
                 'renderer' => fn (string $type) => $this->translator->trans("milhq.rank.type.$type"),
                 'searchable' => false,
             ])
-            ->addDocumentColumn(true, 'rank');
+            ->addActionsColumn(true, 'rank');
     }
 
     private function renderRank(string $rankName, RankRecord $record): string

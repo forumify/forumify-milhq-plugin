@@ -40,7 +40,7 @@ abstract class AbstractRecordTable extends AbstractDoctrineTable
                 'field' => 'text',
                 'searchable' => false,
             ])
-            ->addDocumentColumn();
+            ->addActionsColumn();
     }
 
     protected function addDateColumn(): static
@@ -56,14 +56,14 @@ abstract class AbstractRecordTable extends AbstractDoctrineTable
         return $this;
     }
 
-    protected function addDocumentColumn(bool $recordTextModal = false, ?string $itemKey = null, ?string $tierKey = null): static
+    protected function addActionsColumn(bool $recordTextModal = false, ?string $itemKey = null, ?string $tierKey = null): static
     {
         $propAccess = PropertyAccess::createPropertyAccessor();
 
-        $this->addColumn('document', [
+        $this->addColumn('actions', [
             'field' => 'document',
             'label' => '',
-            'renderer' => fn (?Document $document, RecordInterface $record) => $this->twig->render('@ForumifyMilhqPlugin/frontend/components/record_table/documents.html.twig', [
+            'renderer' => fn (?Document $document, RecordInterface $record) => $this->twig->render('@ForumifyMilhqPlugin/frontend/components/record_table/actions.html.twig', [
                 'document' => $document,
                 'item' => $itemKey !== null
                     ? $propAccess->getValue($record, $itemKey)
@@ -73,7 +73,7 @@ abstract class AbstractRecordTable extends AbstractDoctrineTable
                     : null,
                 'record' => $record,
                 'showRecordText' => $recordTextModal,
-                ...$this->getDocumentColumnContext($record),
+                ...$this->getActionsColumnContext($record),
             ]),
             'searchable' => false,
             'sortable' => false,
@@ -85,7 +85,7 @@ abstract class AbstractRecordTable extends AbstractDoctrineTable
     /**
      * @return array<string, mixed>
      */
-    protected function getDocumentColumnContext(RecordInterface $record): array
+    protected function getActionsColumnContext(RecordInterface $record): array
     {
         return [];
     }

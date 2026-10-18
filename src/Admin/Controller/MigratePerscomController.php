@@ -7,7 +7,6 @@ namespace Forumify\Milhq\Admin\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Forumify\Core\Repository\SettingRepository;
 use Forumify\Core\Twig\Extension\MenuRuntime;
-use Forumify\Milhq\Repository\CombatRecordRepository;
 use Forumify\Plugin\Service\PluginVersionChecker;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,7 +33,6 @@ class MigratePerscomController extends AbstractController
         private readonly CacheInterface $cache,
         private readonly FilesystemOperator $milhqAssetStorage,
         private readonly FilesystemOperator $assetStorage,
-        private readonly CombatRecordRepository $combatRecordRepository,
         private readonly ?FilesystemOperator $perscomAssetStorage = null,
     ) {
     }
@@ -282,9 +280,6 @@ class MigratePerscomController extends AbstractController
     /**
      * @return Result
      */
-    /**
-     * @return Result
-     */
     private function migrateAttendance(): array
     {
         $result = ['count' => 0, 'messages' => []];
@@ -315,7 +310,28 @@ class MigratePerscomController extends AbstractController
         $result = ['count' => 0, 'messages' => []];
 
         try {
-            $result['count'] = $this->combatRecordRepository->linkUnlinkedToAfterActionReports();
+            $result['count'] = $this->em->getConnection()->executeStatement(<<<'SQL'
+                UPDATE milhq_record_combat cr
+                SET cr.after_action_report_id = (
+                    SELECT aar.id
+                    FROM milhq_after_action_report aar
+                    JOIN milhq_after_action_report_attendance a ON a.after_action_report_id = aar.id
+                    JOIN milhq_mission m ON m.id = aar.mission_id
+                    JOIN milhq_operation o ON o.id = m.operation_id
+                    WHERE a.soldier_id = cr.soldier_id
+                        AND a.state = 'present'
+                        AND (
+                            ABS(TIMESTAMPDIFF(SECOND, aar.created_at, cr.created_at)) <= 60
+                            OR (
+                                ABS(TIMESTAMPDIFF(SECOND, aar.created_at, cr.created_at)) <= 86400
+                                AND cr.text IN (m.combat_record_text, CONCAT('Operation ', o.title, ': Mission ', m.title))
+                            )
+                        )
+                    ORDER BY ABS(TIMESTAMPDIFF(SECOND, aar.created_at, cr.created_at)), aar.id
+                    LIMIT 1
+                )
+                WHERE cr.after_action_report_id IS NULL
+            SQL);
         } catch (Throwable $ex) {
             $result['messages'][] = $ex->getMessage();
         }
@@ -323,6 +339,9 @@ class MigratePerscomController extends AbstractController
         return $result;
     }
 
+    /**
+     * @return Result
+     */
     private function migrateFormStatuses(): array
     {
         $conn = $this->em->getConnection();
