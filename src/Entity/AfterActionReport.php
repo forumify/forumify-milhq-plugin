@@ -12,6 +12,8 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\CreateProvider;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\BlameableEntityTrait;
@@ -77,15 +79,27 @@ class AfterActionReport implements AuditableEntityInterface
     #[Groups('AfterActionReport')]
     private string $report = '';
 
-    /** @var array<string, list<int>> */
-    #[ORM\Column(type: 'json')]
+    /** @var Collection<int, AfterActionReportAttendance> */
+    #[ORM\OneToMany(
+        targetEntity: AfterActionReportAttendance::class,
+        mappedBy: 'afterActionReport',
+        cascade: ['persist'],
+        orphanRemoval: true,
+    )]
+    #[ORM\OrderBy(['id' => 'ASC'])]
+    #[Assert\Valid]
     #[Groups('AfterActionReport')]
-    private array $attendance = [];
+    private Collection $attendance;
 
     #[ORM\ManyToOne(targetEntity: Mission::class, fetch: 'EXTRA_LAZY', inversedBy: 'afterActionReports')]
     #[ORM\JoinColumn(onDelete: 'CASCADE', nullable: false)]
     #[Groups('AfterActionReport::read')]
     private Mission $mission;
+
+    public function __construct()
+    {
+        $this->attendance = new ArrayCollection();
+    }
 
     public function getUnit(): ?Unit
     {
@@ -107,14 +121,51 @@ class AfterActionReport implements AuditableEntityInterface
         $this->report = $report;
     }
 
-    public function getAttendance(): array
+    /**
+     * @return Collection<int, AfterActionReportAttendance>
+     */
+    public function getAttendance(): Collection
     {
         return $this->attendance;
     }
 
-    public function setAttendance(array $attendance): void
+    /**
+     * @param iterable<AfterActionReportAttendance> $attendance
+     */
+    public function setAttendance(iterable $attendance): void
     {
-        $this->attendance = $attendance;
+        $existing = [];
+        foreach ($this->attendance as $entry) {
+            $existing[$entry->getSoldier()->getId()] = $entry;
+        }
+
+        $merged = [];
+        foreach ($attendance as $entry) {
+            $soldierId = $entry->getSoldier()->getId();
+            if (isset($existing[$soldierId])) {
+                $existing[$soldierId]->setState($entry->getState());
+                $entry = $existing[$soldierId];
+            } else {
+                $entry->setAfterActionReport($this);
+            }
+            $merged[$soldierId] = $entry;
+        }
+
+        $this->attendance->clear();
+        foreach ($merged as $entry) {
+            $this->attendance->add($entry);
+        }
+    }
+
+    /**
+     * @return list<Soldier>
+     */
+    public function getSoldiersWithState(string $state): array
+    {
+        return $this->attendance
+            ->filter(fn (AfterActionReportAttendance $entry) => $entry->getState() === $state)
+            ->map(fn (AfterActionReportAttendance $entry) => $entry->getSoldier())
+            ->getValues();
     }
 
     public function getMission(): Mission

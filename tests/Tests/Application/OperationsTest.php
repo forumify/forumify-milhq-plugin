@@ -5,19 +5,28 @@ declare(strict_types=1);
 namespace PluginTests\Tests\Application;
 
 use DateInterval;
+use DateTime;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Forumify\Core\Repository\SettingRepository;
 use Forumify\Calendar\ForumifyCalendarPlugin;
+use Forumify\Milhq\Entity\AfterActionReport;
+use Forumify\Milhq\Entity\AfterActionReportAttendance;
+use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Repository\AfterActionReportRepository;
 use Forumify\Milhq\Entity\Operation;
+use Forumify\Milhq\Repository\AssignmentRecordRepository;
 use Forumify\Testing\Factories\Core\ACLFactory;
 use Forumify\Testing\Factories\Core\UserFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PluginTests\Tests\Factories\Forumify\CalendarFactory;
 use PluginTests\Tests\Factories\Milhq\AfterActionReportFactory;
+use PluginTests\Tests\Factories\Milhq\MissionFactory;
 use PluginTests\Tests\Factories\Milhq\OperationFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
+use PluginTests\Tests\Factories\Milhq\StatusFactory;
+use PluginTests\Tests\Factories\Milhq\UnitFactory;
 use PluginTests\Tests\Factories\Stories\MilsimStory;
 use PluginTests\Tests\Traits\SessionTrait;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
@@ -162,7 +171,10 @@ class OperationsTest extends MilhqWebTestCase
         $absent = SoldierFactory::createOne(['name' => 'Jane Absent']);
         $aar = AfterActionReportFactory::createOne([
             'report' => '<p id="aar-report">We won.</p>',
-            'attendance' => ['present' => [$present->getId()], 'absent' => [$absent->getId()]],
+            'attendance' => [
+                new AfterActionReportAttendance($present, 'present'),
+                new AfterActionReportAttendance($absent, 'absent'),
+            ],
         ]);
         ACLFactory::createOne([
             'entity' => Operation::class,
@@ -224,5 +236,164 @@ class OperationsTest extends MilhqWebTestCase
     {
         yield 'edit' => ['edit'];
         yield 'delete' => ['delete'];
+    }
+
+    public function testEditingAfterActionReportUpdatesAttendance(): void
+    {
+        [$stays, $leaves, $joins] = SoldierFactory::createMany(3);
+        $aar = AfterActionReportFactory::createOne([
+            'report' => 'Original report',
+            'attendance' => [
+                new AfterActionReportAttendance($stays, 'present'),
+                new AfterActionReportAttendance($leaves, 'absent'),
+            ],
+        ]);
+        $staysEntryId = $aar->getAttendance()->first()->getId();
+
+        $c = $this->client->request('GET', "/milhq/aar/{$aar->getId()}/edit");
+        self::assertSame(
+            ['present' => [$stays->getId()], 'absent' => [$leaves->getId()]],
+            json_decode($c->filter('#after_action_report_attendanceJson')->attr('value'), true),
+        );
+
+        $this->client->submitForm('Save', [
+            'after_action_report[attendanceJson]' => json_encode([
+                'excused' => [(string)$stays->getId()],
+                'present' => [(string)$joins->getId()],
+            ]),
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $attendance = $this->findAttendance($aar->getId());
+        self::assertSame([$stays->getId() => 'excused', $joins->getId() => 'present'], $attendance);
+        $staysEntry = $this->findAfterActionReport($aar->getId())->getAttendance()->first();
+        self::assertSame($staysEntryId, $staysEntry->getId());
+    }
+
+    public function testDeletingSoldierRemovesTheirAttendance(): void
+    {
+        $deleted = SoldierFactory::createOne(['name' => 'John Deleted']);
+        $kept = SoldierFactory::createOne(['name' => 'Jane Kept']);
+        $aar = AfterActionReportFactory::createOne([
+            'attendance' => [
+                new AfterActionReportAttendance($deleted, 'present'),
+                new AfterActionReportAttendance($kept, 'absent'),
+            ],
+        ]);
+
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $em->remove($em->find(Soldier::class, $deleted->getId()));
+        $em->flush();
+        $em->clear();
+
+        self::assertSame([$kept->getId() => 'absent'], $this->findAttendance($aar->getId()));
+
+        $this->client->request('GET', "/milhq/aar/{$aar->getId()}");
+        self::assertSelectorTextContains('table.box tbody', 'Jane Kept');
+        self::assertSelectorTextNotContains('table.box tbody', 'John Deleted');
+    }
+
+    public function testConsecutiveAbsenceStatusOnlyAppliesToRepeatAbsentees(): void
+    {
+        $status = StatusFactory::createOne(['name' => 'AWOL']);
+        $settings = self::getContainer()->get(SettingRepository::class);
+        $settings->set('milhq.operations.consecutive_absent_notification', true);
+        $settings->set('milhq.operations.consecutive_absent_notification_count', 2);
+        $settings->set('milhq.operations.consecutive_absent_notification_message', 'Report to your CO');
+        $settings->set('milhq.operations.consecutive_absent_status', $status->getId());
+
+        $unit = UnitFactory::createOne();
+        $repeatAbsentee = SoldierFactory::createOne(['unit' => $unit]);
+        $firstAbsence = SoldierFactory::createOne(['unit' => $unit]);
+        $operation = OperationFactory::createOne();
+
+        AfterActionReportFactory::createOne([
+            'unit' => $unit,
+            'mission' => MissionFactory::createOne(['operation' => $operation, 'start' => new DateTime('-2 weeks')]),
+            'attendance' => [
+                new AfterActionReportAttendance($repeatAbsentee, 'absent'),
+                new AfterActionReportAttendance($firstAbsence, 'present'),
+            ],
+        ]);
+        $mission = MissionFactory::createOne(['operation' => $operation, 'start' => new DateTime('-1 week')]);
+
+        $this->client->request('GET', "/milhq/aar/new?mission={$mission->getId()}");
+        $this->client->submitForm('Save', [
+            'after_action_report[unit]' => $unit->getId(),
+            'after_action_report[report]' => 'Nobody showed up',
+            'after_action_report[attendanceJson]' => json_encode([
+                'absent' => [$repeatAbsentee->getId(), $firstAbsence->getId()],
+            ]),
+        ]);
+
+        $assignmentRecords = self::getContainer()->get(AssignmentRecordRepository::class);
+        self::assertCount(1, $assignmentRecords->findBy(['soldier' => $repeatAbsentee->getId(), 'status' => $status->getId()]));
+        self::assertCount(0, $assignmentRecords->findBy(['soldier' => $firstAbsence->getId(), 'status' => $status->getId()]));
+    }
+
+    public function testAttendanceSheetCountsSoldiersWhoChangedUnits(): void
+    {
+        $operation = OperationFactory::createOne();
+        $firstMission = MissionFactory::createOne(['operation' => $operation, 'start' => new DateTime('-2 days')]);
+        $secondMission = MissionFactory::createOne(['operation' => $operation, 'start' => new DateTime('-1 day')]);
+
+        $oldUnit = UnitFactory::createOne();
+        $newUnit = UnitFactory::createOne();
+        $stayed = SoldierFactory::createOne(['unit' => $oldUnit]);
+        $transferred = SoldierFactory::createOne(['unit' => $newUnit]);
+
+        AfterActionReportFactory::createOne([
+            'unit' => $oldUnit,
+            'mission' => $firstMission,
+            'attendance' => [
+                new AfterActionReportAttendance($stayed, 'absent'),
+                new AfterActionReportAttendance($transferred, 'present'),
+            ],
+        ]);
+        AfterActionReportFactory::createOne([
+            'unit' => $newUnit,
+            'mission' => $secondMission,
+            'attendance' => [new AfterActionReportAttendance($transferred, 'excused')],
+        ]);
+
+        $this->initializeSession();
+        $c = $this
+            ->createLiveComponent('Milhq\\AttendanceSheet')
+            ->actingAs($this->user)
+            ->submitForm([
+                'form' => [
+                    'from' => (new DateTime('-1 week'))->format('Y-m-d'),
+                    'to' => (new DateTime())->format('Y-m-d'),
+                    'operation' => [$operation->getId()],
+                ],
+            ], 'calculate')
+            ->render()
+            ->crawler()
+        ;
+
+        $totals = fn (string $testId) => $c->filter("td[data-testid=\"$testId\"]")->siblings()->each(fn ($td) => $td->innerText());
+        self::assertSame(['1', '0'], $totals('total-present'));
+        self::assertSame(['0', '1'], $totals('total-excused'));
+        self::assertSame(['1', '0'], $totals('total-absent'));
+        self::assertSame(['50%', '0%'], $totals('perc-attended'));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function findAttendance(int $aarId): array
+    {
+        $attendance = [];
+        foreach ($this->findAfterActionReport($aarId)->getAttendance() as $entry) {
+            $attendance[$entry->getSoldier()->getId()] = $entry->getState();
+        }
+        return $attendance;
+    }
+
+    private function findAfterActionReport(int $aarId): AfterActionReport
+    {
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $em->clear();
+        return $em->find(AfterActionReport::class, $aarId);
     }
 }

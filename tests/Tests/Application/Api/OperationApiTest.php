@@ -6,6 +6,7 @@ namespace PluginTests\Tests\Application\Api;
 
 use DateTime;
 use Forumify\Core\Service\TokenService;
+use Forumify\Milhq\Entity\AfterActionReportAttendance;
 use Forumify\Milhq\Entity\Operation;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Repository\CombatRecordRepository;
@@ -180,21 +181,53 @@ class OperationApiTest extends ApiTestCase
                 'unit' => "/api/milhq/units/{$unit->getId()}",
                 'report' => 'We won.',
                 'attendance' => [
-                    'present' => [$soldiers[0]->getId(), $soldiers[1]->getId()],
-                    'absent' => [$soldiers[2]->getId()],
+                    ['soldier' => "/api/milhq/soldiers/{$soldiers[0]->getId()}", 'state' => 'present'],
+                    ['soldier' => "/api/milhq/soldiers/{$soldiers[1]->getId()}", 'state' => 'present'],
+                    ['soldier' => "/api/milhq/soldiers/{$soldiers[2]->getId()}", 'state' => 'absent'],
                 ],
             ],
         ]);
 
         self::assertSame('We won.', $aar['report']);
-        self::assertSame([$soldiers[0]->getId(), $soldiers[1]->getId()], $aar['attendance']['present']);
-        self::assertSame([], $aar['attendance']['excused']);
+        self::assertSame(
+            [
+                [$soldiers[0]->getId(), 'present'],
+                [$soldiers[1]->getId(), 'present'],
+                [$soldiers[2]->getId(), 'absent'],
+            ],
+            array_map(fn (array $entry) => [$entry['soldier']['id'], $entry['state']], $aar['attendance']),
+        );
 
         $combatRecords = self::getContainer()->get(CombatRecordRepository::class)->findBy(['text' => 'Fought bravely']);
         self::assertCount(2, $combatRecords);
 
         $aars = $this->getCollection("/api/milhq/missions/{$mission->getId()}/after-action-reports");
         self::assertSame('First Squad', $aars[0]['unit']['name']);
+    }
+
+    public function testPatchAfterActionReportReplacesAttendance(): void
+    {
+        [$stays, $leaves, $joins] = SoldierFactory::createMany(3);
+        $aar = AfterActionReportFactory::createOne([
+            'attendance' => [
+                new AfterActionReportAttendance($stays, 'present'),
+                new AfterActionReportAttendance($leaves, 'absent'),
+            ],
+        ]);
+
+        $patched = $this->patch("/api/milhq/after-action-reports/{$aar->getId()}", [
+            'json' => [
+                'attendance' => [
+                    ['soldier' => "/api/milhq/soldiers/{$stays->getId()}", 'state' => 'excused'],
+                    ['soldier' => "/api/milhq/soldiers/{$joins->getId()}", 'state' => 'present'],
+                ],
+            ],
+        ]);
+
+        self::assertSame(
+            [[$stays->getId(), 'excused'], [$joins->getId(), 'present']],
+            array_map(fn (array $entry) => [$entry['soldier']['id'], $entry['state']], $patched['attendance']),
+        );
     }
 
     public function testOnlyOneAfterActionReportPerUnit(): void

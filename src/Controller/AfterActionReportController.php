@@ -8,12 +8,10 @@ use Forumify\Core\Security\VoterAttribute;
 use Forumify\Milhq\Form\AfterActionReportType;
 use Forumify\Milhq\Entity\AfterActionReport;
 use Forumify\Milhq\Entity\MissionRsvp;
-use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Unit;
 use Forumify\Milhq\Repository\AfterActionReportRepository;
 use Forumify\Milhq\Repository\MissionRepository;
 use Forumify\Milhq\Repository\MissionRSVPRepository;
-use Forumify\Milhq\Repository\SoldierRepository;
 use Forumify\Milhq\Service\AfterActionReportService;
 use Forumify\Milhq\Service\SoldierService;
 use Forumify\Plugin\Attribute\PluginVersion;
@@ -33,7 +31,6 @@ class AfterActionReportController extends AbstractController
         private readonly MissionRepository $missionRepository,
         private readonly AfterActionReportService $afterActionReportService,
         private readonly SoldierService $userService,
-        private readonly SoldierRepository $userRepository,
         private readonly Packages $packages,
     ) {
     }
@@ -46,31 +43,15 @@ class AfterActionReportController extends AbstractController
             'permission' => 'view_after_action_reports',
         ]);
 
-        $allUserIds = [];
-        foreach ($aar->getAttendance() as $list) {
-            foreach ($list as $userId) {
-                $allUserIds[] = $userId;
-            }
+        $attendance = [];
+        foreach ($aar->getAttendance() as $entry) {
+            $attendance[$entry->getState()][] = $entry->getSoldier();
         }
 
-        /** @var array<Soldier> $users */
-        $users = $this->userRepository->findBy(['id' => $allUserIds]);
-        $allUserIds = array_map(fn (Soldier $user) => $user->getId(), $users);
-        $users = array_combine($allUserIds, $users);
-
-        $attendance = $aar->getAttendance();
-        foreach ($attendance as &$list) {
-            foreach ($list as $k => $userId) {
-                $list[$k] = $users[$userId] ?? null;
-            }
+        foreach ($attendance as &$soldiers) {
+            $this->userService->sortSoldiers($soldiers);
         }
-        unset($list);
-
-        foreach ($attendance as &$list) {
-            $list = array_filter($list);
-            $this->userService->sortSoldiers($list);
-        }
-        unset($list);
+        unset($soldiers);
 
         return $this->render('@ForumifyMilhqPlugin/frontend/aar/aar.html.twig', [
             'aar' => $aar,
@@ -138,9 +119,8 @@ class AfterActionReportController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var AfterActionReport $aar */
             $aar = $form->getData();
-            $attendance = $form->get('attendanceJson')->getData();
 
-            $this->afterActionReportService->createOrUpdate($aar, $attendance, $isNew);
+            $this->afterActionReportService->save($aar, $isNew);
             $this->addFlash('success', $isNew ? 'milhq.aar.created' : 'milhq.aar.edited');
             return $this->redirectToRoute('milhq_aar_view', ['id' => $aar->getId()]);
         }

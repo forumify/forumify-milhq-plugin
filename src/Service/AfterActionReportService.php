@@ -14,10 +14,9 @@ use Forumify\Milhq\Entity\AfterActionReport;
 use Forumify\Milhq\Entity\Mission;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Status;
+use Forumify\Milhq\Repository\AfterActionReportAttendanceRepository;
 use Forumify\Milhq\Repository\AfterActionReportRepository;
-use Forumify\Milhq\Repository\SoldierRepository;
 use Forumify\Milhq\Repository\StatusRepository;
-use JsonException;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -27,36 +26,16 @@ class AfterActionReportService
         private readonly SettingRepository $settingRepository,
         private readonly AfterActionReportRepository $afterActionReportRepository,
         private readonly RecordService $recordService,
-        private readonly SoldierRepository $soldierRepository,
         private readonly NotificationService $notificationService,
         private readonly Packages $packages,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly StatusRepository $statusRepository,
+        private readonly AfterActionReportAttendanceRepository $attendanceRepository,
     ) {
-    }
-
-    public function createOrUpdate(AfterActionReport $aar, string $attendanceJson, bool $isNew): void
-    {
-        try {
-            $attendance = json_decode($attendanceJson, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            $attendance = [];
-            foreach ($this->getAttendanceStates() as $state) {
-                $attendance[$state] = [];
-            }
-        }
-        $aar->setAttendance($attendance);
-        $this->save($aar, $isNew);
     }
 
     public function save(AfterActionReport $aar, bool $isNew): void
     {
-        $attendance = $aar->getAttendance();
-        foreach ($this->getAttendanceStates() as $state) {
-            $attendance[$state] ??= [];
-        }
-        $aar->setAttendance($attendance);
-
         $this->afterActionReportRepository->save($aar);
 
         if (!$isNew) {
@@ -84,12 +63,11 @@ class AfterActionReportService
 
     public function createCombatRecords(AfterActionReport $aar): void
     {
-        $userIds = $aar->getAttendance()['present'] ?? [];
-        if (empty($userIds)) {
+        $soldiers = $aar->getSoldiersWithState('present');
+        if (empty($soldiers)) {
             return;
         }
 
-        $soldiers = $this->soldierRepository->findBy(['id' => $userIds]);
         $this->recordService->createRecord('combat', [
             'sendNotification' => true,
             'text' => $aar->getMission()->getCombatRecordText() ?: $this->getDefaultCombatRecordText($aar->getMission()),
@@ -104,12 +82,7 @@ class AfterActionReportService
 
     private function handleAbsence(AfterActionReport $aar): void
     {
-        $absences = $aar->getAttendance()['absent'] ?? [];
-        if (empty($absences)) {
-            return;
-        }
-
-        $absentees = $this->soldierRepository->findBy(['id' => $absences]);
+        $absentees = $aar->getSoldiersWithState('absent');
         if (empty($absentees)) {
             return;
         }
@@ -154,9 +127,9 @@ class AfterActionReportService
     }
 
     /**
-     * @param array<Soldier> $absentUsers
+     * @param array<Soldier> $absentSoldiers
      */
-    private function handleConsecutiveAbsences(array $absentUsers, AfterActionReport $aar): void
+    private function handleConsecutiveAbsences(array $absentSoldiers, AfterActionReport $aar): void
     {
         $s = $this->settingRepository->get(...);
         $consecutiveEnabled = (bool)$s('milhq.operations.consecutive_absent_notification');
@@ -186,13 +159,22 @@ class AfterActionReportService
             return;
         }
 
+        $consecutiveAbsentIds = $this->attendanceRepository->findSoldierIdsWithStateInAll('absent', $pastAars);
+        $consecutiveAbsentees = array_values(array_filter(
+            $absentSoldiers,
+            fn (Soldier $soldier) => in_array($soldier->getId(), $consecutiveAbsentIds, true),
+        ));
+        if (empty($consecutiveAbsentees)) {
+            return;
+        }
+
         $description = "You have been marked absent $consecutiveCount times in a row. Please contact your leadership immediately or risk punitive action!";
         $consecutiveMessage = $s('milhq.operations.consecutive_absent_notification_message');
         $consecutiveMessage = empty(strip_tags($consecutiveMessage)) ? $description : $consecutiveMessage;
 
-        foreach ($absentUsers as $soldier) {
+        foreach ($consecutiveAbsentees as $soldier) {
             $user = $soldier->getUser();
-            if ($user === null || !$this->isAbsentInAllAars($soldier, $pastAars)) {
+            if ($user === null) {
                 continue;
             }
 
@@ -227,18 +209,7 @@ class AfterActionReportService
             'status' => $consecutiveStatus,
             'text' => "Status updated to {$consecutiveStatus->getName()} due to consecutive absences.",
             'type' => 'primary',
-            'soldiers' => $absentUsers,
+            'soldiers' => $consecutiveAbsentees,
         ]);
-    }
-
-    private function isAbsentInAllAars(Soldier $soldier, array $pastAars): bool
-    {
-        foreach ($pastAars as $pastAar) {
-            $absences = $pastAar->getAttendance()['absent'] ?? [];
-            if (!in_array($soldier->getId(), $absences)) {
-                return false;
-            }
-        }
-        return true;
     }
 }
