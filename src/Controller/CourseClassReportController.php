@@ -55,12 +55,14 @@ class CourseClassReportController extends AbstractController
         $class->setResult(true);
         $this->classRepository->save($class);
 
-        if (!$alreadyProcessed) {
-            try {
+        try {
+            if ($alreadyProcessed) {
+                $this->classService->updateResult($class);
+            } else {
                 $this->classService->processResult($class);
-            } catch (SoldierNotFoundException) {
-                $this->addFlash('error', 'milhq.admin.requires_milhq_account');
             }
+        } catch (SoldierNotFoundException) {
+            $this->addFlash('error', 'milhq.admin.requires_milhq_account');
         }
 
         return $this->redirectToRoute('milhq_course_class_view', ['id' => $class->getId()]);

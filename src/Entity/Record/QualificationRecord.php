@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AuditableEntityInterface;
+use Forumify\Milhq\Entity\CourseClass;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Qualification;
 use Forumify\Milhq\Entity\QualificationTier;
@@ -65,6 +66,10 @@ class QualificationRecord implements RecordInterface, AuditableEntityInterface
     #[Groups('QualificationRecord')]
     private ?QualificationTier $tier = null;
 
+    #[ORM\ManyToOne(targetEntity: CourseClass::class)]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    private ?CourseClass $courseClass = null;
+
     public function getSoldier(): Soldier
     {
         return $this->soldier;
@@ -93,6 +98,16 @@ class QualificationRecord implements RecordInterface, AuditableEntityInterface
     public function setTier(?QualificationTier $tier): void
     {
         $this->tier = $tier;
+    }
+
+    public function getCourseClass(): ?CourseClass
+    {
+        return $this->courseClass;
+    }
+
+    public function setCourseClass(?CourseClass $courseClass): void
+    {
+        $this->courseClass = $courseClass;
     }
 
     #[Assert\Callback]

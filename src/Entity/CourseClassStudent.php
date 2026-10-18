@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\CreateProvider;
+use Forumify\Milhq\Api\Processor\CourseClassStudentProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Plugin\Attribute\PluginVersion;
@@ -30,8 +31,14 @@ use Forumify\Milhq\Entity\Enum\CourseResult;
     normalizationContext: ['groups' => ['MilhqSummary']],
     operations: [
         new Get(extraProperties: ['acl' => ['permission' => 'view_classes', 'entity' => 'class.course']]),
-        new Patch(extraProperties: ['acl' => ['permission' => 'manage_classes', 'entity' => 'class.course']]),
-        new Delete(extraProperties: ['acl' => ['permission' => 'manage_classes', 'entity' => 'class.course']]),
+        new Patch(
+            extraProperties: ['acl' => ['permission' => 'manage_classes', 'entity' => 'class.course']],
+            processor: CourseClassStudentProcessor::class,
+        ),
+        new Delete(
+            extraProperties: ['acl' => ['permission' => 'manage_classes', 'entity' => 'class.course']],
+            processor: CourseClassStudentProcessor::class,
+        ),
         new GetCollection(
             uriTemplate: '/course-classes/{classId}/students',
             uriVariables: [
@@ -50,6 +57,7 @@ use Forumify\Milhq\Entity\Enum\CourseResult;
                 ),
             ],
             provider: CreateProvider::class,
+            processor: CourseClassStudentProcessor::class,
         ),
     ],
 )]

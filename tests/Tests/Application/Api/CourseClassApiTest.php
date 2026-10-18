@@ -6,6 +6,7 @@ namespace PluginTests\Tests\Application\Api;
 
 use Forumify\Milhq\Entity\Course;
 use Forumify\Milhq\Entity\Enum\CourseResult;
+use Forumify\Milhq\Entity\Record\QualificationRecord;
 use Forumify\Milhq\Repository\QualificationRecordRepository;
 use Forumify\Milhq\Repository\ServiceRecordRepository;
 use Forumify\Testing\Api\ApiTestCase;
@@ -22,6 +23,7 @@ use PluginTests\Tests\Factories\Milhq\CourseFactory;
 use PluginTests\Tests\Factories\Milhq\CourseInstructorFactory;
 use PluginTests\Tests\Factories\Milhq\QualificationFactory;
 use PluginTests\Tests\Factories\Milhq\RankFactory;
+use PluginTests\Tests\Factories\Milhq\Record\QualificationRecordFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use Symfony\Component\HttpClient\Exception\ClientException;
 
@@ -147,12 +149,77 @@ class CourseClassApiTest extends ApiTestCase
 
         $qualificationRecords = self::getContainer()->get(QualificationRecordRepository::class)->findBy(['soldier' => $soldier->getId()]);
         self::assertCount(1, $qualificationRecords);
+        self::assertSame($class->getId(), $qualificationRecords[0]->getCourseClass()?->getId());
 
         $response = $this->request('PATCH', self::endpoint() . "/{$class->getId()}", [
             'json' => ['result' => false],
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
         ]);
         self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testPatchStudentOfReportedClassSyncsQualificationRecords(): void
+    {
+        $qualification = QualificationFactory::createOne();
+        $class = CourseClassFactory::createOne([
+            'course' => CourseFactory::createOne(['qualifications' => [$qualification->getId()]]),
+            'result' => true,
+        ]);
+        $student = CourseClassStudentFactory::createOne(['class' => $class, 'result' => CourseResult::Failed]);
+        $unrelatedRecord = QualificationRecordFactory::createOne(['soldier' => $student->getSoldier(), 'qualification' => $qualification]);
+
+        $this->patch("/api/milhq/course-class-students/{$student->getId()}", [
+            'json' => [
+                'result' => CourseResult::Passed->value,
+                'qualifications' => [$qualification->getId() => null],
+            ],
+        ]);
+
+        $records = $this->findQualificationRecords($class->getId());
+        self::assertCount(1, $records);
+        self::assertSame($student->getSoldier()->getId(), $records[0]->getSoldier()->getId());
+
+        $this->patch("/api/milhq/course-class-students/{$student->getId()}", [
+            'json' => ['result' => CourseResult::Failed->value],
+        ]);
+
+        self::assertSame([], $this->findQualificationRecords($class->getId()));
+        self::assertNotNull(self::getContainer()->get(QualificationRecordRepository::class)->find($unrelatedRecord->getId()));
+    }
+
+    public function testDeleteStudentOfReportedClassDeletesTheirQualificationRecords(): void
+    {
+        $qualification = QualificationFactory::createOne();
+        $class = CourseClassFactory::createOne([
+            'course' => CourseFactory::createOne(['qualifications' => [$qualification->getId()]]),
+            'result' => true,
+        ]);
+        [$removed, $kept] = CourseClassStudentFactory::createMany(2, [
+            'class' => $class,
+            'result' => CourseResult::Passed,
+            'qualifications' => [$qualification->getId() => null],
+        ]);
+        foreach ([$removed, $kept] as $student) {
+            QualificationRecordFactory::createOne(['soldier' => $student->getSoldier(), 'qualification' => $qualification, 'courseClass' => $class]);
+        }
+
+        $this->delete("/api/milhq/course-class-students/{$removed->getId()}");
+
+        $records = $this->findQualificationRecords($class->getId());
+        self::assertSame([$kept->getSoldier()->getId()], array_map(fn ($record) => $record->getSoldier()->getId(), $records));
+    }
+
+    public function testDeleteClassDeletesItsQualificationRecords(): void
+    {
+        $class = CourseClassFactory::createOne(['result' => true]);
+        $soldier = SoldierFactory::createOne();
+        QualificationRecordFactory::createOne(['soldier' => $soldier, 'qualification' => QualificationFactory::createOne(), 'courseClass' => $class]);
+        $unrelatedRecord = QualificationRecordFactory::createOne(['soldier' => $soldier, 'qualification' => QualificationFactory::createOne()]);
+
+        $this->delete(self::endpoint() . "/{$class->getId()}");
+
+        $remaining = self::getContainer()->get(QualificationRecordRepository::class)->findBy(['soldier' => $soldier->getId()]);
+        self::assertSame([$unrelatedRecord->getId()], array_map(fn ($record) => $record->getId(), $remaining));
     }
 
     public function testStudentCanOnlySignUpOnce(): void
@@ -203,6 +270,14 @@ class CourseClassApiTest extends ApiTestCase
         $response = $this->get(self::endpoint() . "/{$class->getId()}");
 
         self::assertSame('Needs more practice', $response['students'][0]['notes']);
+    }
+
+    /**
+     * @return array<int, QualificationRecord>
+     */
+    private function findQualificationRecords(int $classId): array
+    {
+        return self::getContainer()->get(QualificationRecordRepository::class)->findBy(['courseClass' => $classId]);
     }
 
     private function grantCourseAccess(Course $course, string $permission): void

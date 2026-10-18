@@ -4,14 +4,25 @@ declare(strict_types=1);
 
 namespace PluginTests\Tests\Application;
 
+use Forumify\Milhq\Entity\AfterActionReportAttendance;
+use Forumify\Milhq\Entity\Course;
+use Forumify\Milhq\Entity\Operation;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
+use Forumify\Testing\Factories\Core\ACLFactory;
+use Forumify\Testing\Factories\Core\UserFactory;
+use PluginTests\Tests\Factories\Milhq\AfterActionReportFactory;
 use PluginTests\Tests\Factories\Milhq\AwardFactory;
 use PluginTests\Tests\Factories\Milhq\AwardTierFactory;
+use PluginTests\Tests\Factories\Milhq\CourseClassFactory;
+use PluginTests\Tests\Factories\Milhq\CourseFactory;
+use PluginTests\Tests\Factories\Milhq\MissionFactory;
+use PluginTests\Tests\Factories\Milhq\OperationFactory;
 use PluginTests\Tests\Factories\Milhq\QualificationFactory;
 use PluginTests\Tests\Factories\Milhq\PositionFactory;
 use PluginTests\Tests\Factories\Milhq\QualificationTierFactory;
 use PluginTests\Tests\Factories\Milhq\Record\AssignmentRecordFactory;
 use PluginTests\Tests\Factories\Milhq\Record\AwardRecordFactory;
+use PluginTests\Tests\Factories\Milhq\Record\CombatRecordFactory;
 use PluginTests\Tests\Factories\Milhq\Record\QualificationRecordFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use PluginTests\Tests\Factories\Milhq\UnitFactory;
@@ -37,6 +48,65 @@ class SoldierTest extends MilhqWebTestCase
         self::assertSelectorTextContains('#secondary-weapons', 'M17');
         self::assertSelectorTextContains('#vehicles', 'HMMWV');
         self::assertSelectorCount(3, '#supervisors > li');
+    }
+
+    public function testCombatRecordLinksToMissionWhenAllowed(): void
+    {
+        $soldier = SoldierFactory::createOne();
+        $visibleOperation = OperationFactory::createOne();
+        $visibleMission = MissionFactory::createOne(['operation' => $visibleOperation]);
+        $hiddenMission = MissionFactory::createOne(['operation' => OperationFactory::createOne()]);
+        foreach ([$visibleMission, $hiddenMission] as $mission) {
+            CombatRecordFactory::createOne([
+                'soldier' => $soldier,
+                'afterActionReport' => AfterActionReportFactory::createOne([
+                    'mission' => $mission,
+                    'attendance' => [new AfterActionReportAttendance($soldier, 'present')],
+                ]),
+            ]);
+        }
+        CombatRecordFactory::createOne(['soldier' => $soldier]);
+        ACLFactory::createOne([
+            'entity' => Operation::class,
+            'entityId' => (string)$visibleOperation->getId(),
+            'permission' => 'view_missions',
+        ]);
+        $this->client->loginUser(UserFactory::createOne());
+
+        $this->client->request('GET', '/milhq/soldier/' . $soldier->getId());
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorCount(3, '#combat-record tbody tr');
+        self::assertSelectorCount(1, '#combat-record a[aria-label="View Mission"]');
+        self::assertSelectorExists("#combat-record a[href='/milhq/missions/{$visibleMission->getId()}']");
+    }
+
+    public function testQualificationRecordLinksToCourseClassWhenAllowed(): void
+    {
+        $soldier = SoldierFactory::createOne();
+        $visibleCourse = CourseFactory::createOne();
+        $visibleClass = CourseClassFactory::createOne(['course' => $visibleCourse, 'result' => true]);
+        $hiddenClass = CourseClassFactory::createOne(['result' => true]);
+        foreach ([$visibleClass, $hiddenClass, null] as $class) {
+            QualificationRecordFactory::createOne([
+                'soldier' => $soldier,
+                'qualification' => MilsimStory::qualificationCLS(),
+                'courseClass' => $class,
+            ]);
+        }
+        ACLFactory::createOne([
+            'entity' => Course::class,
+            'entityId' => (string)$visibleCourse->getId(),
+            'permission' => 'view_classes',
+        ]);
+        $this->client->loginUser(UserFactory::createOne());
+
+        $this->client->request('GET', '/milhq/soldier/' . $soldier->getId());
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorCount(3, '#qualification-record tbody tr');
+        self::assertSelectorCount(1, '#qualification-record a[aria-label="View Class"]');
+        self::assertSelectorExists("#qualification-record a[href='/milhq/courses/class/{$visibleClass->getId()}']");
     }
 
     public function testQualificationRecordDisplaysTier(): void

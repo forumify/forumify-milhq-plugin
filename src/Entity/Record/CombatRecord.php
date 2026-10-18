@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AuditableEntityInterface;
+use Forumify\Milhq\Entity\AfterActionReport;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Api\Processor\RecordProcessor;
 use Forumify\Milhq\Repository\CombatRecordRepository;
@@ -50,4 +51,18 @@ class CombatRecord implements RecordInterface, AuditableEntityInterface
     #[Assert\NotNull]
     #[Groups('Record')]
     private Soldier $soldier;
+
+    #[ORM\ManyToOne(targetEntity: AfterActionReport::class)]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    private ?AfterActionReport $afterActionReport = null;
+
+    public function getAfterActionReport(): ?AfterActionReport
+    {
+        return $this->afterActionReport;
+    }
+
+    public function setAfterActionReport(?AfterActionReport $afterActionReport): void
+    {
+        $this->afterActionReport = $afterActionReport;
+    }
 }

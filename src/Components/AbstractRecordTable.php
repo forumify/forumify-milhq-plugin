@@ -73,12 +73,21 @@ abstract class AbstractRecordTable extends AbstractDoctrineTable
                     : null,
                 'record' => $record,
                 'showRecordText' => $recordTextModal,
+                ...$this->getDocumentColumnContext($record),
             ]),
             'searchable' => false,
             'sortable' => false,
         ]);
 
         return $this;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function getDocumentColumnContext(RecordInterface $record): array
+    {
+        return [];
     }
 
     protected function getQuery(array $search): QueryBuilder

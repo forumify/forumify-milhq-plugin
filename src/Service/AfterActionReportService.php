@@ -16,6 +16,7 @@ use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Status;
 use Forumify\Milhq\Repository\AfterActionReportAttendanceRepository;
 use Forumify\Milhq\Repository\AfterActionReportRepository;
+use Forumify\Milhq\Repository\CombatRecordRepository;
 use Forumify\Milhq\Repository\StatusRepository;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -31,6 +32,7 @@ class AfterActionReportService
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly StatusRepository $statusRepository,
         private readonly AfterActionReportAttendanceRepository $attendanceRepository,
+        private readonly CombatRecordRepository $combatRecordRepository,
     ) {
     }
 
@@ -38,14 +40,13 @@ class AfterActionReportService
     {
         $this->afterActionReportRepository->save($aar);
 
-        if (!$isNew) {
-            return;
+        if ($aar->getMission()->isCreateCombatRecords()) {
+            $this->syncCombatRecords($aar);
         }
 
-        if ($aar->getMission()->isCreateCombatRecords()) {
-            $this->createCombatRecords($aar);
+        if ($isNew) {
+            $this->handleAbsence($aar);
         }
-        $this->handleAbsence($aar);
     }
 
     public function getAttendanceStates(): array
@@ -61,17 +62,29 @@ class AfterActionReportService
             : $attendanceStates;
     }
 
-    public function createCombatRecords(AfterActionReport $aar): void
+    private function syncCombatRecords(AfterActionReport $aar): void
     {
-        $soldiers = $aar->getSoldiersWithState('present');
-        if (empty($soldiers)) {
-            return;
+        $present = [];
+        foreach ($aar->getSoldiersWithState('present') as $soldier) {
+            $present[$soldier->getId()] = $soldier;
         }
 
+        $staleRecords = [];
+        foreach ($this->combatRecordRepository->findBy(['afterActionReport' => $aar]) as $record) {
+            $soldierId = $record->getSoldier()->getId();
+            if (isset($present[$soldierId])) {
+                unset($present[$soldierId]);
+            } else {
+                $staleRecords[] = $record;
+            }
+        }
+
+        $this->combatRecordRepository->removeAll($staleRecords);
         $this->recordService->createRecord('combat', [
+            'afterActionReport' => $aar,
             'sendNotification' => true,
             'text' => $aar->getMission()->getCombatRecordText() ?: $this->getDefaultCombatRecordText($aar->getMission()),
-            'soldiers' => $soldiers,
+            'soldiers' => array_values($present),
         ]);
     }
 

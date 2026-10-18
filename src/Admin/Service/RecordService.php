@@ -70,6 +70,8 @@ class RecordService
             } elseif ($record instanceof QualificationRecord) {
                 $record->setQualification($data['qualification']);
                 $record->setTier($data['tier'] ?? null);
+            } elseif ($record instanceof CombatRecord) {
+                $record->setAfterActionReport($data['afterActionReport'] ?? null);
             }
 
             $records[] = $record;

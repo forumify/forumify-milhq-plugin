@@ -7,6 +7,7 @@ namespace Forumify\Milhq\Admin\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Forumify\Core\Repository\SettingRepository;
 use Forumify\Core\Twig\Extension\MenuRuntime;
+use Forumify\Milhq\Repository\CombatRecordRepository;
 use Forumify\Plugin\Service\PluginVersionChecker;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,6 +34,7 @@ class MigratePerscomController extends AbstractController
         private readonly CacheInterface $cache,
         private readonly FilesystemOperator $milhqAssetStorage,
         private readonly FilesystemOperator $assetStorage,
+        private readonly CombatRecordRepository $combatRecordRepository,
         private readonly ?FilesystemOperator $perscomAssetStorage = null,
     ) {
     }
@@ -114,6 +116,7 @@ class MigratePerscomController extends AbstractController
         $results['missionRsvps'] = $this->migrateTable('perscom_mission_rsvp', 'milhq_mission_rsvp', ['id', 'user_id' => 'soldier_id', 'mission_id', 'going', 'created_at', 'updated_at']);
         $results['missionAfterActionReports'] = $this->migrateTable('perscom_after_action_report', 'milhq_after_action_report', ['id', 'unit_id', 'mission_id', 'report', 'created_by', 'updated_by', 'created_at', 'updated_at']);
         $results['missionAttendance'] = $this->migrateAttendance();
+        $results['missionCombatRecords'] = $this->linkCombatRecords();
 
         return $results;
     }
@@ -297,6 +300,22 @@ class MigratePerscomController extends AbstractController
                 JOIN milhq_soldier s ON s.id = soldiers.soldier_id
                 GROUP BY aar.id, s.id
             SQL);
+        } catch (Throwable $ex) {
+            $result['messages'][] = $ex->getMessage();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return Result
+     */
+    private function linkCombatRecords(): array
+    {
+        $result = ['count' => 0, 'messages' => []];
+
+        try {
+            $result['count'] = $this->combatRecordRepository->linkUnlinkedToAfterActionReports();
         } catch (Throwable $ex) {
             $result['messages'][] = $ex->getMessage();
         }

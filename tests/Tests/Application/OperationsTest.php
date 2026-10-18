@@ -12,10 +12,12 @@ use Forumify\Core\Repository\SettingRepository;
 use Forumify\Calendar\ForumifyCalendarPlugin;
 use Forumify\Milhq\Entity\AfterActionReport;
 use Forumify\Milhq\Entity\AfterActionReportAttendance;
+use Forumify\Milhq\Entity\Record\CombatRecord;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Repository\AfterActionReportRepository;
 use Forumify\Milhq\Entity\Operation;
 use Forumify\Milhq\Repository\AssignmentRecordRepository;
+use Forumify\Milhq\Repository\CombatRecordRepository;
 use Forumify\Testing\Factories\Core\ACLFactory;
 use Forumify\Testing\Factories\Core\UserFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,6 +26,7 @@ use PluginTests\Tests\Factories\Forumify\CalendarFactory;
 use PluginTests\Tests\Factories\Milhq\AfterActionReportFactory;
 use PluginTests\Tests\Factories\Milhq\MissionFactory;
 use PluginTests\Tests\Factories\Milhq\OperationFactory;
+use PluginTests\Tests\Factories\Milhq\Record\CombatRecordFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use PluginTests\Tests\Factories\Milhq\StatusFactory;
 use PluginTests\Tests\Factories\Milhq\UnitFactory;
@@ -106,10 +109,12 @@ class OperationsTest extends MilhqWebTestCase
         ]);
 
         self::assertSelectorExists('#test-aar-report');
+        $aarId = (int)basename($this->client->getRequest()->getPathInfo());
         foreach ($present as $presentUser) {
             $cr = $presentUser->getCombatRecords()->first();
             self::assertNotNull($cr);
             self::assertEquals('Operation Sandstorm: Mission Test Mission', $cr->getText());
+            self::assertSame($aarId, $cr->getAfterActionReport()?->getId());
         }
 
         $this->initializeSession();
@@ -376,6 +381,90 @@ class OperationsTest extends MilhqWebTestCase
         self::assertSame(['0', '1'], $totals('total-excused'));
         self::assertSame(['1', '0'], $totals('total-absent'));
         self::assertSame(['50%', '0%'], $totals('perc-attended'));
+    }
+
+    public function testEditingAfterActionReportSyncsCombatRecords(): void
+    {
+        [$stays, $leaves, $joins] = SoldierFactory::createMany(3);
+        $aar = AfterActionReportFactory::createOne([
+            'report' => 'Original report',
+            'mission' => MissionFactory::createOne(['createCombatRecords' => true, 'combatRecordText' => 'Took the hill']),
+            'attendance' => [
+                new AfterActionReportAttendance($stays, 'present'),
+                new AfterActionReportAttendance($leaves, 'present'),
+                new AfterActionReportAttendance($joins, 'absent'),
+            ],
+        ]);
+        $staysRecord = CombatRecordFactory::createOne(['soldier' => $stays, 'afterActionReport' => $aar, 'text' => 'Took the hill']);
+        CombatRecordFactory::createOne(['soldier' => $leaves, 'afterActionReport' => $aar, 'text' => 'Took the hill']);
+        $unrelatedRecord = CombatRecordFactory::createOne(['soldier' => $leaves, 'text' => 'Earlier deployment']);
+
+        $this->client->request('GET', "/milhq/aar/{$aar->getId()}/edit");
+        $this->client->submitForm('Save', [
+            'after_action_report[attendanceJson]' => json_encode([
+                'present' => [(string)$stays->getId(), (string)$joins->getId()],
+                'excused' => [(string)$leaves->getId()],
+            ]),
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $records = $this->findCombatRecords($aar->getId());
+        self::assertEqualsCanonicalizing([$stays->getId(), $joins->getId()], array_keys($records));
+        self::assertSame($staysRecord->getId(), $records[$stays->getId()]->getId());
+        self::assertSame('Took the hill', $records[$joins->getId()]->getText());
+        self::assertNotNull(self::getContainer()->get(CombatRecordRepository::class)->find($unrelatedRecord->getId()));
+    }
+
+    public function testEditingAfterActionReportWithoutCombatRecordsLeavesRecordsAlone(): void
+    {
+        $soldier = SoldierFactory::createOne();
+        $aar = AfterActionReportFactory::createOne([
+            'report' => 'Original report',
+            'mission' => MissionFactory::createOne(['createCombatRecords' => false]),
+            'attendance' => [new AfterActionReportAttendance($soldier, 'absent')],
+        ]);
+
+        $this->client->request('GET', "/milhq/aar/{$aar->getId()}/edit");
+        $this->client->submitForm('Save', [
+            'after_action_report[attendanceJson]' => json_encode(['present' => [(string)$soldier->getId()]]),
+        ]);
+
+        self::assertResponseIsSuccessful();
+        self::assertSame([], $this->findCombatRecords($aar->getId()));
+        self::assertCount(0, self::getContainer()->get(CombatRecordRepository::class)->findBy(['soldier' => $soldier->getId()]));
+    }
+
+    public function testDeletingAfterActionReportDeletesItsCombatRecords(): void
+    {
+        $soldier = SoldierFactory::createOne();
+        $aar = AfterActionReportFactory::createOne([
+            'mission' => MissionFactory::createOne(['createCombatRecords' => true]),
+            'attendance' => [new AfterActionReportAttendance($soldier, 'present')],
+        ]);
+        $aarId = $aar->getId();
+        CombatRecordFactory::createOne(['soldier' => $soldier, 'afterActionReport' => $aar]);
+        $unrelatedRecord = CombatRecordFactory::createOne(['soldier' => $soldier]);
+
+        $this->client->request('GET', "/milhq/aar/{$aarId}/delete?confirmed=1");
+
+        self::assertResponseIsSuccessful();
+        self::assertSame([], $this->findCombatRecords($aarId));
+        $remaining = self::getContainer()->get(CombatRecordRepository::class)->findBy(['soldier' => $soldier->getId()]);
+        self::assertSame([$unrelatedRecord->getId()], array_map(fn ($record) => $record->getId(), $remaining));
+    }
+
+    /**
+     * @return array<int, CombatRecord>
+     */
+    private function findCombatRecords(int $aarId): array
+    {
+        self::getContainer()->get(EntityManagerInterface::class)->clear();
+
+        $records = [];
+        foreach (self::getContainer()->get(CombatRecordRepository::class)->findBy(['afterActionReport' => $aarId]) as $record) {
+            $records[$record->getSoldier()->getId()] = $record;
+        }
+        return $records;
     }
 
     /**
