@@ -6,6 +6,7 @@ namespace Forumify\Milhq\Components;
 
 use Doctrine\ORM\QueryBuilder;
 use Forumify\Milhq\Entity\Record\QualificationRecord;
+use Forumify\Milhq\Entity\Record\RecordInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Symfony\Component\Asset\Packages;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
@@ -37,7 +38,7 @@ class QualificationRecordTable extends AbstractRecordTable
                 'searchable' => false,
                 'sortable' => false,
             ])
-            ->addDocumentColumn(true, 'qualification', 'tier');
+            ->addActionsColumn(true, 'qualification', 'tier');
     }
 
     private function renderQualification(string $qualificationName, QualificationRecord $record): string
@@ -56,11 +57,22 @@ class QualificationRecordTable extends AbstractRecordTable
         return "<div class='w-100 flex items-center gap-2'>$image $label</div>";
     }
 
+    /**
+     * @param QualificationRecord $record
+     */
+    protected function getActionsColumnContext(RecordInterface $record): array
+    {
+        return ['courseClass' => $record->getCourseClass()];
+    }
+
     protected function getQuery(array $search): QueryBuilder
     {
         return parent::getQuery($search)
+            ->leftJoin('e.courseClass', 'courseClass')
+            ->leftJoin('courseClass.course', 'course')
             ->addSelect('qualification')
-            ->addSelect('tier');
+            ->addSelect('tier')
+            ->addSelect('courseClass', 'course');
     }
 
     protected function addSearchToQuery(QueryBuilder $qb): QueryBuilder

@@ -15,6 +15,7 @@ use Forumify\Milhq\Entity\Record\ServiceRecord;
 use Forumify\Milhq\Exception\MilhqException;
 use Forumify\Milhq\Repository\AwardRepository;
 use Forumify\Milhq\Repository\AwardTierRepository;
+use Forumify\Milhq\Repository\QualificationRecordRepository;
 use Forumify\Milhq\Repository\QualificationRepository;
 use Forumify\Milhq\Repository\QualificationTierRepository;
 
@@ -26,6 +27,7 @@ class CourseClassService
         private readonly QualificationTierRepository $qualificationTierRepository,
         private readonly AwardRepository $awardRepository,
         private readonly AwardTierRepository $awardTierRepository,
+        private readonly QualificationRecordRepository $qualificationRecordRepository,
     ) {
     }
 
@@ -37,8 +39,19 @@ class CourseClassService
         $records = [];
 
         $this->addServiceRecords($records, $class);
-        $this->addQualificationRecords($records, $class);
+        $this->syncQualificationRecords($records, $class);
         $this->addAwardRecords($records, $class);
+
+        $this->recordService->createRecords($records, true);
+    }
+
+    /**
+     * @throws MilhqException
+     */
+    public function updateResult(CourseClass $class): void
+    {
+        $records = [];
+        $this->syncQualificationRecords($records, $class);
 
         $this->recordService->createRecords($records, true);
     }
@@ -85,11 +98,12 @@ class CourseClassService
     /**
      * @param array<RecordInterface> $records
      */
-    private function addQualificationRecords(array &$records, CourseClass $class): void
+    private function syncQualificationRecords(array &$records, CourseClass $class): void
     {
         $allowed = $class->getCourse()->getQualifications();
         $qualifications = [];
         $tiers = [];
+        $missing = [];
 
         $students = $class->getStudents()->filter(fn (CourseClassStudent $s) => $s->getResult() === CourseResult::Passed);
         /** @var CourseClassStudent $student */
@@ -119,9 +133,32 @@ class CourseClassService
                 $record->setQualification($qualifications[$qualificationId]);
                 $record->setTier($tier);
                 $record->setSoldier($recipient);
-                $records[] = $record;
+                $record->setCourseClass($class);
+                $missing[$this->getQualificationRecordKey($record)] = $record;
             }
         }
+
+        $staleRecords = [];
+        foreach ($this->qualificationRecordRepository->findBy(['courseClass' => $class]) as $existing) {
+            $key = $this->getQualificationRecordKey($existing);
+            if (isset($missing[$key])) {
+                unset($missing[$key]);
+            } else {
+                $staleRecords[] = $existing;
+            }
+        }
+
+        $this->qualificationRecordRepository->removeAll($staleRecords);
+        array_push($records, ...array_values($missing));
+    }
+
+    private function getQualificationRecordKey(QualificationRecord $record): string
+    {
+        return implode('-', [
+            $record->getSoldier()->getId(),
+            $record->getQualification()->getId(),
+            $record->getTier()?->getId(),
+        ]);
     }
 
     /**

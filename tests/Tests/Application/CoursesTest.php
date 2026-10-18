@@ -6,16 +6,23 @@ namespace PluginTests\Tests\Application;
 
 use DateInterval;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
+use Forumify\Milhq\Entity\Course;
+use Forumify\Milhq\Entity\Enum\CourseResult;
+use Forumify\Milhq\Entity\Record\QualificationRecord;
 use Forumify\Milhq\Repository\AwardRecordRepository;
 use Forumify\Milhq\Repository\CourseClassRepository;
 use Forumify\Milhq\Repository\CourseInstructorRepository;
 use Forumify\Milhq\Repository\QualificationRecordRepository;
 use Forumify\Milhq\Repository\ServiceRecordRepository;
+use Forumify\Testing\Factories\Core\ACLFactory;
 use Forumify\Testing\Factories\Core\UserFactory;
 use PluginTests\Tests\Application\MilhqWebTestCase;
 use PluginTests\Tests\Factories\Milhq\AwardFactory;
 use PluginTests\Tests\Factories\Milhq\AwardTierFactory;
 use PluginTests\Tests\Factories\Milhq\CourseClassFactory;
+use PluginTests\Tests\Factories\Milhq\CourseClassStudentFactory;
+use PluginTests\Tests\Factories\Milhq\CourseFactory;
 use PluginTests\Tests\Factories\Milhq\Record\QualificationRecordFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use PluginTests\Tests\Factories\Stories\MilsimStory;
@@ -196,6 +203,10 @@ class CoursesTest extends MilhqWebTestCase
             self::assertContains($expected, $realQualifications);
         }
 
+        $linkedRecords = $this->findQualificationRecords((int)$classId);
+        self::assertCount(2, $linkedRecords);
+        self::assertSame([(int)$soldier->getId()], array_unique(array_map(fn ($record) => $record->getSoldier()->getId(), $linkedRecords)));
+
         $tieredLandNav = array_filter(
             $qualificationRecords,
             fn ($record) => $record->getQualification()->getName() === 'Land Navigation' && $record->getTier() !== null,
@@ -222,6 +233,89 @@ class CoursesTest extends MilhqWebTestCase
         }
     }
 
+    public function testEditingClassReportSyncsQualificationRecords(): void
+    {
+        $cls = MilsimStory::qualificationCLS();
+        $landNav = MilsimStory::qualificationLandNav();
+        $class = CourseClassFactory::createOne([
+            'course' => CourseFactory::createOne(['qualifications' => [$cls->getId(), $landNav->getId()]]),
+            'result' => true,
+        ]);
+        [$stays, $fails, $passes, $promoted] = SoldierFactory::createMany(4);
+        CourseClassStudentFactory::createOne(['class' => $class, 'soldier' => $stays, 'result' => CourseResult::Passed, 'qualifications' => [$cls->getId() => null]]);
+        CourseClassStudentFactory::createOne(['class' => $class, 'soldier' => $fails, 'result' => CourseResult::Passed, 'qualifications' => [$cls->getId() => null]]);
+        CourseClassStudentFactory::createOne(['class' => $class, 'soldier' => $passes, 'result' => CourseResult::Failed]);
+        CourseClassStudentFactory::createOne([
+            'class' => $class,
+            'soldier' => $promoted,
+            'result' => CourseResult::Passed,
+            'qualifications' => [$landNav->getId() => MilsimStory::qualificationLandNavBasic()->getId()],
+        ]);
+        $staysRecord = QualificationRecordFactory::createOne(['soldier' => $stays, 'qualification' => $cls, 'courseClass' => $class]);
+        QualificationRecordFactory::createOne(['soldier' => $fails, 'qualification' => $cls, 'courseClass' => $class]);
+        $basicRecord = QualificationRecordFactory::createOne([
+            'soldier' => $promoted,
+            'qualification' => $landNav,
+            'tier' => MilsimStory::qualificationLandNavBasic(),
+            'courseClass' => $class,
+        ]);
+        $unrelatedRecord = QualificationRecordFactory::createOne(['soldier' => $fails, 'qualification' => $cls]);
+
+        $this->client->request('GET', "/milhq/courses/class/{$class->getId()}/report");
+        $this->client->submitForm('Save', [
+            'class_result[students][1][result]' => CourseResult::Failed->value,
+            'class_result[students][2][result]' => CourseResult::Passed->value,
+            "class_result[students][2][qualification_{$cls->getId()}]" => true,
+            "class_result[students][3][qualification_{$landNav->getId()}]" => (string)MilsimStory::qualificationLandNavExpert()->getId(),
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $records = [];
+        foreach ($this->findQualificationRecords($class->getId()) as $record) {
+            $records[$record->getSoldier()->getId()] = $record;
+        }
+        self::assertEqualsCanonicalizing([$stays->getId(), $passes->getId(), $promoted->getId()], array_keys($records));
+        self::assertSame($staysRecord->getId(), $records[$stays->getId()]->getId());
+        self::assertSame('Combat Life Saver', $records[$passes->getId()]->getQualification()->getName());
+        self::assertNotSame($basicRecord->getId(), $records[$promoted->getId()]->getId());
+        self::assertSame('Expert', $records[$promoted->getId()]->getTier()?->getNameForAudit());
+        self::assertNotNull(self::getContainer()->get(QualificationRecordRepository::class)->find($unrelatedRecord->getId()));
+    }
+
+    public function testDeletingClassDeletesItsQualificationRecords(): void
+    {
+        $soldier = SoldierFactory::createOne();
+        $class = CourseClassFactory::createOne(['result' => true]);
+        $classId = $class->getId();
+        QualificationRecordFactory::createOne(['soldier' => $soldier, 'qualification' => MilsimStory::qualificationCLS(), 'courseClass' => $class]);
+        $unrelatedRecord = QualificationRecordFactory::createOne(['soldier' => $soldier, 'qualification' => MilsimStory::qualificationCLS()]);
+
+        $this->client->request('GET', "/milhq/courses/class/{$classId}/delete?confirmed=1");
+
+        self::assertResponseIsSuccessful();
+        self::assertSame([], $this->findQualificationRecords($classId));
+        $remaining = self::getContainer()->get(QualificationRecordRepository::class)->findBy(['soldier' => $soldier->getId()]);
+        self::assertSame([$unrelatedRecord->getId()], array_map(fn ($record) => $record->getId(), $remaining));
+    }
+
+    public function testViewClassRequiresViewClasses(): void
+    {
+        $class = CourseClassFactory::createOne();
+        $this->client->loginUser(UserFactory::createOne());
+
+        $this->client->request('GET', "/milhq/courses/class/{$class->getId()}");
+        self::assertResponseStatusCodeSame(403);
+
+        ACLFactory::createOne([
+            'entity' => Course::class,
+            'entityId' => (string)$class->getCourse()->getId(),
+            'permission' => 'view_classes',
+        ]);
+
+        $this->client->request('GET', "/milhq/courses/class/{$class->getId()}");
+        self::assertResponseIsSuccessful();
+    }
+
     public function testDeleteClass(): void
     {
         $class = CourseClassFactory::createOne();
@@ -242,5 +336,15 @@ class CoursesTest extends MilhqWebTestCase
 
         self::assertResponseStatusCodeSame(403);
         self::assertNotNull(self::getContainer()->get(CourseClassRepository::class)->find($classId));
+    }
+
+    /**
+     * @return array<int, QualificationRecord>
+     */
+    private function findQualificationRecords(int $classId): array
+    {
+        self::getContainer()->get(EntityManagerInterface::class)->clear();
+
+        return self::getContainer()->get(QualificationRecordRepository::class)->findBy(['courseClass' => $classId]);
     }
 }

@@ -230,6 +230,8 @@ milhq:
         no_secondary_positions: 'This user does not have any secondary positions.'
         document: 'Record Document'
         text: 'Record Text'
+        mission: 'View Mission'
+        course_class: 'View Class'
         last_report_in: 'Last report in'
         no_report_in: 'This user has not reported in yet.'
         search_records: 'Search Records'

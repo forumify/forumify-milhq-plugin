@@ -1,0 +1,68 @@
+<div class="flex items-center justify-end gap-1" style="height: 30px">
+    {% if document is not null %}
+        {% embed '@Forumify/components/modal.html.twig' %}
+            {% block modalOpenButton %}
+                <button class="btn-link btn-icon btn-small"><i class="ph ph-certificate"></i></button>
+            {% endblock %}
+            {% block modalContent %}
+                <div class="card">
+                    <div class="card-title">
+                        {% if document.name %}
+                            {{ record.document.name }}
+                        {% else %}
+                            {{ 'milhq.user.document'|trans }}
+                        {% endif %}
+                        {% if tier is not null %}
+                            : {{ tier.name }}
+                        {% endif %}
+                    </div>
+                    <div class="card-body text-left">
+                        {% set modalImage = tier is not null and tier.image is not null ? tier.image : (item is not null and item.image is defined ? item.image : null) %}
+                        {% if modalImage is not null %}
+                            <div class="text-center mb-6">
+                                <img width="25%" height="auto" src="{{ asset(modalImage, 'milhq.asset') }}" alt="">
+                            </div>
+                        {% endif %}
+                        {{ document|milhq_document(record)|rich }}
+                    </div>
+                </div>
+            {% endblock %}
+        {% endembed %}
+    {% endif %}
+    {% if showRecordText and record.text %}
+        {% embed '@Forumify/components/modal.html.twig' %}
+            {% block modalOpenButton %}
+                <button class="btn-link btn-icon btn-small"><i class="ph ph-file-text"></i></button>
+            {% endblock %}
+            {% block modalContent %}
+                <div class="card">
+                    <div class="card-title">
+                        {{ 'milhq.soldier.text'|trans }}
+                        {% if tier is not null %}
+                            : {{ tier.name }}
+                        {% endif %}
+                    </div>
+                    <div class="card-body text-left">
+                        {% set modalImage = tier is not null and tier.image is not null ? tier.image : (item is not null and item.image is defined ? item.image : null) %}
+                        {% if modalImage is not null %}
+                            <div class="text-center mb-6">
+                                <img width="25%" height="auto" src="{{ asset(modalImage, 'milhq.asset') }}" alt="">
+                            </div>
+                        {% endif %}
+                        {{ record.text|rich }}
+                    </div>
+                </div>
+            {% endblock %}
+        {% endembed %}
+    {% endif %}
+    {% if mission is defined and mission is not null and plugin_version('forumify/forumify-milhq-plugin', 'premium') and can('view_missions', mission.operation) %}
+        <a class="btn-link btn-icon btn-small" href="{{ path('milhq_missions_view', { id: mission.id }) }}" aria-label="{{ 'milhq.soldier.mission'|trans }}">
+            <i class="ph ph-crosshair"></i>
+        </a>
+    {% endif %}
+    {% if courseClass is defined and courseClass is not null and plugin_version('forumify/forumify-milhq-plugin', 'premium') and can('view_classes', courseClass.course) %}
+        <a class="btn-link btn-icon btn-small" href="{{ path('milhq_course_class_view', { id: courseClass.id }) }}" aria-label="{{ 'milhq.soldier.course_class'|trans }}">
+            <i class="ph ph-graduation-cap"></i>
+        </a>
+    {% endif %}
+</div>

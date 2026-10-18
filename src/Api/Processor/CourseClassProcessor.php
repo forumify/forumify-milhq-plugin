@@ -35,7 +35,9 @@ class CourseClassProcessor implements ProcessorInterface
         }
 
         $class = $this->persistProcessor->process($data, $operation, $uriVariables, $context);
-        if (!$alreadyProcessed && $class->getResult()) {
+        if ($alreadyProcessed) {
+            $this->courseClassService->updateResult($class);
+        } elseif ($class->getResult()) {
             $this->courseClassService->processResult($class);
         }
 

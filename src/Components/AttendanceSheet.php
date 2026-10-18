@@ -12,6 +12,7 @@ use Forumify\Milhq\Entity\Mission;
 use Forumify\Milhq\Entity\Soldier;
 use Forumify\Milhq\Entity\Specialty;
 use Forumify\Milhq\Entity\Unit;
+use Forumify\Milhq\Repository\AfterActionReportAttendanceRepository;
 use Forumify\Milhq\Repository\AfterActionReportRepository;
 use Forumify\Milhq\Service\SoldierService;
 use Forumify\Plugin\Attribute\PluginVersion;
@@ -42,6 +43,7 @@ class AttendanceSheet extends AbstractController
     public function __construct(
         private readonly AfterActionReportRepository $aarRepository,
         private readonly SoldierService $userService,
+        private readonly AfterActionReportAttendanceRepository $attendanceRepository,
     ) {
     }
 
@@ -161,7 +163,7 @@ class AttendanceSheet extends AbstractController
             $users[$unit->getId()] = $unitUsers;
         }
 
-        $this->sheet = $this->buildSheetData($aars, $missions, $units, $users);
+        $this->sheet = $this->buildSheetData($aars, $missions, $users);
         $this->missions = $missions;
         $this->units = $units;
         $this->users = $users;
@@ -169,40 +171,23 @@ class AttendanceSheet extends AbstractController
 
     /**
      * @param array<AfterActionReport> $aars
-     * @param array<Mission> $missions
-     * @param array<Unit> $units
-     * @param array<array<Soldier>> $users
-     * @return array<int, array<int, array<int, string>>>
+     * @param array<int, Mission> $missions
+     * @param array<int, array<Soldier>> $users
+     * @return array<int, array<int, string>>
      */
-    private function buildSheetData(array $aars, array $missions, array $units, array $users): array
+    private function buildSheetData(array $aars, array $missions, array $users): array
     {
-        $sheetData = [];
-        foreach (array_keys($missions) as $missionId) {
-            foreach (array_keys($units) as $unitId) {
-                foreach (($users[$unitId] ?? []) as $user) {
-                    $sheetData[$missionId][$unitId][$user->getId()] = '';
-                }
+        $displayedSoldierIds = [];
+        foreach ($users as $unitSoldiers) {
+            foreach ($unitSoldiers as $soldier) {
+                $displayedSoldierIds[$soldier->getId()] = true;
             }
         }
 
-        foreach ($aars as $aar) {
-            $missionId = $aar->getMission()->getId();
-            $unitId = $aar->getUnit()->getId();
-
-            foreach ($aar->getAttendance() as $state => $userIds) {
-                foreach ($userIds as $userId) {
-                    if (isset($sheetData[$missionId][$unitId][$userId])) {
-                        $sheetData[$missionId][$unitId][$userId] = $state;
-                    } else {
-                        // The user changed combat units, let's see if we can find them in a different unit
-                        foreach ($sheetData[$missionId] as $mUnitId => $mUserIds) {
-                            if (in_array($userId, array_keys($mUserIds))) {
-                                $sheetData[$missionId][$mUnitId][$userId] = $state;
-                                break;
-                            }
-                        }
-                    }
-                }
+        $sheetData = array_fill_keys(array_keys($missions), []);
+        foreach ($this->attendanceRepository->findStatesByAfterActionReports($aars) as $row) {
+            if (isset($displayedSoldierIds[$row['soldierId']])) {
+                $sheetData[$row['missionId']][$row['soldierId']] = $row['state'];
             }
         }
 
@@ -232,37 +217,7 @@ class AttendanceSheet extends AbstractController
 
     private function getUserPercentage(int $userId, array $states): ?int
     {
-        $total = 0;
-        $count = null;
-
-        foreach ($this->sheet as $units) {
-            foreach ($units as $users) {
-                foreach ($users as $uid => $state) {
-                    if (empty($state)) {
-                        continue;
-                    }
-
-                    if ($userId !== $uid) {
-                        continue;
-                    }
-
-                    $total++;
-                    if ($count === null) {
-                        $count = 0;
-                    }
-
-                    if (in_array($state, $states, true)) {
-                        $count++;
-                    }
-                }
-            }
-        }
-
-        if ($count === null || $total <= 0) {
-            return null;
-        }
-
-        return (int)($count / $total * 100);
+        return $this->getPercentage(array_column($this->sheet, $userId), $states);
     }
 
     public function missionTotalPresent(int $missionId): ?int
@@ -280,18 +235,9 @@ class AttendanceSheet extends AbstractController
         return $this->getMissionTotal($missionId, 'absent');
     }
 
-    private function getMissionTotal(int $missionId, string $tState): int
+    private function getMissionTotal(int $missionId, string $state): int
     {
-        $count = 0;
-        foreach ($this->sheet[$missionId] as $users) {
-            foreach ($users as $state) {
-                if ($state === $tState) {
-                    $count++;
-                }
-            }
-        }
-
-        return $count;
+        return count(array_keys($this->sheet[$missionId], $state, true));
     }
 
     public function missionPercentageAttended(int $missionId): ?int
@@ -306,30 +252,20 @@ class AttendanceSheet extends AbstractController
 
     private function getMissionPercentage(int $missionId, array $states): ?int
     {
-        $total = 0;
-        $count = null;
+        return $this->getPercentage($this->sheet[$missionId], $states);
+    }
 
-        foreach ($this->sheet[$missionId] as $users) {
-            foreach ($users as $state) {
-                if (empty($state)) {
-                    continue;
-                }
-
-                $total++;
-                if ($count === null) {
-                    $count = 0;
-                }
-
-                if (in_array($state, $states, true)) {
-                    $count++;
-                }
-            }
-        }
-
-        if ($count === null || $total <= 0) {
+    /**
+     * @param array<string> $recordedStates
+     * @param array<string> $states
+     */
+    private function getPercentage(array $recordedStates, array $states): ?int
+    {
+        if (empty($recordedStates)) {
             return null;
         }
 
-        return (int)($count / $total * 100);
+        $matching = array_filter($recordedStates, fn (string $state) => in_array($state, $states, true));
+        return (int)(count($matching) / count($recordedStates) * 100);
     }
 }

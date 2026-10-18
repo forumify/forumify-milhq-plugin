@@ -112,7 +112,9 @@ class MigratePerscomController extends AbstractController
         $this->fixOperationImages($results['operations']);
         $results['missions'] = $this->migrateTable('perscom_mission', 'milhq_mission', ['id', 'operation_id', 'title', 'slug', 'briefing', 'start', 'end', 'send_notification', 'create_combat_records', 'combat_record_text', 'created_at', 'updated_at', 'created_by', 'updated_by', 'calendar_id', 'calendar_event_id']);
         $results['missionRsvps'] = $this->migrateTable('perscom_mission_rsvp', 'milhq_mission_rsvp', ['id', 'user_id' => 'soldier_id', 'mission_id', 'going', 'created_at', 'updated_at']);
-        $results['missionAfterActionReports'] = $this->migrateTable('perscom_after_action_report', 'milhq_after_action_report', ['id', 'unit_id', 'mission_id', 'report', 'attendance', 'created_by', 'updated_by', 'created_at', 'updated_at']);
+        $results['missionAfterActionReports'] = $this->migrateTable('perscom_after_action_report', 'milhq_after_action_report', ['id', 'unit_id', 'mission_id', 'report', 'created_by', 'updated_by', 'created_at', 'updated_at']);
+        $results['missionAttendance'] = $this->migrateAttendance();
+        $results['missionCombatRecords'] = $this->linkCombatRecords();
 
         return $results;
     }
@@ -273,6 +275,68 @@ class MigratePerscomController extends AbstractController
             $fieldOptions = json_encode(['options' => $newOptions]);
             $conn->executeStatement('UPDATE milhq_form_field SET `field_options` = ? WHERE `id` = ?', [$fieldOptions, $id]);
         }
+    }
+
+    /**
+     * @return Result
+     */
+    private function migrateAttendance(): array
+    {
+        $result = ['count' => 0, 'messages' => []];
+
+        try {
+            $result['count'] = $this->em->getConnection()->executeStatement(<<<'SQL'
+                INSERT INTO milhq_after_action_report_attendance (after_action_report_id, soldier_id, state)
+                SELECT aar.id, s.id, MIN(states.state)
+                FROM perscom_after_action_report paar
+                JOIN milhq_after_action_report aar ON aar.id = paar.id
+                CROSS JOIN JSON_TABLE(JSON_KEYS(paar.attendance), '$[*]' COLUMNS (state VARCHAR(255) PATH '$')) states
+                CROSS JOIN JSON_TABLE(JSON_EXTRACT(paar.attendance, CONCAT('$."', states.state, '"')), '$[*]' COLUMNS (soldier_id INT PATH '$')) soldiers
+                JOIN milhq_soldier s ON s.id = soldiers.soldier_id
+                GROUP BY aar.id, s.id
+            SQL);
+        } catch (Throwable $ex) {
+            $result['messages'][] = $ex->getMessage();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return Result
+     */
+    private function linkCombatRecords(): array
+    {
+        $result = ['count' => 0, 'messages' => []];
+
+        try {
+            $result['count'] = $this->em->getConnection()->executeStatement(<<<'SQL'
+                UPDATE milhq_record_combat cr
+                SET cr.after_action_report_id = (
+                    SELECT aar.id
+                    FROM milhq_after_action_report aar
+                    JOIN milhq_after_action_report_attendance a ON a.after_action_report_id = aar.id
+                    JOIN milhq_mission m ON m.id = aar.mission_id
+                    JOIN milhq_operation o ON o.id = m.operation_id
+                    WHERE a.soldier_id = cr.soldier_id
+                        AND a.state = 'present'
+                        AND (
+                            ABS(TIMESTAMPDIFF(SECOND, aar.created_at, cr.created_at)) <= 60
+                            OR (
+                                ABS(TIMESTAMPDIFF(SECOND, aar.created_at, cr.created_at)) <= 86400
+                                AND cr.text IN (m.combat_record_text, CONCAT('Operation ', o.title, ': Mission ', m.title))
+                            )
+                        )
+                    ORDER BY ABS(TIMESTAMPDIFF(SECOND, aar.created_at, cr.created_at)), aar.id
+                    LIMIT 1
+                )
+                WHERE cr.after_action_report_id IS NULL
+            SQL);
+        } catch (Throwable $ex) {
+            $result['messages'][] = $ex->getMessage();
+        }
+
+        return $result;
     }
 
     /**

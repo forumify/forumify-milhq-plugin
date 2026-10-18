@@ -34,7 +34,7 @@ class AssignmentRecordTable extends AbstractRecordTable
                 'searchable' => false,
                 'sortable' => false,
             ])
-            ->addDocumentColumn(true);
+            ->addActionsColumn(true);
     }
 
     protected function getQuery(array $search): QueryBuilder

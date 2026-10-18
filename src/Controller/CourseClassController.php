@@ -27,6 +27,11 @@ class CourseClassController extends AbstractController
     #[Route('/class/{id}', 'view')]
     public function view(CourseClass $class): Response
     {
+        $this->denyAccessUnlessGranted(VoterAttribute::ACL->value, [
+            'entity' => $class->getCourse(),
+            'permission' => 'view_classes',
+        ]);
+
         return $this->render('@ForumifyMilhqPlugin/frontend/course/class.html.twig', [
             'class' => $class,
         ]);
