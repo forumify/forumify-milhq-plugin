@@ -7,6 +7,7 @@ namespace Forumify\Milhq\Components;
 use Doctrine\ORM\QueryBuilder;
 use Forumify\Core\Component\List\AbstractDoctrineList;
 use Forumify\Milhq\Entity\Award;
+use Forumify\Milhq\Repository\AwardRepository;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 
@@ -19,6 +20,10 @@ class AwardList extends AbstractDoctrineList
     #[LiveProp]
     public ?int $groupId = null;
 
+    public function __construct(private readonly AwardRepository $awardRepository)
+    {
+    }
+
     protected function getEntityClass(): string
     {
         return Award::class;
@@ -26,7 +31,7 @@ class AwardList extends AbstractDoctrineList
 
     protected function getQuery(): QueryBuilder
     {
-        $qb = parent::getQuery();
+        $qb = $this->awardRepository->addViewACLToQuery(parent::getQuery());
 
         return $this->groupId === null
             ? $qb->andWhere('e.group IS NULL')

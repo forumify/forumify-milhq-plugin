@@ -18,8 +18,14 @@ class AwardController extends AbstractController
         AwardGroupRepository $awardGroupRepository,
     ): Response {
         return $this->render('@ForumifyMilhqPlugin/frontend/award/award.html.twig', [
-            'groups' => $awardGroupRepository->findBy([], ['position' => 'ASC']),
-            'hasUngroupedAwards' => $awardRepository->count(['group' => null]) > 0,
+            'groups' => $awardGroupRepository
+                ->addACLToQuery($awardGroupRepository->createQueryBuilder('e')->distinct()->orderBy('e.position', 'ASC'), 'view')
+                ->getQuery()
+                ->getResult(),
+            'hasUngroupedAwards' => $awardRepository
+                ->addViewACLToQuery($awardRepository->createQueryBuilder('e')->select('COUNT(e.id)')->where('e.group IS NULL'))
+                ->getQuery()
+                ->getSingleScalarResult() > 0,
         ]);
     }
 }

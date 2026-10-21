@@ -17,6 +17,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Api\Entity\NewAsset;
 use Forumify\Api\Serializer\Attribute\Asset;
+use Forumify\Core\Entity\AccessControlledEntityInterface;
+use Forumify\Core\Entity\ACLParameters;
 use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SortableEntityTrait;
@@ -47,7 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
     ],
 )]
-class Award implements GroupedEntityInterface, AuditableEntityInterface
+class Award implements GroupedEntityInterface, AuditableEntityInterface, AccessControlledEntityInterface
 {
     use IdentifiableEntityTrait;
     use SortableEntityTrait;
@@ -133,6 +135,20 @@ class Award implements GroupedEntityInterface, AuditableEntityInterface
     public function setGroup(?AwardGroup $group): void
     {
         $this->group = $group;
+    }
+
+    public function getACLPermissions(): array
+    {
+        return ['view'];
+    }
+
+    public function getACLParameters(): ACLParameters
+    {
+        return new ACLParameters(
+            self::class,
+            (string)$this->getId(),
+            'milhq_admin_award_list',
+        );
     }
 
     public function getIdentifierForAudit(): string

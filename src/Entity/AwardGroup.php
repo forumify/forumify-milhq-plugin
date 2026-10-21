@@ -13,6 +13,8 @@ use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AccessControlledEntityInterface;
+use Forumify\Core\Entity\ACLParameters;
 use Forumify\Milhq\Repository\AwardGroupRepository;
 
 #[ORM\Entity(repositoryClass: AwardGroupRepository::class)]
@@ -27,7 +29,7 @@ use Forumify\Milhq\Repository\AwardGroupRepository;
         new Delete(security: 'is_granted("milhq.admin.organization.awards.delete")'),
     ],
 )]
-class AwardGroup implements GroupInterface
+class AwardGroup implements GroupInterface, AccessControlledEntityInterface
 {
     use GroupEntityTrait;
 
@@ -55,5 +57,19 @@ class AwardGroup implements GroupInterface
     public function setAwards(Collection $awards): void
     {
         $this->awards = $awards;
+    }
+
+    public function getACLPermissions(): array
+    {
+        return ['view'];
+    }
+
+    public function getACLParameters(): ACLParameters
+    {
+        return new ACLParameters(
+            self::class,
+            (string)$this->getId(),
+            'milhq_admin_award_list',
+        );
     }
 }

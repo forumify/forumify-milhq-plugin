@@ -1,6 +1,17 @@
 {% extends '@ForumifyMilhqPlugin/admin/components/group_editor/group_editor.html.twig' %}
+{% block group_actions %}
+    {% if group is not null and canManage %}
+        <a class="btn-link btn-small btn-icon" href="{{ path('forumify_admin_acl', group|acl_parameters) }}">
+            <i class="ph ph-lock-simple"></i>
+        </a>
+    {% endif %}
+    {{ parent() }}
+{% endblock %}
 {% block group_item_actions %}
     {% if canManage %}
+        <a class="btn-link btn-small btn-icon" href="{{ path('forumify_admin_acl', item|acl_parameters) }}">
+            <i class="ph ph-lock-simple"></i>
+        </a>
         <a class="btn-link btn-small btn-icon" href="{{ path('milhq_admin_award_make_tier', { id: item.id }) }}">
             <i class="ph ph-caret-double-down"></i>
         </a>
