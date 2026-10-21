@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PluginTests\Tests\Application;
 
 use Forumify\Milhq\Entity\AfterActionReportAttendance;
+use Forumify\Milhq\Entity\AwardGroup;
 use Forumify\Milhq\Entity\Course;
 use Forumify\Milhq\Entity\Operation;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
@@ -28,6 +29,8 @@ use PluginTests\Tests\Factories\Milhq\SoldierFactory;
 use PluginTests\Tests\Factories\Milhq\UnitFactory;
 use PluginTests\Tests\Factories\Stories\MilsimStory;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
+
+use function Zenstruck\Foundry\Persistence\persist;
 
 class SoldierTest extends MilhqWebTestCase
 {
@@ -278,6 +281,39 @@ class SoldierTest extends MilhqWebTestCase
 
         self::assertStringContainsString('good-conduct.png', $html);
         self::assertStringContainsString('x2', $html);
+    }
+
+    public function testProfileAwardGalleryIsSortedByGroupThenAward(): void
+    {
+        $soldier = SoldierFactory::createOne();
+        $groupLast = persist(AwardGroup::class, ['title' => 'Group Zulu', 'position' => 20]);
+        $groupFirst = persist(AwardGroup::class, ['title' => 'Group Alpha', 'position' => 10]);
+
+        $awards = [
+            ['Ungrouped Award', null, 0],
+            ['Zulu First', $groupLast, 1],
+            ['Alpha Second', $groupFirst, 2],
+            ['Alpha First', $groupFirst, 1],
+        ];
+        foreach ($awards as [$name, $group, $position]) {
+            AwardRecordFactory::createOne([
+                'soldier' => $soldier,
+                'award' => AwardFactory::createOne([
+                    'name' => $name,
+                    'group' => $group,
+                    'position' => $position,
+                    'image' => 'awards/ribbon.png',
+                ]),
+            ]);
+        }
+
+        $c = $this->client->request('GET', '/milhq/soldier/' . $soldier->getId());
+        self::assertResponseIsSuccessful();
+
+        self::assertSame(
+            ['Alpha First', 'Alpha Second', 'Zulu First', 'Ungrouped Award'],
+            $c->filter('#assignment [title]')->each(static fn ($node) => $node->attr('title')),
+        );
     }
 
     public function testAwardRecordSearchIncludesTierName(): void
