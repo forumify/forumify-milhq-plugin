@@ -7,6 +7,7 @@ namespace Forumify\Milhq\Components;
 use Doctrine\ORM\QueryBuilder;
 use Forumify\Core\Component\List\AbstractDoctrineList;
 use Forumify\Milhq\Entity\Qualification;
+use Forumify\Milhq\Repository\QualificationRepository;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 
@@ -19,6 +20,10 @@ class QualificationList extends AbstractDoctrineList
     #[LiveProp]
     public ?int $groupId = null;
 
+    public function __construct(private readonly QualificationRepository $qualificationRepository)
+    {
+    }
+
     protected function getEntityClass(): string
     {
         return Qualification::class;
@@ -26,7 +31,7 @@ class QualificationList extends AbstractDoctrineList
 
     protected function getQuery(): QueryBuilder
     {
-        $qb = parent::getQuery();
+        $qb = $this->qualificationRepository->addViewACLToQuery(parent::getQuery());
 
         return $this->groupId === null
             ? $qb->andWhere('e.group IS NULL')
