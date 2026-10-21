@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PluginTests\Tests\Application;
 
-use Forumify\Core\Entity\AccessControlledEntityInterface;
+use Forumify\Milhq\Entity\Rank;
 use Forumify\Milhq\Entity\RankGroup;
 use Forumify\Testing\Factories\Core\ACLFactory;
 use Forumify\Testing\Factories\Core\RoleFactory;
@@ -21,10 +21,10 @@ class RankVisibilityTest extends MilhqWebTestCase
 
     public function testHiddenGroupHidesItsTabAndRanks(): void
     {
-        $visible = $this->group('Visible Group', ['user']);
-        $hidden = $this->group('Hidden Group');
-        $this->rank('Visible Group Rank', $visible, ['user']);
-        $this->rank('Hidden Group Rank', $hidden, ['user']);
+        $visible = $this->group('Visible Rank Group', ['user']);
+        $hidden = $this->group('Hidden Rank Group');
+        $this->rank('Visible Group Rank', $visible);
+        $this->rank('Hidden Group Rank', $hidden);
         $user = UserFactory::createOne();
         $this->client->loginUser($user);
 
@@ -32,7 +32,8 @@ class RankVisibilityTest extends MilhqWebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('Visible Group Rank', $text);
-        self::assertStringNotContainsString('Hidden Group', $text);
+        self::assertStringNotContainsString('Hidden Rank Group', $text);
+        self::assertStringNotContainsString('Hidden Group Rank', $text);
 
         $list = $this->createLiveComponent('RankList', ['groupId' => $hidden->getId()])
             ->actingAs($user)
@@ -41,48 +42,21 @@ class RankVisibilityTest extends MilhqWebTestCase
         self::assertStringNotContainsString('Hidden Group Rank', $list);
     }
 
-    public function testHiddenRankInVisibleGroupIsHidden(): void
+    public function testUngroupedRanksAreAlwaysVisible(): void
     {
-        $group = $this->group('Officer Ranks Group', ['user']);
-        $this->rank('Visible Captain Rank', $group, ['user']);
-        $this->rank('Secret Rank', $group);
-        $this->client->loginUser(UserFactory::createOne());
-
-        $text = $this->client->request('GET', '/milhq/ranks')->text();
-
-        self::assertStringContainsString('Visible Captain Rank', $text);
-        self::assertStringNotContainsString('Secret Rank', $text);
-    }
-
-    public function testUngroupedRanksFollowOnlyTheirOwnACL(): void
-    {
-        $this->rank('Loose Rank', null, ['user']);
-        $this->rank('Hidden Loose Rank');
-        $this->client->loginUser(UserFactory::createOne());
+        $this->rank('Loose Rank');
+        $this->client->restart();
 
         $crawler = $this->client->request('GET', '/milhq/ranks');
 
         self::assertSelectorExists('[data-tab-id="rank-group-ungrouped"]');
         self::assertStringContainsString('Loose Rank', $crawler->text());
-        self::assertStringNotContainsString('Hidden Loose Rank', $crawler->text());
     }
 
-    public function testUngroupedTabIsHiddenWithoutViewableUngroupedRanks(): void
+    public function testGuestSeesOnlyGuestGrantedGroups(): void
     {
-        $this->rank('Hidden Loose Rank');
-        $this->rank('Grouped Rank', $this->group('Officer Ranks Group', ['user']), ['user']);
-        $this->client->loginUser(UserFactory::createOne());
-
-        $this->client->request('GET', '/milhq/ranks');
-
-        self::assertSelectorNotExists('[data-tab-id="rank-group-ungrouped"]');
-    }
-
-    public function testGuestSeesOnlyGuestGrantedRanks(): void
-    {
-        $group = $this->group('Enlisted Ranks Group', ['guest', 'user']);
-        $this->rank('Guest Visible Rank', $group, ['guest', 'user']);
-        $this->rank('Members Only Rank', $group, ['user']);
+        $this->rank('Guest Visible Rank', $this->group('Guest Rank Group', ['guest', 'user']));
+        $this->rank('Members Only Rank', $this->group('Members Rank Group', ['user']));
         $this->client->restart();
 
         $text = $this->client->request('GET', '/milhq/ranks')->text();
@@ -97,17 +71,17 @@ class RankVisibilityTest extends MilhqWebTestCase
 
     public function testSuperAdminSeesEverything(): void
     {
-        $this->rank('Unlisted Rank', $this->group('Unlisted Group'));
+        $this->rank('Unlisted Rank', $this->group('Unlisted Rank Group'));
 
         $text = $this->client->request('GET', '/milhq/ranks')->text();
 
-        self::assertStringContainsString('Unlisted Group', $text);
+        self::assertStringContainsString('Unlisted Rank Group', $text);
         self::assertStringContainsString('Unlisted Rank', $text);
     }
 
-    public function testProfileStillShowsHiddenRanks(): void
+    public function testProfileStillShowsRanksOfHiddenGroups(): void
     {
-        $rank = RankFactory::createOne(['name' => 'Secret Rank', 'abbreviation' => 'SECR', 'group' => $this->group('Hidden Group')]);
+        $rank = RankFactory::createOne(['name' => 'Secret Rank', 'abbreviation' => 'SECR', 'group' => $this->group('Secret Rank Group')]);
         $soldier = SoldierFactory::createOne(['rank' => $rank]);
         $this->client->loginUser(UserFactory::createOne());
 
@@ -117,19 +91,19 @@ class RankVisibilityTest extends MilhqWebTestCase
         self::assertStringContainsString('SECR', $text);
     }
 
-    public function testRankEditorLinksToGroupAndRankACL(): void
+    public function testEditorLinksToGroupACLOnly(): void
     {
-        $group = $this->group('Officer Ranks Group');
-        $rank = $this->rank('Visible Captain Rank', $group);
+        $group = $this->group('Editor Rank Group');
+        $this->rank('Editor Rank', $group);
 
-        $html = html_entity_decode($this->createLiveComponent('Milhq\\RankEditor')
+        $html = urldecode(html_entity_decode($this->createLiveComponent('Milhq\\RankEditor')
             ->actingAs($this->user)
             ->call('toggleGroup', ['groupId' => $group->getId()])
             ->render()
-            ->toString());
+            ->toString()));
 
-        self::assertStringContainsString('entity=' . RankGroup::class . '&entityId=' . $group->getId() . '&', urldecode($html));
-        self::assertStringContainsString('entity=' . get_class($rank) . '&entityId=' . $rank->getId() . '&', urldecode($html));
+        self::assertStringContainsString('entity=' . RankGroup::class . '&entityId=' . $group->getId() . '&', $html);
+        self::assertStringNotContainsString('entity=' . Rank::class . '&', $html);
     }
 
     /**
@@ -138,36 +112,20 @@ class RankVisibilityTest extends MilhqWebTestCase
     private function group(string $title, array $roles = []): RankGroup
     {
         $group = persist(RankGroup::class, ['title' => $title]);
-        $this->grant($group, $roles);
+        if (!empty($roles)) {
+            ACLFactory::createOne([
+                'entity' => RankGroup::class,
+                'entityId' => (string)$group->getId(),
+                'permission' => 'view',
+                'roles' => array_map(static fn (string $slug) => RoleFactory::findOrCreate(['slug' => $slug]), $roles),
+            ]);
+        }
 
         return $group;
     }
 
-    /**
-     * @param list<string> $roles
-     */
-    private function rank(string $name, ?RankGroup $group = null, array $roles = []): object
+    private function rank(string $name, ?RankGroup $group = null): Rank
     {
-        $rank = RankFactory::createOne(['name' => $name, 'group' => $group]);
-        $this->grant($rank, $roles);
-
-        return $rank;
-    }
-
-    /**
-     * @param list<string> $roles
-     */
-    private function grant(AccessControlledEntityInterface $entity, array $roles): void
-    {
-        if (empty($roles)) {
-            return;
-        }
-
-        ACLFactory::createOne([
-            'entity' => $entity::class,
-            'entityId' => $entity->getACLParameters()->entityId,
-            'permission' => 'view',
-            'roles' => array_map(static fn (string $slug) => RoleFactory::findOrCreate(['slug' => $slug]), $roles),
-        ]);
+        return RankFactory::createOne(['name' => $name, 'group' => $group]);
     }
 }

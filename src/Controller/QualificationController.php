@@ -22,10 +22,7 @@ class QualificationController extends AbstractController
                 ->addACLToQuery($qualificationGroupRepository->createQueryBuilder('e')->distinct()->orderBy('e.position', 'ASC'), 'view')
                 ->getQuery()
                 ->getResult(),
-            'hasUngroupedQualifications' => $qualificationRepository
-                ->addViewACLToQuery($qualificationRepository->createQueryBuilder('e')->select('COUNT(e.id)')->where('e.group IS NULL'))
-                ->getQuery()
-                ->getSingleScalarResult() > 0,
+            'hasUngroupedQualifications' => $qualificationRepository->count(['group' => null]) > 0,
         ]);
     }
 }

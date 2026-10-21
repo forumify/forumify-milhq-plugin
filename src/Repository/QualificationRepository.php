@@ -18,8 +18,8 @@ class QualificationRepository extends AbstractRepository implements GroupScopedR
 {
     use GroupScopedRepositoryTrait;
 
-    /** @var array<string, array{qualifications: array<mixed>, groups: array<mixed>}> */
-    private array $viewableIds = [];
+    /** @var array<string, array<mixed>> */
+    private array $viewableGroupIds = [];
 
     public static function getEntityClass(): string
     {
@@ -46,12 +46,7 @@ class QualificationRepository extends AbstractRepository implements GroupScopedR
             return $qb;
         }
 
-        ['qualifications' => $qualificationIds, 'groups' => $groupIds] = $this->getViewableIds();
-        if (empty($qualificationIds)) {
-            return $qb->andWhere('1 = 0');
-        }
-
-        $qb->andWhere("$alias.id IN (:viewableQualificationIds)")->setParameter('viewableQualificationIds', $qualificationIds);
+        $groupIds = $this->getViewableGroupIds();
 
         return empty($groupIds)
             ? $qb->andWhere("$alias.group IS NULL")
@@ -62,30 +57,24 @@ class QualificationRepository extends AbstractRepository implements GroupScopedR
 
     public function reset(): void
     {
-        $this->viewableIds = [];
+        $this->viewableGroupIds = [];
     }
 
     /**
-     * @return array{qualifications: array<mixed>, groups: array<mixed>}
+     * @return array<mixed>
      */
-    private function getViewableIds(): array
+    private function getViewableGroupIds(): array
     {
         $key = $this->security->getUser()?->getUserIdentifier() ?? '';
 
-        return $this->viewableIds[$key] ??= [
-            'qualifications' => $this
-                ->addACLToQuery($this->createQueryBuilder('q')->select('q.id'), 'view', alias: 'q')
-                ->getQuery()
-                ->getSingleColumnResult(),
-            'groups' => $this
-                ->addACLToQuery(
-                    $this->getEntityManager()->createQueryBuilder()->select('g.id')->from(QualificationGroup::class, 'g'),
-                    'view',
-                    QualificationGroup::class,
-                    'g',
-                )
-                ->getQuery()
-                ->getSingleColumnResult(),
-        ];
+        return $this->viewableGroupIds[$key] ??= $this
+            ->addACLToQuery(
+                $this->getEntityManager()->createQueryBuilder()->select('g.id')->from(QualificationGroup::class, 'g'),
+                'view',
+                QualificationGroup::class,
+                'g',
+            )
+            ->getQuery()
+            ->getSingleColumnResult();
     }
 }

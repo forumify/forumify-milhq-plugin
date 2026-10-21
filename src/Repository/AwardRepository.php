@@ -18,8 +18,8 @@ class AwardRepository extends AbstractRepository implements GroupScopedRepositor
 {
     use GroupScopedRepositoryTrait;
 
-    /** @var array<string, array{awards: array<mixed>, groups: array<mixed>}> */
-    private array $viewableIds = [];
+    /** @var array<string, array<mixed>> */
+    private array $viewableGroupIds = [];
 
     public static function getEntityClass(): string
     {
@@ -46,12 +46,7 @@ class AwardRepository extends AbstractRepository implements GroupScopedRepositor
             return $qb;
         }
 
-        ['awards' => $awardIds, 'groups' => $groupIds] = $this->getViewableIds();
-        if (empty($awardIds)) {
-            return $qb->andWhere('1 = 0');
-        }
-
-        $qb->andWhere("$alias.id IN (:viewableAwardIds)")->setParameter('viewableAwardIds', $awardIds);
+        $groupIds = $this->getViewableGroupIds();
 
         return empty($groupIds)
             ? $qb->andWhere("$alias.group IS NULL")
@@ -62,30 +57,24 @@ class AwardRepository extends AbstractRepository implements GroupScopedRepositor
 
     public function reset(): void
     {
-        $this->viewableIds = [];
+        $this->viewableGroupIds = [];
     }
 
     /**
-     * @return array{awards: array<mixed>, groups: array<mixed>}
+     * @return array<mixed>
      */
-    private function getViewableIds(): array
+    private function getViewableGroupIds(): array
     {
         $key = $this->security->getUser()?->getUserIdentifier() ?? '';
 
-        return $this->viewableIds[$key] ??= [
-            'awards' => $this
-                ->addACLToQuery($this->createQueryBuilder('a')->select('a.id'), 'view', alias: 'a')
-                ->getQuery()
-                ->getSingleColumnResult(),
-            'groups' => $this
-                ->addACLToQuery(
-                    $this->getEntityManager()->createQueryBuilder()->select('g.id')->from(AwardGroup::class, 'g'),
-                    'view',
-                    AwardGroup::class,
-                    'g',
-                )
-                ->getQuery()
-                ->getSingleColumnResult(),
-        ];
+        return $this->viewableGroupIds[$key] ??= $this
+            ->addACLToQuery(
+                $this->getEntityManager()->createQueryBuilder()->select('g.id')->from(AwardGroup::class, 'g'),
+                'view',
+                AwardGroup::class,
+                'g',
+            )
+            ->getQuery()
+            ->getSingleColumnResult();
     }
 }

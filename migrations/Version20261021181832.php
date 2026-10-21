@@ -6,19 +6,17 @@ namespace ForumifyMilhqPluginMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Forumify\Milhq\Entity\Rank;
 use Forumify\Milhq\Entity\RankGroup;
 
 final class Version20261021181832 extends AbstractMigration
 {
     private const TABLES = [
         RankGroup::class => 'milhq_rank_group',
-        Rank::class => 'milhq_rank',
     ];
 
     public function getDescription(): string
     {
-        return 'grant view ACL to guest and user roles for all existing ranks and rank groups';
+        return 'grant view ACL to guest and user roles for all existing rank groups';
     }
 
     public function up(Schema $schema): void

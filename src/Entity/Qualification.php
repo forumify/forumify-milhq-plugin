@@ -16,8 +16,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Api\Entity\NewAsset;
 use Forumify\Api\Serializer\Attribute\Asset;
-use Forumify\Core\Entity\AccessControlledEntityInterface;
-use Forumify\Core\Entity\ACLParameters;
 use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
 use Forumify\Core\Entity\SortableEntityTrait;
@@ -48,7 +46,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
     ],
 )]
-class Qualification implements GroupedEntityInterface, AuditableEntityInterface, AccessControlledEntityInterface
+class Qualification implements GroupedEntityInterface, AuditableEntityInterface
 {
     use IdentifiableEntityTrait;
     use SortableEntityTrait;
@@ -130,20 +128,6 @@ class Qualification implements GroupedEntityInterface, AuditableEntityInterface,
     public function setGroup(?QualificationGroup $group): void
     {
         $this->group = $group;
-    }
-
-    public function getACLPermissions(): array
-    {
-        return ['view'];
-    }
-
-    public function getACLParameters(): ACLParameters
-    {
-        return new ACLParameters(
-            self::class,
-            (string)$this->getId(),
-            'milhq_admin_qualification_list',
-        );
     }
 
     public function getIdentifierForAudit(): string

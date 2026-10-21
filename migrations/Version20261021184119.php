@@ -6,19 +6,17 @@ namespace ForumifyMilhqPluginMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Forumify\Milhq\Entity\Qualification;
 use Forumify\Milhq\Entity\QualificationGroup;
 
 final class Version20261021184119 extends AbstractMigration
 {
     private const TABLES = [
         QualificationGroup::class => 'milhq_qualification_group',
-        Qualification::class => 'milhq_qualification',
     ];
 
     public function getDescription(): string
     {
-        return 'grant view ACL to guest and user roles for all existing qualifications and qualification groups';
+        return 'grant view ACL to guest and user roles for all existing qualification groups';
     }
 
     public function up(Schema $schema): void

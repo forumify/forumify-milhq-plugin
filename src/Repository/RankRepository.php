@@ -18,8 +18,8 @@ class RankRepository extends AbstractRepository implements GroupScopedRepository
 {
     use GroupScopedRepositoryTrait;
 
-    /** @var array<string, array{ranks: array<mixed>, groups: array<mixed>}> */
-    private array $viewableIds = [];
+    /** @var array<string, array<mixed>> */
+    private array $viewableGroupIds = [];
 
     public static function getEntityClass(): string
     {
@@ -46,12 +46,7 @@ class RankRepository extends AbstractRepository implements GroupScopedRepository
             return $qb;
         }
 
-        ['ranks' => $rankIds, 'groups' => $groupIds] = $this->getViewableIds();
-        if (empty($rankIds)) {
-            return $qb->andWhere('1 = 0');
-        }
-
-        $qb->andWhere("$alias.id IN (:viewableRankIds)")->setParameter('viewableRankIds', $rankIds);
+        $groupIds = $this->getViewableGroupIds();
 
         return empty($groupIds)
             ? $qb->andWhere("$alias.group IS NULL")
@@ -62,30 +57,24 @@ class RankRepository extends AbstractRepository implements GroupScopedRepository
 
     public function reset(): void
     {
-        $this->viewableIds = [];
+        $this->viewableGroupIds = [];
     }
 
     /**
-     * @return array{ranks: array<mixed>, groups: array<mixed>}
+     * @return array<mixed>
      */
-    private function getViewableIds(): array
+    private function getViewableGroupIds(): array
     {
         $key = $this->security->getUser()?->getUserIdentifier() ?? '';
 
-        return $this->viewableIds[$key] ??= [
-            'ranks' => $this
-                ->addACLToQuery($this->createQueryBuilder('r')->select('r.id'), 'view', alias: 'r')
-                ->getQuery()
-                ->getSingleColumnResult(),
-            'groups' => $this
-                ->addACLToQuery(
-                    $this->getEntityManager()->createQueryBuilder()->select('g.id')->from(RankGroup::class, 'g'),
-                    'view',
-                    RankGroup::class,
-                    'g',
-                )
-                ->getQuery()
-                ->getSingleColumnResult(),
-        ];
+        return $this->viewableGroupIds[$key] ??= $this
+            ->addACLToQuery(
+                $this->getEntityManager()->createQueryBuilder()->select('g.id')->from(RankGroup::class, 'g'),
+                'view',
+                RankGroup::class,
+                'g',
+            )
+            ->getQuery()
+            ->getSingleColumnResult();
     }
 }

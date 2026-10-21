@@ -22,10 +22,7 @@ class RankController extends AbstractController
                 ->addACLToQuery($rankGroupRepository->createQueryBuilder('e')->distinct()->orderBy('e.position', 'ASC'), 'view')
                 ->getQuery()
                 ->getResult(),
-            'hasUngroupedRanks' => $rankRepository
-                ->addViewACLToQuery($rankRepository->createQueryBuilder('e')->select('COUNT(e.id)')->where('e.group IS NULL'))
-                ->getQuery()
-                ->getSingleScalarResult() > 0,
+            'hasUngroupedRanks' => $rankRepository->count(['group' => null]) > 0,
         ]);
     }
 }

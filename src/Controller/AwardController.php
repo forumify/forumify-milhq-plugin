@@ -22,10 +22,7 @@ class AwardController extends AbstractController
                 ->addACLToQuery($awardGroupRepository->createQueryBuilder('e')->distinct()->orderBy('e.position', 'ASC'), 'view')
                 ->getQuery()
                 ->getResult(),
-            'hasUngroupedAwards' => $awardRepository
-                ->addViewACLToQuery($awardRepository->createQueryBuilder('e')->select('COUNT(e.id)')->where('e.group IS NULL'))
-                ->getQuery()
-                ->getSingleScalarResult() > 0,
+            'hasUngroupedAwards' => $awardRepository->count(['group' => null]) > 0,
         ]);
     }
 }

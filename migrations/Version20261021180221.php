@@ -6,19 +6,17 @@ namespace ForumifyMilhqPluginMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Forumify\Milhq\Entity\Award;
 use Forumify\Milhq\Entity\AwardGroup;
 
 final class Version20261021180221 extends AbstractMigration
 {
     private const TABLES = [
         AwardGroup::class => 'milhq_award_group',
-        Award::class => 'milhq_award',
     ];
 
     public function getDescription(): string
     {
-        return 'grant view ACL to guest and user roles for all existing awards and award groups';
+        return 'grant view ACL to guest and user roles for all existing award groups';
     }
 
     public function up(Schema $schema): void
