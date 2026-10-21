@@ -13,6 +13,8 @@ use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AccessControlledEntityInterface;
+use Forumify\Core\Entity\ACLParameters;
 use Forumify\Milhq\Repository\RankGroupRepository;
 
 #[ORM\Entity(repositoryClass: RankGroupRepository::class)]
@@ -27,7 +29,7 @@ use Forumify\Milhq\Repository\RankGroupRepository;
         new Delete(security: 'is_granted("milhq.admin.organization.ranks.delete")'),
     ],
 )]
-class RankGroup implements GroupInterface
+class RankGroup implements GroupInterface, AccessControlledEntityInterface
 {
     use GroupEntityTrait;
 
@@ -55,5 +57,19 @@ class RankGroup implements GroupInterface
     public function setRanks(Collection $ranks): void
     {
         $this->ranks = $ranks;
+    }
+
+    public function getACLPermissions(): array
+    {
+        return ['view'];
+    }
+
+    public function getACLParameters(): ACLParameters
+    {
+        return new ACLParameters(
+            self::class,
+            (string)$this->getId(),
+            'milhq_admin_rank_list',
+        );
     }
 }
