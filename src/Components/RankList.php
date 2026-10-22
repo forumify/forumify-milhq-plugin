@@ -6,8 +6,11 @@ namespace Forumify\Milhq\Components;
 
 use Doctrine\ORM\QueryBuilder;
 use Forumify\Core\Component\List\AbstractDoctrineList;
+use Forumify\Core\Security\VoterAttribute;
 use Forumify\Milhq\Entity\Rank;
-use Forumify\Milhq\Repository\RankRepository;
+use Forumify\Milhq\Repository\RankGroupRepository;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\Attribute\LiveProp;
 
@@ -20,8 +23,10 @@ class RankList extends AbstractDoctrineList
     #[LiveProp]
     public ?int $groupId = null;
 
-    public function __construct(private readonly RankRepository $rankRepository)
-    {
+    public function __construct(
+        private readonly RankGroupRepository $rankGroupRepository,
+        private readonly Security $security,
+    ) {
     }
 
     protected function getEntityClass(): string
@@ -31,10 +36,21 @@ class RankList extends AbstractDoctrineList
 
     protected function getQuery(): QueryBuilder
     {
-        $qb = $this->rankRepository->addViewACLToQuery(parent::getQuery());
+        $qb = parent::getQuery();
 
-        return $this->groupId === null
-            ? $qb->andWhere('e.group IS NULL')
-            : $qb->andWhere('e.group = :group')->setParameter('group', $this->groupId);
+        $group = $this->groupId ? $this->rankGroupRepository->find($this->groupId) : null;
+        if ($group === null) {
+            return $qb->andWhere('e.group IS NULL');
+        }
+
+        $canViewGroup = $this->security->isGranted(VoterAttribute::ACL->value, [
+            'permission' => 'view',
+            'entity' => $group,
+        ]);
+        if (!$canViewGroup) {
+            throw new AccessDeniedHttpException();
+        }
+
+        return $qb->andWhere('e.group = :group')->setParameter('group', $group);
     }
 }

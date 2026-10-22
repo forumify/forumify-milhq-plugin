@@ -4,22 +4,15 @@ declare(strict_types=1);
 
 namespace Forumify\Milhq\Repository;
 
-use Doctrine\ORM\QueryBuilder;
 use Forumify\Core\Repository\AbstractRepository;
-use Forumify\Core\Security\VoterAttribute;
 use Forumify\Milhq\Entity\Qualification;
-use Forumify\Milhq\Entity\QualificationGroup;
-use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @extends AbstractRepository<Qualification>
  */
-class QualificationRepository extends AbstractRepository implements GroupScopedRepositoryInterface, ResetInterface
+class QualificationRepository extends AbstractRepository implements GroupScopedRepositoryInterface
 {
     use GroupScopedRepositoryTrait;
-
-    /** @var array<string, array<mixed>> */
-    private array $viewableGroupIds = [];
 
     public static function getEntityClass(): string
     {
@@ -38,43 +31,5 @@ class QualificationRepository extends AbstractRepository implements GroupScopedR
             ->setMaxResults(5)
             ->getQuery()
             ->getResult();
-    }
-
-    public function addViewACLToQuery(QueryBuilder $qb, string $alias = 'e'): QueryBuilder
-    {
-        if ($this->security->isGranted(VoterAttribute::SuperAdmin->value)) {
-            return $qb;
-        }
-
-        $groupIds = $this->getViewableGroupIds();
-
-        return empty($groupIds)
-            ? $qb->andWhere("$alias.group IS NULL")
-            : $qb
-                ->andWhere("($alias.group IS NULL OR $alias.group IN (:viewableQualificationGroupIds))")
-                ->setParameter('viewableQualificationGroupIds', $groupIds);
-    }
-
-    public function reset(): void
-    {
-        $this->viewableGroupIds = [];
-    }
-
-    /**
-     * @return array<mixed>
-     */
-    private function getViewableGroupIds(): array
-    {
-        $key = $this->security->getUser()?->getUserIdentifier() ?? '';
-
-        return $this->viewableGroupIds[$key] ??= $this
-            ->addACLToQuery(
-                $this->getEntityManager()->createQueryBuilder()->select('g.id')->from(QualificationGroup::class, 'g'),
-                'view',
-                QualificationGroup::class,
-                'g',
-            )
-            ->getQuery()
-            ->getSingleColumnResult();
     }
 }
