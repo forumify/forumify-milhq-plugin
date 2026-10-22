@@ -18,7 +18,10 @@ class RankController extends AbstractController
         RankGroupRepository $rankGroupRepository,
     ): Response {
         return $this->render('@ForumifyMilhqPlugin/frontend/rank/rank.html.twig', [
-            'groups' => $rankGroupRepository->findBy([], ['position' => 'ASC']),
+            'groups' => $rankGroupRepository
+                ->addACLToQuery($rankGroupRepository->createQueryBuilder('e')->distinct()->orderBy('e.position', 'ASC'), 'view')
+                ->getQuery()
+                ->getResult(),
             'hasUngroupedRanks' => $rankRepository->count(['group' => null]) > 0,
         ]);
     }

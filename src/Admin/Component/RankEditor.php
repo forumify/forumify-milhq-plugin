@@ -12,7 +12,7 @@ use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 /**
  * @extends AbstractGroupEditor<RankGroup, Rank>
  */
-#[AsLiveComponent('Milhq\\RankEditor', '@ForumifyMilhqPlugin/admin/components/group_editor/group_editor.html.twig')]
+#[AsLiveComponent('Milhq\\RankEditor', '@ForumifyMilhqPlugin/admin/components/group_editor/rank_editor.html.twig')]
 #[IsGranted('milhq.admin.organization.ranks.view')]
 class RankEditor extends AbstractGroupEditor
 {

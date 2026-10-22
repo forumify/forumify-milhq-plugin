@@ -18,7 +18,10 @@ class QualificationController extends AbstractController
         QualificationGroupRepository $qualificationGroupRepository,
     ): Response {
         return $this->render('@ForumifyMilhqPlugin/frontend/qualification/qualification.html.twig', [
-            'groups' => $qualificationGroupRepository->findBy([], ['position' => 'ASC']),
+            'groups' => $qualificationGroupRepository
+                ->addACLToQuery($qualificationGroupRepository->createQueryBuilder('e')->distinct()->orderBy('e.position', 'ASC'), 'view')
+                ->getQuery()
+                ->getResult(),
             'hasUngroupedQualifications' => $qualificationRepository->count(['group' => null]) > 0,
         ]);
     }

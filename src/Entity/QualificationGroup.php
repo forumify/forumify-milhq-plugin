@@ -13,6 +13,8 @@ use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Forumify\Core\Entity\AccessControlledEntityInterface;
+use Forumify\Core\Entity\ACLParameters;
 use Forumify\Milhq\Repository\QualificationGroupRepository;
 
 #[ORM\Entity(repositoryClass: QualificationGroupRepository::class)]
@@ -27,7 +29,7 @@ use Forumify\Milhq\Repository\QualificationGroupRepository;
         new Delete(security: 'is_granted("milhq.admin.organization.qualifications.delete")'),
     ],
 )]
-class QualificationGroup implements GroupInterface
+class QualificationGroup implements GroupInterface, AccessControlledEntityInterface
 {
     use GroupEntityTrait;
 
@@ -55,5 +57,19 @@ class QualificationGroup implements GroupInterface
     public function setQualifications(Collection $qualifications): void
     {
         $this->qualifications = $qualifications;
+    }
+
+    public function getACLPermissions(): array
+    {
+        return ['view'];
+    }
+
+    public function getACLParameters(): ACLParameters
+    {
+        return new ACLParameters(
+            self::class,
+            (string)$this->getId(),
+            'milhq_admin_qualification_list',
+        );
     }
 }
