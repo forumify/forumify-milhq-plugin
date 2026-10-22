@@ -12,6 +12,7 @@ use Forumify\Testing\Factories\Core\UserFactory;
 use PluginTests\Tests\Factories\Milhq\AwardFactory;
 use PluginTests\Tests\Factories\Milhq\Record\AwardRecordFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
 
 use function Zenstruck\Foundry\Persistence\persist;
@@ -36,11 +37,8 @@ class AwardVisibilityTest extends MilhqWebTestCase
         self::assertStringNotContainsString('Hidden Award Group', $text);
         self::assertStringNotContainsString('Hidden Group Award', $text);
 
-        $list = $this->createLiveComponent('AwardList', ['groupId' => $hidden->getId()])
-            ->actingAs($user)
-            ->render()
-            ->toString();
-        self::assertStringNotContainsString('Hidden Group Award', $list);
+        $this->expectException(AccessDeniedHttpException::class);
+        $this->createLiveComponent('AwardList', ['groupId' => $hidden->getId()])->actingAs($user)->render();
     }
 
     public function testUngroupedAwardsAreAlwaysVisible(): void

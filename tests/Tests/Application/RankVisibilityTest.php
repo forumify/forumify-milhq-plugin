@@ -11,6 +11,7 @@ use Forumify\Testing\Factories\Core\RoleFactory;
 use Forumify\Testing\Factories\Core\UserFactory;
 use PluginTests\Tests\Factories\Milhq\RankFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
 
 use function Zenstruck\Foundry\Persistence\persist;
@@ -35,11 +36,8 @@ class RankVisibilityTest extends MilhqWebTestCase
         self::assertStringNotContainsString('Hidden Rank Group', $text);
         self::assertStringNotContainsString('Hidden Group Rank', $text);
 
-        $list = $this->createLiveComponent('RankList', ['groupId' => $hidden->getId()])
-            ->actingAs($user)
-            ->render()
-            ->toString();
-        self::assertStringNotContainsString('Hidden Group Rank', $list);
+        $this->expectException(AccessDeniedHttpException::class);
+        $this->createLiveComponent('RankList', ['groupId' => $hidden->getId()])->actingAs($user)->render();
     }
 
     public function testUngroupedRanksAreAlwaysVisible(): void

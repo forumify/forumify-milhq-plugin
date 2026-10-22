@@ -12,6 +12,7 @@ use Forumify\Testing\Factories\Core\UserFactory;
 use PluginTests\Tests\Factories\Milhq\QualificationFactory;
 use PluginTests\Tests\Factories\Milhq\Record\QualificationRecordFactory;
 use PluginTests\Tests\Factories\Milhq\SoldierFactory;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\UX\LiveComponent\Test\InteractsWithLiveComponents;
 
 use function Zenstruck\Foundry\Persistence\persist;
@@ -36,11 +37,8 @@ class QualificationVisibilityTest extends MilhqWebTestCase
         self::assertStringNotContainsString('Hidden Qualification Group', $text);
         self::assertStringNotContainsString('Hidden Group Qualification', $text);
 
-        $list = $this->createLiveComponent('Milhq\\QualificationList', ['groupId' => $hidden->getId()])
-            ->actingAs($user)
-            ->render()
-            ->toString();
-        self::assertStringNotContainsString('Hidden Group Qualification', $list);
+        $this->expectException(AccessDeniedHttpException::class);
+        $this->createLiveComponent('Milhq\\QualificationList', ['groupId' => $hidden->getId()])->actingAs($user)->render();
     }
 
     public function testUngroupedQualificationsAreAlwaysVisible(): void
