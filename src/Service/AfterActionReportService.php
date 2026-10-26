@@ -86,6 +86,7 @@ class AfterActionReportService
         $this->recordService->createRecord('combat', [
             'afterActionReport' => $aar,
             'sendNotification' => true,
+            'created_at' => $aar->getMission()->getStart(),
             'text' => $aar->getMission()->getCombatRecordText() ?: $this->getDefaultCombatRecordText($aar->getMission()),
             'soldiers' => array_values($present),
         ]);
