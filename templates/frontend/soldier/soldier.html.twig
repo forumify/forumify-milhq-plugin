@@ -77,12 +77,18 @@
                         {% if tis %}
                             <p class="text-bold">{{ 'milhq.soldier.time_in_service'|trans }}</p>
                             <p class="mb-2">
+                                {% if soldier.status.freezeTimeInService|default(false) %}
+                                    <i id="tis-frozen" class="ph ph-pause" title="{{ 'milhq.soldier.time_in_service_frozen'|trans({ status: soldier.status.name }) }}"></i>
+                                {% endif %}
                                 {{ tis }}
                             </p>
                         {% endif %}
                         {% if tig %}
                             <p class="text-bold">{{ 'milhq.soldier.time_in_grade'|trans }}</p>
                             <p class="mb-2">
+                                {% if soldier.status.freezeTimeInGrade|default(false) %}
+                                    <i id="tig-frozen" class="ph ph-pause" title="{{ 'milhq.soldier.time_in_grade_frozen'|trans({ status: soldier.status.name }) }}"></i>
+                                {% endif %}
                                 {{ tig }}
                             </p>
                         {% endif %}

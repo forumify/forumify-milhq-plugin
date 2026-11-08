@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Forumify\Core\Entity\AuditableEntityInterface;
 use Forumify\Core\Entity\IdentifiableEntityTrait;
@@ -51,6 +52,14 @@ class Status implements SortableEntityInterface, AuditableEntityInterface
     #[ORM\ManyToOne(targetEntity: Role::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     public ?Role $role = null;
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    #[Groups('Status')]
+    public bool $freezeTimeInGrade = false;
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    #[Groups('Status')]
+    public bool $freezeTimeInService = false;
 
     public function getName(): string
     {

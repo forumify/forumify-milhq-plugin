@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Service;
 
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\User;
@@ -15,11 +15,13 @@ use Forumify\Milhq\Entity\GroupedEntityInterface;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
 use Forumify\Milhq\Form\Enlistment;
 use Forumify\Milhq\Entity\Soldier;
+use Forumify\Milhq\Entity\Status;
 use Forumify\Milhq\Entity\Unit;
 use Forumify\Milhq\Repository\AssignmentRecordRepository;
 use Forumify\Milhq\Repository\RankRecordRepository;
 use Forumify\Milhq\Repository\ReportInRepository;
 use Forumify\Milhq\Repository\SoldierRepository;
+use Forumify\Milhq\Repository\StatusRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -36,6 +38,7 @@ class SoldierService
         private readonly RankRecordRepository $rankRecordRepository,
         private readonly AssignmentRecordRepository $assignmentRecordRepository,
         private readonly ReportInRepository $reportInRepository,
+        private readonly StatusRepository $statusRepository,
         private readonly TranslatorInterface $translator,
     ) {
     }
@@ -128,8 +131,8 @@ class SoldierService
 
     public function getTimeInService(Soldier $soldier): string
     {
-        $diff = $soldier->getCreatedAt()->diff(new DateTime());
-        return $this->formatTimeInX($diff);
+        $freezingStatuses = $this->statusRepository->findBy(['freezeTimeInService' => true]);
+        return $this->formatTimeInX($this->getUnfrozenTime($soldier, $soldier->getCreatedAt(), $freezingStatuses));
     }
 
     public function getTimeInGrade(Soldier $soldier): string
@@ -153,8 +156,51 @@ class SoldierService
             return '';
         }
 
-        $diff = (new DateTime($lastDate))->diff(new DateTime());
-        return $this->formatTimeInX($diff);
+        $freezingStatuses = $this->statusRepository->findBy(['freezeTimeInGrade' => true]);
+        return $this->formatTimeInX($this->getUnfrozenTime($soldier, new DateTimeImmutable($lastDate), $freezingStatuses));
+    }
+
+    /**
+     * @param array<Status> $freezingStatuses
+     */
+    private function getUnfrozenTime(Soldier $soldier, DateTimeInterface $start, array $freezingStatuses): DateInterval
+    {
+        $now = new DateTimeImmutable();
+        $frozenSeconds = $this->getFrozenSeconds($soldier, $start, $now, $freezingStatuses);
+
+        return $start->diff($now->setTimestamp($now->getTimestamp() - $frozenSeconds));
+    }
+
+    /**
+     * @param array<Status> $freezingStatuses
+     */
+    private function getFrozenSeconds(
+        Soldier $soldier,
+        DateTimeInterface $start,
+        DateTimeInterface $now,
+        array $freezingStatuses,
+    ): int {
+        if (empty($freezingStatuses)) {
+            return 0;
+        }
+
+        $freezingStatusIds = array_map(static fn (Status $status) => $status->getId(), $freezingStatuses);
+        $history = $this->assignmentRecordRepository->findStatusHistory($soldier);
+
+        $frozenSeconds = 0;
+        foreach ($history as $index => $entry) {
+            $next = $history[$index + 1] ?? null;
+            $statusId = $next === null ? $soldier->getStatus()?->getId() : $entry['statusId'];
+            if (!in_array($statusId, $freezingStatusIds, true)) {
+                continue;
+            }
+
+            $frozenFrom = max($start->getTimestamp(), $entry['createdAt']->getTimestamp());
+            $frozenUntil = min($now->getTimestamp(), ($next['createdAt'] ?? $now)->getTimestamp());
+            $frozenSeconds += max(0, $frozenUntil - $frozenFrom);
+        }
+
+        return $frozenSeconds;
     }
 
     private function formatTimeInX(DateInterval $interval): string
@@ -164,6 +210,11 @@ class SoldierService
             $this->translator->trans('date_relative.months', ['count' => $interval->format('%m')]),
             $this->translator->trans('date_relative.days', ['count' => $interval->format('%d')]),
         ]);
+
+        if (empty($parts)) {
+            return $this->translator->trans('milhq.soldier.no_time_served');
+        }
+
         return implode(', ', $parts);
     }
 
