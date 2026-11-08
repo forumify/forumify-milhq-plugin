@@ -24,7 +24,7 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         $soldier = $this->createSoldier(20);
         $this->addStatus($soldier, StatusFactory::createOne(), 10);
 
-        self::assertSame('20 days', $this->service()->getTimeInService($soldier));
+        self::assertSame('20 days', $this->timeInService($soldier));
     }
 
     public function testFrozenPeriodIsExcludedFromTimeInService(): void
@@ -37,7 +37,7 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         $this->addStatus($soldier, $leave, 15);
         $this->addStatus($soldier, $active, 10);
 
-        self::assertSame('15 days', $this->service()->getTimeInService($soldier));
+        self::assertSame('15 days', $this->timeInService($soldier));
     }
 
     public function testCurrentFrozenStatusStopsTheClock(): void
@@ -46,7 +46,7 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         $this->addStatus($soldier, StatusFactory::createOne(), 20);
         $this->addStatus($soldier, StatusFactory::createOne(['freezeTimeInService' => true]), 8);
 
-        self::assertSame('12 days', $this->service()->getTimeInService($soldier));
+        self::assertSame('12 days', $this->timeInService($soldier));
     }
 
     public function testRepeatedFrozenRecordsAreOnlyCountedOnce(): void
@@ -57,7 +57,7 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         $this->addStatus($soldier, $leave, 10);
         $this->addStatus($soldier, $leave, 5);
 
-        self::assertSame('10 days', $this->service()->getTimeInService($soldier));
+        self::assertSame('10 days', $this->timeInService($soldier));
     }
 
     public function testFlagsAreIndependent(): void
@@ -68,8 +68,8 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         $this->addRank($soldier, 20);
         $this->addStatus($soldier, $status, 5);
 
-        self::assertSame('20 days', $this->service()->getTimeInService($soldier));
-        self::assertSame('15 days', $this->service()->getTimeInGrade($soldier));
+        self::assertSame('20 days', $this->timeInService($soldier));
+        self::assertSame('15 days', $this->timeInGrade($soldier));
     }
 
     public function testStatusFromBeforeLastRankRecordOnlyFreezesFromThatRankRecord(): void
@@ -82,7 +82,7 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         $this->addRank($soldier, 12);
         $this->addStatus($soldier, $active, 10);
 
-        self::assertSame('10 days', $this->service()->getTimeInGrade($soldier));
+        self::assertSame('10 days', $this->timeInGrade($soldier));
     }
 
     public function testStatusRecordsBeforeSoldierStartAreIgnored(): void
@@ -93,7 +93,7 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         $this->addStatus($soldier, $leave, 100);
         $this->addStatus($soldier, StatusFactory::createOne(), 15);
 
-        self::assertSame('15 days', $this->service()->getTimeInService($soldier));
+        self::assertSame('15 days', $this->timeInService($soldier));
     }
 
     public function testTimeBeforeFirstStatusRecordCountsAsActive(): void
@@ -101,7 +101,7 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         $soldier = $this->createSoldier(20);
         $this->addStatus($soldier, StatusFactory::createOne(['freezeTimeInService' => true]), 5);
 
-        self::assertSame('15 days', $this->service()->getTimeInService($soldier));
+        self::assertSame('15 days', $this->timeInService($soldier));
     }
 
     public function testBackdatedRecordDoesNotOverrideCurrentStatusForOpenPeriod(): void
@@ -114,7 +114,7 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         $this->addStatus($soldier, $civilian, 6);
 
         self::assertSame($civilian->getId(), $soldier->getStatus()?->getId());
-        self::assertSame('14 days', $this->service()->getTimeInService($soldier));
+        self::assertSame('14 days', $this->timeInService($soldier));
     }
 
     public function testSecondaryAssignmentStatusIsIgnored(): void
@@ -129,7 +129,7 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
             'createdAt' => new DateTime('-10 days'),
         ]);
 
-        self::assertSame('20 days', $this->service()->getTimeInService($soldier));
+        self::assertSame('20 days', $this->timeInService($soldier));
     }
 
     public function testFullyFrozenTimeInGradeShowsZeroDays(): void
@@ -138,7 +138,7 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         $this->addStatus($soldier, StatusFactory::createOne(['freezeTimeInGrade' => true]), 15);
         $this->addRank($soldier, 10);
 
-        self::assertSame('0 days', $this->service()->getTimeInGrade($soldier));
+        self::assertSame('0 days', $this->timeInGrade($soldier));
     }
 
     public function testProfileShowsFrozenIconOnlyForFrozenTimes(): void
@@ -169,9 +169,18 @@ class SoldierTimeFreezeTest extends MilhqWebTestCase
         self::assertSelectorNotExists('#tig-frozen');
     }
 
-    private function service(): SoldierService
+    private function timeInService(Soldier $soldier): string
     {
-        return self::getContainer()->get(SoldierService::class);
+        $service = self::getContainer()->get(SoldierService::class);
+
+        return $service->formatTimeInX($service->getTimeInService($soldier));
+    }
+
+    private function timeInGrade(Soldier $soldier): string
+    {
+        $service = self::getContainer()->get(SoldierService::class);
+
+        return $service->formatTimeInX($service->getTimeInGrade($soldier));
     }
 
     private function createSoldier(int $servedDays): Soldier

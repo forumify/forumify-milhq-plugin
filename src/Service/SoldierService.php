@@ -31,6 +31,9 @@ class SoldierService
     /** @var array<int, Soldier|null> */
     private array $userIdToSoldier = [];
 
+    /** @var array<string, array<int>> */
+    private array $freezingStatusIds = [];
+
     public function __construct(
         private readonly SoldierRepository $soldierRepository,
         private readonly SettingRepository $settingRepository,
@@ -129,63 +132,29 @@ class SoldierService
         });
     }
 
-    public function getTimeInService(Soldier $soldier): string
+    public function getTimeInService(Soldier $soldier): DateInterval
     {
-        $freezingStatuses = $this->statusRepository->findBy(['freezeTimeInService' => true]);
-        return $this->formatTimeInX($this->getUnfrozenTime($soldier, $soldier->getCreatedAt(), $freezingStatuses));
+        return $this->getUnfrozenTime($soldier, $soldier->getCreatedAt(), 'freezeTimeInService');
     }
 
-    public function getTimeInGrade(Soldier $soldier): string
+    public function getTimeInGrade(Soldier $soldier): ?DateInterval
     {
-        $rankRecords = $this->rankRecordRepository
-            ->createQueryBuilder('rr')
-            ->select('MAX(rr.createdAt)')
-            ->where('rr.soldier = :soldier')
-            ->setParameter('soldier', $soldier)
-            ->getQuery()
-            ->getResult()
-        ;
-
-        $lastRankRecord = reset($rankRecords);
-        if (!$lastRankRecord) {
-            return '';
+        $lastRankRecord = $this->rankRecordRepository->findLastBySoldier($soldier);
+        if ($lastRankRecord === null) {
+            return null;
         }
 
-        $lastDate = reset($lastRankRecord);
-        if (!$lastDate) {
-            return '';
-        }
-
-        $freezingStatuses = $this->statusRepository->findBy(['freezeTimeInGrade' => true]);
-        return $this->formatTimeInX($this->getUnfrozenTime($soldier, new DateTimeImmutable($lastDate), $freezingStatuses));
+        return $this->getUnfrozenTime($soldier, $lastRankRecord->getCreatedAt(), 'freezeTimeInGrade');
     }
 
     /**
-     * @param array<Status> $freezingStatuses
+     * @param 'freezeTimeInService'|'freezeTimeInGrade' $freezeField
      */
-    private function getUnfrozenTime(Soldier $soldier, DateTimeInterface $start, array $freezingStatuses): DateInterval
+    private function getUnfrozenTime(Soldier $soldier, DateTimeInterface $start, string $freezeField): DateInterval
     {
+        $freezingStatusIds = $this->getFreezingStatusIds($freezeField);
+        $history = empty($freezingStatusIds) ? [] : $this->assignmentRecordRepository->findStatusHistory($soldier);
         $now = new DateTimeImmutable();
-        $frozenSeconds = $this->getFrozenSeconds($soldier, $start, $now, $freezingStatuses);
-
-        return $start->diff($now->setTimestamp($now->getTimestamp() - $frozenSeconds));
-    }
-
-    /**
-     * @param array<Status> $freezingStatuses
-     */
-    private function getFrozenSeconds(
-        Soldier $soldier,
-        DateTimeInterface $start,
-        DateTimeInterface $now,
-        array $freezingStatuses,
-    ): int {
-        if (empty($freezingStatuses)) {
-            return 0;
-        }
-
-        $freezingStatusIds = array_map(static fn (Status $status) => $status->getId(), $freezingStatuses);
-        $history = $this->assignmentRecordRepository->findStatusHistory($soldier);
 
         $frozenSeconds = 0;
         foreach ($history as $index => $entry) {
@@ -200,11 +169,27 @@ class SoldierService
             $frozenSeconds += max(0, $frozenUntil - $frozenFrom);
         }
 
-        return $frozenSeconds;
+        return $start->diff($now->sub(new DateInterval("PT{$frozenSeconds}S")));
     }
 
-    private function formatTimeInX(DateInterval $interval): string
+    /**
+     * @param 'freezeTimeInService'|'freezeTimeInGrade' $freezeField
+     * @return array<int>
+     */
+    private function getFreezingStatusIds(string $freezeField): array
     {
+        return $this->freezingStatusIds[$freezeField] ??= array_map(
+            static fn (Status $status) => $status->getId(),
+            $this->statusRepository->findBy([$freezeField => true]),
+        );
+    }
+
+    public function formatTimeInX(?DateInterval $interval): string
+    {
+        if ($interval === null) {
+            return '';
+        }
+
         $parts = array_filter([
             $this->translator->trans('date_relative.years', ['count' => $interval->format('%y')]),
             $this->translator->trans('date_relative.months', ['count' => $interval->format('%m')]),

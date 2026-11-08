@@ -113,10 +113,10 @@ class SoldierCommand implements DiscordCommandInterface
             }
         }
 
-        $tis = $this->soldierService->getTimeInService($soldier);
+        $tis = $this->soldierService->formatTimeInX($this->soldierService->getTimeInService($soldier));
         $embed->addField('Time In Service', $tis, true);
 
-        $tig = $this->soldierService->getTimeInGrade($soldier);
+        $tig = $this->soldierService->formatTimeInX($this->soldierService->getTimeInGrade($soldier));
         $embed->addField('Time In Grade', $tig, true);
 
         $lastReportIn = $this->soldierService->getLastReportInDate($soldier);
