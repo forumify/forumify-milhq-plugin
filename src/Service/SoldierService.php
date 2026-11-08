@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Forumify\Milhq\Service;
 
 use DateInterval;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Forumify\Core\Entity\SortableEntityInterface;
 use Forumify\Core\Entity\User;
@@ -15,11 +15,13 @@ use Forumify\Milhq\Entity\GroupedEntityInterface;
 use Forumify\Milhq\Entity\Record\AssignmentRecord;
 use Forumify\Milhq\Form\Enlistment;
 use Forumify\Milhq\Entity\Soldier;
+use Forumify\Milhq\Entity\Status;
 use Forumify\Milhq\Entity\Unit;
 use Forumify\Milhq\Repository\AssignmentRecordRepository;
 use Forumify\Milhq\Repository\RankRecordRepository;
 use Forumify\Milhq\Repository\ReportInRepository;
 use Forumify\Milhq\Repository\SoldierRepository;
+use Forumify\Milhq\Repository\StatusRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -29,6 +31,9 @@ class SoldierService
     /** @var array<int, Soldier|null> */
     private array $userIdToSoldier = [];
 
+    /** @var array<string, array<int>> */
+    private array $freezingStatusIds = [];
+
     public function __construct(
         private readonly SoldierRepository $soldierRepository,
         private readonly SettingRepository $settingRepository,
@@ -36,6 +41,7 @@ class SoldierService
         private readonly RankRecordRepository $rankRecordRepository,
         private readonly AssignmentRecordRepository $assignmentRecordRepository,
         private readonly ReportInRepository $reportInRepository,
+        private readonly StatusRepository $statusRepository,
         private readonly TranslatorInterface $translator,
     ) {
     }
@@ -126,44 +132,74 @@ class SoldierService
         });
     }
 
-    public function getTimeInService(Soldier $soldier): string
+    public function getTimeInService(Soldier $soldier): DateInterval
     {
-        $diff = $soldier->getCreatedAt()->diff(new DateTime());
-        return $this->formatTimeInX($diff);
+        return $this->getUnfrozenTime($soldier, $soldier->getCreatedAt(), 'freezeTimeInService');
     }
 
-    public function getTimeInGrade(Soldier $soldier): string
+    public function getTimeInGrade(Soldier $soldier): ?DateInterval
     {
-        $rankRecords = $this->rankRecordRepository
-            ->createQueryBuilder('rr')
-            ->select('MAX(rr.createdAt)')
-            ->where('rr.soldier = :soldier')
-            ->setParameter('soldier', $soldier)
-            ->getQuery()
-            ->getResult()
-        ;
+        $lastRankRecord = $this->rankRecordRepository->findLastBySoldier($soldier);
+        if ($lastRankRecord === null) {
+            return null;
+        }
 
-        $lastRankRecord = reset($rankRecords);
-        if (!$lastRankRecord) {
+        return $this->getUnfrozenTime($soldier, $lastRankRecord->getCreatedAt(), 'freezeTimeInGrade');
+    }
+
+    /**
+     * @param 'freezeTimeInService'|'freezeTimeInGrade' $freezeField
+     */
+    private function getUnfrozenTime(Soldier $soldier, DateTimeInterface $start, string $freezeField): DateInterval
+    {
+        $freezingStatusIds = $this->getFreezingStatusIds($freezeField);
+        $history = empty($freezingStatusIds) ? [] : $this->assignmentRecordRepository->findStatusHistory($soldier);
+        $now = new DateTimeImmutable();
+
+        $frozenSeconds = 0;
+        foreach ($history as $index => $entry) {
+            $next = $history[$index + 1] ?? null;
+            $statusId = $next === null ? $soldier->getStatus()?->getId() : $entry['statusId'];
+            if (!in_array($statusId, $freezingStatusIds, true)) {
+                continue;
+            }
+
+            $frozenFrom = max($start->getTimestamp(), $entry['createdAt']->getTimestamp());
+            $frozenUntil = min($now->getTimestamp(), ($next['createdAt'] ?? $now)->getTimestamp());
+            $frozenSeconds += max(0, $frozenUntil - $frozenFrom);
+        }
+
+        return $start->diff($now->sub(new DateInterval("PT{$frozenSeconds}S")));
+    }
+
+    /**
+     * @param 'freezeTimeInService'|'freezeTimeInGrade' $freezeField
+     * @return array<int>
+     */
+    private function getFreezingStatusIds(string $freezeField): array
+    {
+        return $this->freezingStatusIds[$freezeField] ??= array_map(
+            static fn (Status $status) => $status->getId(),
+            $this->statusRepository->findBy([$freezeField => true]),
+        );
+    }
+
+    public function formatTimeInX(?DateInterval $interval): string
+    {
+        if ($interval === null) {
             return '';
         }
 
-        $lastDate = reset($lastRankRecord);
-        if (!$lastDate) {
-            return '';
-        }
-
-        $diff = (new DateTime($lastDate))->diff(new DateTime());
-        return $this->formatTimeInX($diff);
-    }
-
-    private function formatTimeInX(DateInterval $interval): string
-    {
         $parts = array_filter([
             $this->translator->trans('date_relative.years', ['count' => $interval->format('%y')]),
             $this->translator->trans('date_relative.months', ['count' => $interval->format('%m')]),
             $this->translator->trans('date_relative.days', ['count' => $interval->format('%d')]),
         ]);
+
+        if (empty($parts)) {
+            return $this->translator->trans('milhq.soldier.no_time_served');
+        }
+
         return implode(', ', $parts);
     }
 

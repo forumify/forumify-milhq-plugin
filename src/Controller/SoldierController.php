@@ -31,8 +31,8 @@ class SoldierController extends AbstractController
             'awards' => $this->getAwardCounts($soldier),
             'reportInDate' => $this->soldierService->getLastReportInDate($soldier),
             'secondaryAssignments' => $this->getSecondaryUnits($soldier),
-            'tig' => $this->soldierService->getTimeInGrade($soldier),
-            'tis' => $this->soldierService->getTimeInService($soldier),
+            'tig' => $this->soldierService->formatTimeInX($this->soldierService->getTimeInGrade($soldier)),
+            'tis' => $this->soldierService->formatTimeInX($this->soldierService->getTimeInService($soldier)),
             'supervisors' => $this->soldierService->getSupervisors($soldier),
             'equipment' => $this->soldierService->getEquipment($soldier),
         ]);

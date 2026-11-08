@@ -136,6 +136,10 @@ milhq:
             crud:
                 single: 'status'
                 plural: 'statuses'
+            freeze_time_in_grade: 'Freeze time in grade'
+            freeze_time_in_grade_help: 'Time spent in this status does not count towards time in grade. Applies retroactively to all soldiers.'
+            freeze_time_in_service: 'Freeze time in service'
+            freeze_time_in_service_help: 'Time spent in this status does not count towards time in service. Applies retroactively to all soldiers.'
         specialty:
             crud:
                 single: 'specialty'
@@ -212,6 +216,9 @@ milhq:
         length_in_service: 'Length in service'
         time_in_service: 'Time in service'
         time_in_grade: 'Time in grade'
+        time_in_service_frozen: 'Time in service is frozen because the current status is {status}.'
+        time_in_grade_frozen: 'Time in grade is frozen because the current status is {status}.'
+        no_time_served: '0 days'
         assignment: 'Assignment'
         profile: 'Profile'
         awards: 'Awards'

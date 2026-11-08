@@ -8,6 +8,7 @@ use Forumify\Admin\Form\UserRoleType;
 use Forumify\Milhq\Entity\Status;
 use Forumify\Plugin\Service\PluginVersionChecker;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -34,6 +35,16 @@ class StatusType extends AbstractType
         $builder
             ->add('name', TextType::class)
             ->add('color', ColorType::class, [
+                'required' => false,
+            ])
+            ->add('freezeTimeInGrade', CheckboxType::class, [
+                'help' => 'milhq.admin.status.freeze_time_in_grade_help',
+                'label' => 'milhq.admin.status.freeze_time_in_grade',
+                'required' => false,
+            ])
+            ->add('freezeTimeInService', CheckboxType::class, [
+                'help' => 'milhq.admin.status.freeze_time_in_service_help',
+                'label' => 'milhq.admin.status.freeze_time_in_service',
                 'required' => false,
             ])
         ;
