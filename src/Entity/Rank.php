@@ -141,6 +141,12 @@ class Rank implements GroupedEntityInterface, AuditableEntityInterface
         $this->group = $group;
     }
 
+    public function compare(Rank $other): int
+    {
+        return [$this->group?->getPosition() ?? PHP_INT_MAX, $this->getPosition()]
+            <=> [$other->group?->getPosition() ?? PHP_INT_MAX, $other->getPosition()];
+    }
+
     public function getIdentifierForAudit(): string
     {
         return (string)$this->getId();
