@@ -178,7 +178,7 @@ class CourseClassView extends AbstractController
         }
 
         $rank = $soldier->getRank();
-        return $rank !== null && $minimumRank->getPosition() >= $rank->getPosition();
+        return $rank !== null && $rank->compare($minimumRank) <= 0;
     }
 
     public function isSignedUpAsStudent(): bool
